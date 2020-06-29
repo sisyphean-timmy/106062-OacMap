@@ -1,0 +1,74 @@
+{
+    "name": "ocamap",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "serve": "pwa-asset-generator -t png \"./src/assets/favicon.png\" \"public/img/icon\" && vue-cli-service serve",
+        "build": "vue-cli-service build && pwa-asset-generator -t png \"./src/assets/favicon.png\" \"dist/img/icon\""
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-svg-core": "^1.2.18",
+        "@fortawesome/free-brands-svg-icons": "^5.8.2",
+        "@fortawesome/free-regular-svg-icons": "^5.8.2",
+        "@fortawesome/free-solid-svg-icons": "^5.8.2",
+        "@fortawesome/vue-fontawesome": "^0.1.6",
+        "@mapbox/leaflet-pip": "^1.1.0",
+        "@types/arcgis-js-api": "^4.13.0",
+        "@types/esri-leaflet": "^2.1.6",
+        "@types/googlemaps": "^3.39.3",
+        "@types/leaflet": "^1.5.12",
+        "better-scroll": "^1.15.2",
+        "color-convert": "^2.0.1",
+        "core-js": "^3.6.4",
+        "element-ui": "^2.12.0",
+        "esri-leaflet": "^2.4.1",
+        "leaflet": "^1.6.0",
+        "leaflet-filelayer": "^1.2.0",
+        "leaflet-geometryutil": "^0.9.3",
+        "leaflet-velocity": "^1.7.0",
+        "leaflet.markercluster": "^1.4.1",
+        "loader": "^2.1.1",
+        "normalize.css": "^8.0.1",
+        "proj4": "^2.5.0",
+        "proj4leaflet": "^1.0.2",
+        "register-service-worker": "^1.6.2",
+        "togeojson": "^0.16.0",
+        "typescript": "^3.6.3",
+        "uuid": "^3.3.3",
+        "vue": "^2.6.10",
+        "vue-color": "^2.7.1",
+        "vue-draggable-resizable": "^2.1.0",
+        "vue-pull-up-panel": "git+https://github.com/islxyqwe/vue-pull-up-panel.git",
+        "vue-slicksort": "^1.1.3",
+        "vuex": "^3.1.1",
+        "wicket": "^1.3.4"
+    },
+    "devDependencies": {
+        "@vue/cli-plugin-babel": "^4.3.1",
+        "@vue/cli-plugin-pwa": "^4.2.3",
+        "@vue/cli-service": "^3.11.0",
+        "babel-plugin-transform-remove-console": "^6.9.4",
+        "favicons-webpack-plugin": "^1.0.2",
+        "mocha": "^6.2.2",
+        "msdeploy": "^1.2.1",
+        "node-sass": "^4.13.1",
+        "pug": "^2.0.4",
+        "pug-html-loader": "^1.1.5",
+        "pug-plain-loader": "^1.0.0",
+        "pwa-asset-generator": "^3.1.1",
+        "sass-loader": "^7.1.0",
+        "vue-cli-plugin-element": "^1.0.1",
+        "vue-template-compiler": "^2.6.10",
+        "webpack": "^4.43.0",
+        "webpack-bundle-analyzer": "^3.8.0"
+    },
+    "postcss": {
+        "plugins": {
+            "autoprefixer": {}
+        }
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions"
+    ]
+}

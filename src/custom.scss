@@ -1,0 +1,164 @@
+/*
+Theme COLOR
+(淺藍) #02bae7;
+*/
+
+$primary: #56c5bb;
+$warning: #e6a23c;
+$danger:#F56C6C;
+$success:#67C23A;
+$info: #C0C4CC;
+//- base
+$black:#2e3539;
+$white:#F5F7FA;
+
+/*
+DARK THEME
+*/
+
+// $text:$white;
+// $aux:$black;
+
+/*
+light theme
+*/
+
+$text:$black;
+$aux:$white;
+// asideBar custom
+$asideBarBgColor:#0a2234; // #071f2f
+$asideBarColor:$white;
+// toolBar custom
+$toolBarBgColor:$black;
+$toolBarColor:$white;
+
+/*
+mixin
+*/
+
+@mixin boxShadow {
+    box-shadow: 0 0 5px 3px rgba(0, 0, 0, .2);
+}
+
+html,
+body {
+    font-size: 14px;
+    overflow: hidden;
+    @media screen and (max-width: 768px) {
+        font-size: 12px;
+    }
+}
+
+* {
+    font-family: 'Microsoft JhengHei', 'Microsoft YaHei UI', 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-rendering: optimizelegibility;
+    letter-spacing: normal;
+}
+
+
+/* width */
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+
+/* Track */
+
+ ::-webkit-scrollbar-track {
+    // background: #f8f8f8;
+    background: rgba($primary, 0.1);
+}
+
+
+/* Handle */
+
+ ::-webkit-scrollbar-thumb {
+    // background: #888;
+    background: rgba($primary, 0.8);
+}
+
+
+/* Handle on hover */
+
+ ::-webkit-scrollbar-thumb:hover {
+    // background: #555;
+    background: rgba($primary, 0.8);
+}
+
+
+/*
+slide
+*/
+
+.slide-enter-active {
+    transition: all .1s ease;
+}
+
+.slide-leave-active {
+    transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.slide-enter,
+.slide-leave-to {
+    transform: translateX(-150%);
+    // opacity: 0;
+}
+
+
+/*
+fade
+*/
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .2s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+
+/*
+slide-fade
+*/
+
+.slide-fade-enter-active {
+    transition: all .1s ease;
+}
+
+.slide-fade-leave-active {
+    transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+    transform: translateX(-150%);
+    opacity: 0;
+}
+
+
+/*
+slide-fade-up
+*/
+
+.slide-fade-up-enter-active {
+    transition: all .2s ease-in-out;
+}
+
+.slide-fade-up-leave-active {
+    transition: all .23s cubic-bezier(1.2, 0.5, 0.8, 1.0);
+}
+
+.slide-fade-up-enter,
+.slide-fade-up-leave-to {
+    transform: translateY(150%);
+    opacity: 0;
+}
