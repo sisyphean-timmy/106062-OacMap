@@ -1,0 +1,290 @@
+/*
+Write your variables here. All available variables can be
+found in element-ui/packages/theme-chalk/src/common/var.scss.
+For example, to overwrite the theme color:
+*/
+
+$--color-primary: $primary;
+
+/* icon font path, required */
+
+$--font-path: '~element-ui/lib/theme-chalk/fonts';
+@import "~element-ui/packages/theme-chalk/src/index";
+
+/*
+notification
+*/
+
+.el-notification {
+    white-space: pre-line;
+    background-color: $aux; //- rgba(255, 255, 255, 0.8)
+    color: $text;
+    &__group{
+        display: flex;
+        align-items: center;
+    }
+}
+
+
+/*
+LOADING
+*/
+
+.el-loading-spinner {
+    font-size: 2rem;
+    font-weight: bolder;
+    * {
+        color: $white !important;
+    }
+}
+
+// .el-loading-mask {
+//     background-color: rgba($text, 0.4) !important;
+// }
+body.el-loading-parent--relative {
+    position: initial !important;
+}
+
+
+/*
+INPUT
+*/
+
+.el-input+.el-button {
+    border: 0 !important;
+}
+
+.el-button+.el-input {
+    .el-input__inner {
+        border-radius: 0;
+    }
+}
+
+.el-input-group__prepend {
+    border: 0;
+    background: none;
+}
+
+.el-input__prefix {
+    display: flex;
+    align-items: center;
+    left: 0.5rem;
+}
+
+.el-input__suffix {
+    right: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.el-input-number__decrease,
+.el-input-number__increase {
+    background: none;
+    border: 0;
+}
+
+
+/*
+POPOVER
+*/
+
+.el-popper {
+    max-width: 50%;
+    .el-select-dropdown__item {
+        white-space: normal;
+        height: auto;
+        &.hover {
+            font-weight: bolder;
+        }
+    }
+}
+
+
+/*
+CHECKBOX
+*/
+
+.el-checkbox {
+    color: darken($text, 10);
+}
+
+
+/*
+TAB
+*/
+
+.el-tabs__header {
+    margin: 1rem 0;
+}
+
+
+/*
+MESSAGE
+*/
+
+.el-message {
+    min-width: 350px;
+    margin-top: 2.5rem;
+}
+
+.el-message-box {
+    width: 100%;
+    max-width: 350px;
+    &__wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    &__message {
+        white-space: pre-line;
+    }
+}
+
+
+/*
+SELECT
+*/
+
+.el-select {
+    width: 100%;
+}
+
+
+/*
+COLLAPSE
+*/
+
+.el-collapse-item {
+    &__wrap,
+    &__header {
+        background-color: transparent;
+        padding: 0 1rem;
+    }
+    &__header {
+        height: 4rem;
+        font-size: 1.1rem;
+        background-color: transparent;
+        color: $text;
+        transition: all 0.3s ease;
+    }
+    &.is-active {
+        // background-color: rgba($info, 0.1);
+        background-color: #fff;
+        .el-collapse-item__header {
+            font-size: 1.3rem;
+        }
+    }
+    &__content {
+        font-size: 1rem;
+        padding-bottom: 2rem;
+        color: $text;
+    }
+}
+
+
+/*
+ALERT
+*/
+
+.el-alert {
+    padding: 0.5rem;
+}
+
+
+/*
+DIALOG
+*/
+
+.el-dialog {
+    max-width: 600px;
+    width: 90%;
+    box-shadow: unset;
+    background-color: transparent;
+    overflow: auto;
+    // max-height: 70vh;
+    &__headerbtn &__close {
+        // color: $danger;
+        // font-weight: bolder;
+        background: $danger;
+        border-radius: 100%;
+        color: #fff;
+    }
+    &__title,
+    &__body,
+    &__footer {
+        color: $white;
+    }
+    &__body {
+        padding: 0.5rem 1.2rem 1.2rem 1.2rem !important;
+    }
+    &__wrapper {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+}
+
+.el-card {
+    background-color: $aux;
+    color: $text;
+    &__body {
+        padding: 1rem;
+    }
+}
+
+.el-switch {
+    &__label {
+        color: $text;
+    }
+}
+
+.el-radio {
+    &__label {
+        color: $text;
+    }
+}
+
+
+/*
+DRAWER
+*/
+
+.el-drawer__header {
+    margin-bottom: 0;
+}
+
+
+/*
+el-upload
+*/
+
+.el-upload {
+    width: 100%;
+    margin: 1rem 0px;
+}
+
+.el-upload-dragger {
+    width: 100%;
+}
+
+
+/* carousel */
+
+.el-carousel {
+    &__container {
+        height: 100vh;
+    }
+    &__mask {
+        display: none;
+    }
+    &__item {
+        height: auto;
+    }
+}
+
+
+/* .el-image IE fix */
+
+.el-image__inner--center {
+    top: auto;
+    left: auto;
+    transform: none;
+}
