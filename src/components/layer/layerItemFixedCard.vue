@@ -14,7 +14,7 @@
 				strong(style="line-height:200%;")
 					div(style="display:flex;align-items:center;")
 						span {{layer.title}}
-				div(ref="buttonNotTriggerShowOpacity" style="display:flex;align-items:center;")
+				div(ref="outterButton" style="display:flex;align-items:center;")
 					//- 開關
 					el-switch(
 						:value="layer.visible"
@@ -83,7 +83,7 @@ export default {
 			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
 		}),
 		handleOpacitySlider(evt){
-			if(evt.path.includes(this.$refs.buttonNotTriggerShowOpacity)) return
+			if(this.$refs.outterButton.contains(evt.target)) return
 			this.detailVisibility = !this.detailVisibility
 		},
 		openDataSource(dataUrl){

@@ -91,7 +91,6 @@ export default {
     getters: {
         state: state => key => state[key],
         isMobile: state => state.screenWidth < 576,
-        windyOption: state => state.windyOption,
-        isIE: state => document.documentMode,
+        windyOption: state => state.windyOption
     }
 }

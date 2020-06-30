@@ -7,6 +7,7 @@
 	)
 		
 		.dragger(
+			v-if="!isIE"
 			v-handle
 			:style="isRetrival?'color:red;':''"
 			@click.stop="emitDeActiveLayer(layer)"
@@ -47,8 +48,7 @@
 							.color-legendRGBStr(:style="`backgroundColor:${colorModel};`")
 							span {{layer.title}}
 
-					div(ref="buttonNotTriggerShowOpacity" style="display:flex;align-items:center;")
-						//- 開關
+					div(ref="outterButton" style="display:flex;align-items:center;")
 						el-switch(
 							:value="layer.visible"
 							:title="layer.visible?'關閉圖層':'開啟圖層'"
@@ -85,9 +85,7 @@ import { HandleDirective } from 'vue-slicksort'
 
 let colorConverter = (!document.documentMode) ? require("color-convert") : "";
 
-/**
- * @see https://www.npmjs.com/package/vue-color
- */
+/** @see https://www.npmjs.com/package/vue-color */
 import {Slider as colorSliderPicker} from "vue-color"
 
 /**
@@ -128,7 +126,7 @@ export default {
 			rootState:"common/common/state"
 		}),
 		isIE(){
-			return this.rootState("isIE")
+			return Boolean(document.documentMode)
 		},
 		dragAvaliable(){
 			return this.layer.type === "geojson"
@@ -140,7 +138,13 @@ export default {
 					return `#efefef`
 				}
 
-				if(!colorConverter) return `#000000`
+				if(!colorConverter){
+					if(this.isIE){
+						return `rgb(${this.layer.legendRGBStr})`
+					}
+					return `#000000`
+				} 
+
 				let rgb = this.layer.legendRGBStr.split(",")
 				let hslArr = colorConverter.rgb.hsl(rgb)
 				let result = {
@@ -185,14 +189,8 @@ export default {
 				transform: `scale(${ this.handleOpacityFloat },1)`
 			}
 		},
-		mapScale(){
-			return this.rootState('scale')
-		},
 		isSimpleStyle(){
 			return this.status === 'simple'
-		},
-		mapScale(){
-			return this.rootState('scale')
 		},
 		isOutScaleStyle(){
 			return this.status === 'outScale'
@@ -203,7 +201,7 @@ export default {
 			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
 		}),
 		handleOpacitySlider(evt){
-			if(evt.path.includes(this.$refs.buttonNotTriggerShowOpacity)) return
+			if(this.$refs.outterButton.contains(evt.target)) return
 			this.detailVisibility = !this.detailVisibility
 		},
 		emitDeActiveLayer(layer){

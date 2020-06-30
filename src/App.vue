@@ -9,7 +9,7 @@
 			@click="SET_WINDY_OPTION({visible:false})"
 		) 
 			font-awesome-icon(icon="chevron-left" fixed-width tansform="left-2")
-			strong 返回 {{test}}
+			strong 返回
 
 		iframe#windy(
 			:style="`height:${ifh}px`"
@@ -82,7 +82,7 @@ export default {
 				zoom: 8
 			})
 	
-            // 將 vue template UI DOM 掛載入 leaflet map 的 UI DOM
+			// 將 vue template UI DOM 掛載入 leaflet map 的 UI DOM
 			if(!this.isMobile){
 				let map = this.$InitIns.map.getContainer()
 				map.querySelector('.leaflet-bottom.leaflet-left').appendChild(this.$refs.bl)
@@ -105,12 +105,12 @@ export default {
 				const lng = locArr[1]
 				const zoom = locArr[2]
 				this.$InitIns.map.setView({lat,lng},zoom)
-            } 
-            
-            // 初始化相關事件
-            this.eventHandler()
+			} 
+			
+			// 初始化相關事件
+			this.eventHandler()
 
-            // 開啟圖層側邊欄
+			// 開啟圖層側邊欄
 			!this.isMobile && this.SET_CARD_VISIBLE({key:'layer',bool:true})
 
 			await this.initAfterMapMounted(this) // Action after mount
@@ -204,9 +204,11 @@ export default {
 }
 
 #viewDiv {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
+	right: auto;
+	bottom: auto;
 	padding: 0;
 	margin: 0;
 	height: 100%;

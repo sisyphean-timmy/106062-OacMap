@@ -275,3 +275,12 @@ el-upload
         height: auto;
     }
 }
+
+
+/* .el-image IE fix */
+
+.el-image__inner--center {
+    top: auto;
+    left: auto;
+    transform: none;
+}

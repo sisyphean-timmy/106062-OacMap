@@ -63,7 +63,7 @@
 					v-for="layer,index in layerListModel"
 					:key="`${layer.id}`"
 					:index="index"
-					v-loading="updatingLayerList.includes(layer.id)"
+					v-loading="updatingLayerList.indexOf(layer.id)>-1"
 				)
 					layerItemCard.slickList__card(
 						:class="getStatusClassName(layer)"
@@ -121,7 +121,7 @@ export default {
 			freezedLayer: 'layer/layer/freezedLayer'
 		}),
 		isIE(){
-			return this.rootState("isIE")
+			return Boolean(document.documentMode)
 		},
 		activedSubject(){
 			return this.rootState("activedSubject")
@@ -221,10 +221,10 @@ export default {
 		},
 		getStatusClassName(layer){
 			return {
-				'slickList__card--matched-keyword':this.matchKeywordLayers.includes(layer),
+				'slickList__card--matched-keyword':this.matchKeywordLayers.indexOf(layer)>-1,
 				'slickList__card--last-move':(this.lastDraggingLyrPtr === layer),
 				'slickList__card--outScale':(layer.status==='outScale'),
-				'slickList__card--simple':(layer.status==='simple') || (this.matchKeywordLayers.length>0 && !this.matchKeywordLayers.includes(layer))
+				'slickList__card--simple':(layer.status==='simple') || (this.matchKeywordLayers.length>0 && !this.matchKeywordLayers.indexOf(layer)>-1)
 			}
 		}
 	}

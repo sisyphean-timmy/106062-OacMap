@@ -30,6 +30,7 @@ interface layer {
  * 統一化屬性
  */
 interface IQueryResult{
+    layerId:layer["id"]
     layerTitle:layer["title"]
     layerCatelog:layer["catelog"]
     dataId: string

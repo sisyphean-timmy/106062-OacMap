@@ -26,7 +26,7 @@ export default {
         /**
          * 更新一般圖層屬性
          * @param {string} id
-         * @param {object} payload 已定義的欲更新之圖層屬性(選填)
+         * @param {object} payload 已定義的欲更新之圖層屬性
          */
         UPDATE_LAYER_OPTIONS: (state, { id, payload }) => {
             try {
@@ -45,12 +45,12 @@ export default {
         /**
          * 更新底圖圖層屬性
          * @param {string} id
-         * @param {object} payload 已定義的欲更新之圖層屬性(選填)
+         * @param {object} payload 已定義的欲更新之圖層屬性
          */
         UPDATE_BASELAYER_OPTIONS: (state, { id, payload }) => {
             try {
                 /** 底圖屬性的 更新 只作用在 "可見的圖層" */
-                if (Object.keys(payload).includes('visible')) {
+                if (Object.keys(payload).indexOf('visible') > -1) {
                     state['baseLayer'].forEach(bLyr => bLyr.visible = bLyr.id === id)
                     delete payload['visible']
                 }
@@ -75,13 +75,13 @@ export default {
             const activedSubject = rg["common/common"]["activedSubject"]
             const subjects = rg["common/common"]["subjects"]
             const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => /filelayer/ig.test(l.type) || /geojson|clusterMark/ig.test(l.type) && l.catelog.some(c => cateLogs.includes(c.value)))
+            return state.layer.filter(l => /filelayer/ig.test(l.type) || /geojson|clusterMark/ig.test(l.type) && l.catelog.some(c => cateLogs.indexOf(c.value) > -1))
         },
         freezedLayer: (state, g, rg) => {
             const activedSubject = rg["common/common"]["activedSubject"]
             const subjects = rg["common/common"]["subjects"]
             const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => !(/filelayer|geojson|clusterMark/ig.test(l.type)) && l.catelog.some(c => cateLogs.includes(c.value)))
+            return state.layer.filter(l => !(/filelayer|geojson|clusterMark/ig.test(l.type)) && l.catelog.some(c => cateLogs.indexOf(c.value) > -1))
         }
     }
 }

@@ -127,7 +127,7 @@ export default {
                 }
             }
             &__button{
-                flex:0 0 10%;
+                flex:0 1 80px;
                 display: flex;
                 align-items: center;
                 justify-content: space-around;

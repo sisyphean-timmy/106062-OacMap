@@ -131,7 +131,7 @@ export default {
 			return !this.layerActivedId && !this.currentView
 		},
 		isIE(){
-			return document.documentMode //- IE8+ has the porperty
+			return Boolean(document.documentMode)
 		},
 		...mapGetters({
 			state:'layer/layer/state',
@@ -235,10 +235,10 @@ export default {
 		},
 		getStatusClassName(layer){
 			return {
-				'slickList__card--matched-keyword':this.matchKeywordLayers.includes(layer),
+				'slickList__card--matched-keyword':this.matchKeywordLayers.indexOf(layer)>-1,
 				'slickList__card--last-move':(this.lastDraggingLyrPtr === layer),
 				'slickList__card--outScale':(layer.status==='outScale'),
-				'slickList__card--simple':(layer.status==='simple') || (this.matchKeywordLayers.length>0 && !this.matchKeywordLayers.includes(layer))
+				'slickList__card--simple':(layer.status==='simple') || (this.matchKeywordLayers.length>0 && !this.matchKeywordLayers.indexOf(layer)>-1)
 			}
 		}
 	}
