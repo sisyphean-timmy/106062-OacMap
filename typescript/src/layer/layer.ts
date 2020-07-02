@@ -1,6 +1,6 @@
 
 import * as layerDef from "../layerDef.json"
-import * as iconBase64 from "../iconBase64.json"
+import * as layerIcon from "../layerIcon.json"
 
 const uuidv4:()=>string = require('uuid/v4')
 
@@ -16,8 +16,8 @@ import "leaflet.markercluster" // leaflet.MarkerClusterGroup
 import "proj4leaflet"
 import "leaflet-geometryutil"
 require("leaflet-filelayer")()
-
-import {Init} from "../init/init"
+import {Windy} from "../velocity/windy"
+import { Init } from '../init/init';
 
 /**
  * 熱力圖
@@ -506,8 +506,11 @@ export class Layer {
 
             if(!matched_catelog.length) console.error(`無法取得${lyr.title}的分類`)
 
-            // 從定義取得檔案
+            // 從定義取得檔案 - 暫不快取
             const dataFromDef = await (await fetch(`layers/${lyr.filename}`,{
+                headers: {
+                    'Cache-Control': 'no-cache'
+                },
                 method:"get"
             })).json()
 
@@ -551,7 +554,7 @@ export class Layer {
                     break
                 case "velocity":
                     let vlyr = await this.createVelocityLayer(
-                        dataFromDef.test,
+                        dataFromDef,
                         lyr.layerOption
                     )
                     
@@ -572,7 +575,7 @@ export class Layer {
                             iconSize: [30, 30],
                             iconAnchor: [10, 41],
                             popupAnchor: [2, -40],
-                            iconUrl: iconBase64['default'][lyr.layerOption.icon],
+                            iconUrl: layerIcon['default'][lyr.layerOption.icon],
                             // shadowSize:[28, 35],
                             // shadowAnchor: [14, 45],
                             // shadowUrl:"data:image/png;base64,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"
@@ -581,7 +584,7 @@ export class Layer {
                     })
 
                     cmklyr.id = uuidv4()
-                    cmklyr.icon = iconBase64['default'][lyr.layerOption.icon]
+                    cmklyr.icon = layerIcon['default'][lyr.layerOption.icon]
                     cmklyr.type = lyr.type
                     cmklyr.title = lyr.title
                     cmklyr.visible = lyr.visible
@@ -608,7 +611,53 @@ export class Layer {
      * @see https://www.cnblogs.com/tiandi/p/10124095.html
      */
     createVelocityLayer(data:any,option?:any):L.Layer & layer{
+        
+        // console.log(new Windy(option))
 
+        /** 創建 custom canvas layer */
+        const CustomCanvasLayer = leaflet.Layer.extend({
+            onAdd: function(map) {
+                this._map = map
+
+                this._canvas = leaflet.DomUtil.create("canvas", "CustomCanvasLayer")
+
+                const size = map.getSize()
+                this._canvas.style.width = `${size.x}px`
+                this._canvas.style.height = `${size.y}px`
+
+                map.getPane("overlayPane").appendChild(this._canvas)
+        
+                this._update()
+                
+                map.on("dragstart",()=>{})
+                map.on("dragend",()=>{})
+                map.on("zoomstart",()=>{})
+                map.on('zoomend', this._update)
+            },
+            onRemove: function(map) {
+                console.log("CustomCanvasLayer remove")
+                leaflet.DomUtil.remove(this._canvas)
+
+                map.off('zoomend', this._update)
+            },
+            _update: function(){
+                console.log("CustomCanvasLayer update")
+                const tl = this._map.containerPointToLayerPoint([0, 0])
+                leaflet.DomUtil.setPosition(this._canvas,tl)
+            },
+            /** create windy */
+            _initWindy:function(){
+                if(!this._Windy){
+                    const WindyConstructor:any = Windy
+                    this._Windy = new WindyConstructor(option)
+                    this._context = this._canvas.getContext("2d")
+                }
+
+            }
+        })
+
+        console.log(new CustomCanvasLayer().addTo(this.InitIns.map))
+        
         let vlyr = leaflet.velocityLayer({
             ...option,
             ...{

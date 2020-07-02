@@ -46,6 +46,7 @@
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=漁業資源保育",
             "visible": false,
             "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(205, 147, 251)",
@@ -57,6 +58,7 @@
             "filename": "4.json",
             "visible": true,
             "type": "geojson",
+            "tag": [],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(228, 214, 161)",
@@ -68,6 +70,7 @@
             "filename": "5.json",
             "visible": true,
             "type": "geojson",
+            "tag": [],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(228, 155, 161)",
@@ -80,6 +83,7 @@
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=漁業資源保育",
             "visible": false,
             "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(235, 244, 154)",
@@ -91,6 +95,7 @@
             "filename": "6.json",
             "visible": false,
             "type": "geojson",
+            "tag": [],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(164, 244, 153)",
@@ -102,6 +107,7 @@
             "filename": "8.json",
             "visible": true,
             "type": "geojson",
+            "tag": [],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(50, 147, 126)",
@@ -113,6 +119,7 @@
             "filename": "1.json",
             "visible": false,
             "type": "geojson",
+            "tag": ["A"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(255, 0, 0)",
@@ -125,6 +132,7 @@
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?pn=10",
             "visible": true,
             "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(51, 136, 255)",
@@ -137,6 +145,7 @@
             "dataSet": "https://data.gov.tw/dataset/126692",
             "visible": true,
             "type": "geojson",
+            "tag": [],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(51, 136, 255)",
@@ -149,6 +158,7 @@
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=其他",
             "visible": true,
             "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(103, 58, 183)",
@@ -161,6 +171,7 @@
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=其他",
             "visible": true,
             "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(139, 195, 74)",
@@ -173,6 +184,7 @@
             "filename": "11.json",
             "visible": true,
             "type": "geojson",
+            "tag": ["C"],
             "pathOptions": {
                 "fillOpacity": 0.25,
                 "color": "rgb(156, 39, 176)",
@@ -184,6 +196,7 @@
             "filename": "ocf2.json",
             "visible": false,
             "type": "velocity",
+            "tag": [],
             "layerOption": {
                 "velocityScale": 0.1,
                 "lineWidth": 1,
@@ -198,6 +211,7 @@
             "filename": "ocf.json",
             "visible": false,
             "type": "velocity",
+            "tag": [],
             "layerOption": {
                 "maxVelocity": 35,
                 "lineWidth": 1,
@@ -213,6 +227,7 @@
             "visible": true,
             "dataSet": "https://data.gov.tw/dataset/7777",
             "type": "clusterMark",
+            "tag": [],
             "layerOption": {
                 "icon": "starSpot",
                 "featureProperties": {
@@ -228,6 +243,7 @@
             "visible": true,
             "dataSet": "https://isohe.ihmt.gov.tw/station/OpenData/XML/GetObsStationXML.aspx",
             "type": "clusterMark",
+            "tag": ["C"],
             "layerOption": {
                 "icon": "weatherStation",
                 "featureProperties": {
@@ -242,6 +258,7 @@
             "visible": true,
             "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?pn=10",
             "type": "clusterMark",
+            "tag": ["A", "B", "C", "D"],
             "layerOption": {
                 "icon": "fish",
                 "featureProperties": {

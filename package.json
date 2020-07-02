@@ -3,8 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "serve": "pwa-asset-generator -t png \"./src/assets/favicon.png\" \"public/img/icon\" && vue-cli-service serve",
-        "build": "vue-cli-service build && pwa-asset-generator -t png \"./src/assets/favicon.png\" \"dist/img/icon\"",
+        "serve": "pwa-asset-generator -t png \"./src/assets/logoOCA.png\" \"public/img/icon\" && vue-cli-service serve",
+        "build": "vue-cli-service build && pwa-asset-generator -t png \"./src/assets/logoOCA.png\" \"dist/img/icon\"",
         "deploy": "msdeploy --verb sync --allowUntrusted true --source contentPath=%npm_package_config_dist% --dest contentPath=%npm_package_config_dest%,ComputerName=%npm_package_config_ComputerName%,UserName=%npm_package_config_UserName%,Password=%npm_package_config_Password%,AuthType=Basic,includeAcls=False"
     },
     "config": {

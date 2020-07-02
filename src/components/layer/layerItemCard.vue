@@ -80,6 +80,7 @@
 
 <script>
 
+/** 調色、顏色功能 IE 不支援 : 移除 */
 import { mapGetters, mapMutations } from 'vuex'
 import { HandleDirective } from 'vue-slicksort'
 
@@ -112,10 +113,6 @@ export default {
 		status: {
 			type:String,
 			validator: status => status === "" || status === "simple" || status === "outScale"
-		},
-		useDragger: {
-			type:Boolean,
-			default:true
 		},
 		isRetrival:{
 			type: Boolean,

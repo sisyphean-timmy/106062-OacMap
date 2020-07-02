@@ -25,6 +25,8 @@
             font-awesome-icon(icon="envelope" fixed-width) 
             strong(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 意見回饋
 
+        small(style="padding:0 0.5rem;color:#fff;") - 瀏覽人次
+
         //- DIALOG
         el-dialog(
             :title="dialogTitle"
@@ -77,7 +79,7 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import photoLink  from "@/components/common/photoLink"
 
 export default {
@@ -117,6 +119,9 @@ export default {
             if(this.isAndroid) return this.androidGuides
             if(this.isIOS) return this.iosGuides
         }
+    },
+    async mounted(){
+        await this.getGACount()
     },
     data:()=>({
         dialogTitle:"",
@@ -167,6 +172,9 @@ export default {
         ]
     }),
     methods:{
+        ...mapActions({
+            getGACount: "common/common/getGACount",
+        }),
         ...mapMutations({
             SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
         }),

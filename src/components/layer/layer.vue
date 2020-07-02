@@ -6,14 +6,9 @@
 					h3 
 						font-awesome-icon(icon="exclamation-circle" size="lg" fixed-width)
 						| 您想找什麼 ? 
-					
-					//- el-button(type="primary" round size="mini" style="padding:0.2rem 0.5rem;") 衝浪
-					//- el-button(type="primary" round size="mini" style="padding:0.2rem 0.5rem;") 法令與管制規定
-					//- el-button(type="primary" round size="mini" style="padding:0.2rem 0.5rem;") 海象
 
 					p
 						span 點擊地圖上的色塊，來查詢您想知道的資訊，下方的圖層可以控制地圖色塊開關與透明度 。
-
 				el-input(
 					v-model="layerKeywordModel" 
 					size="small" 
@@ -22,30 +17,16 @@
 				)
 					font-awesome-icon(icon="search" fixed-width slot="prefix")
 
-			.fixedTopList(style="position:relative;" )
-				.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
-					layerItemFixedCard.slickList__card(
-						v-for="layer in layerFixedTop"
-						:key="layer.title"
-						:class="getStatusClassName(layer)"
-						:layer="layer" 
-						:status="layer.status"
-						:dragging="dragging"
-						:useDragger="!isIE"
-						@switch="handleLayerVisibility(layer.id,$event)"
-						@opacitySlide="handleLayerOpacity(layer.id,$event)"
-					)
-				div(style="display:flex;justify-content:center;position:absolute;left:0;right:0;bottom:-0.8rem;z-index: 99;")
+				p(style="line-height: 200%;")
 					el-button(
-						round 
-						type="primary"
+						v-for="tag in tourismTags"
+						:key="tag"
+						type="info" 
+						round
 						size="mini" 
-						style="padding:0.15rem 0.3rem;"
-						@click="hideFixedTopList=!hideFixedTopList"
-					) 
-						font-awesome-icon(:icon="hideFixedTopList ? 'chevron-down' : 'chevron-up'" fixed-width style="margin-right:0.25rem;")
-						small {{hideFixedTopList ? '展開' : '收折'}}
-			
+						style="padding:0.2rem 0.5rem;margin:0 0.5rem 0 0;"
+					) {{tag}}
+
 			//- see : https://github.com/Jexordexan/vue-slicksort
 			SlickList.slickList(
 				ref="slickList"
@@ -58,6 +39,29 @@
 				helperClass="dragging"
 				:transitionDuration="300"
 			)
+				.fixedTopList(style="position:relative;" )
+					.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
+						layerItemFixedCard.slickList__card(
+							v-for="layer in layerFixedTop"
+							:key="layer.title"
+							:class="getStatusClassName(layer)"
+							:layer="layer" 
+							:status="layer.status"
+							:dragging="dragging"
+							:useDragger="!isIE"
+							@switch="handleLayerVisibility(layer.id,$event)"
+							@opacitySlide="handleLayerOpacity(layer.id,$event)"
+						)
+					div(style="display:flex;justify-content:center;position:absolute;left:0;right:0;bottom:-0.8rem;z-index: 99;")
+						el-button(
+							round 
+							type="primary"
+							size="mini" 
+							style="padding:0.15rem 0.3rem;"
+							@click="hideFixedTopList=!hideFixedTopList"
+						) 
+							font-awesome-icon(:icon="hideFixedTopList ? 'chevron-down' : 'chevron-up'" fixed-width style="margin-right:0.25rem;")
+							small {{hideFixedTopList ? '展開' : '收折'}}
 				//- use tabindex for search focus | scrollIntoView
 				SlickItem(
 					v-for="layer,index in layerListModel"
@@ -111,7 +115,9 @@ export default {
 		matchKeywordLayers:[],
 		updatingLayerList:[], // 存放正在更新的圖層名稱或ID
 		//
-		hideFixedTopList: false
+		hideFixedTopList: false,
+		//
+		tourismTags:Object.values(require("@/../typescript/src/layerTag.json")['tourism']).reduce((a,c)=>[...a,...c])
 	}),
 	computed:{
 		...mapGetters({
@@ -265,7 +271,7 @@ export default {
 		}
 	}
 	.fixedTopList{
-		margin: 0 1rem;
+		margin-top: 1rem;
 		position: relative;
 		border-top: 1px solid #d7d7d7;
 		border-bottom: 1px solid #d7d7d7;

@@ -38,10 +38,13 @@ export default {
                 value: ["situation"],
             },
         ],
+        /** windy iframe embed */
         windyOption: {
             visible: false,
             location: ''
-        }
+        },
+        /** GA 統計資料 https://www.leica.com.tw/OacTwGA_Hangfire/ocatwgatotalpageviews.json */
+        GACounter: {},
     },
     actions: {
         initBeforeMapMounted: async(context, componentContext) => {
@@ -53,11 +56,23 @@ export default {
         },
         initAfterMapMounted: async(context, componentContext) => {
             console.log("state initAfterMapMounted")
-
-            // 若 query string 含 座標 則對此座標 查詢
-            // if (LONG && LATI) {
-            //     console.log("query string 含 座標 對此座標 查詢 !!")
-            // }
+                // 若 query string 含 座標 則對此座標 查詢
+                // if (LONG && LATI) {
+                //     console.log("query string 含 座標 對此座標 查詢 !!")
+                // }
+        },
+        getGACount: async context => {
+            try {
+                const res = await (await fetch("https://www.leica.com.tw/OacTwGA_Hangfire/ocatwgatotalpageviews.json", {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    },
+                })).json()
+                console.log(res)
+            } catch (e) {
+                console.error(e)
+                throw (e)
+            }
         }
     },
     mutations: {
