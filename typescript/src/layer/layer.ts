@@ -610,115 +610,7 @@ export class Layer {
      * @see https://www.cnblogs.com/tiandi/p/10124095.html
      */
     createVelocityLayer(data:any,option?:any):L.Layer & layer{
-        
-        // /** 創建 custom canvas layer */
-        // let CustomCanvasLayer = leaflet.Layer.extend({
-        //     options: {...{
-        //         displayValues: true,
-        //         displayOptions: {
-        //             velocityType: "Velocity",
-        //             position: "bottomleft",
-        //             emptyString: "No velocity data"
-        //         },
-        //         maxVelocity: 10,
-        //         colorScale: null,
-        //         data: data,
-        //     },...option}, // cover by given option
-        //     _canvas: null,
-        //     _map:null,
-        //     _windy: null,
-        //     _context: null,
-        //     onAdd: function(map) {
-        //         console.log("map added", map)
-        //         this._map = map
-                
-        //         /** 創建 canvas 並設定尺寸  */
-        //         this._canvas = leaflet.DomUtil.create("canvas", "CustomCanvasLayer")
-        //         const size = map.getSize()
-        //         this._canvas['width'] = size.x
-        //         this._canvas['height'] = size.y
-
-        //         map.getPane("overlayPane").appendChild(this._canvas)
-
-        //         map.on("dragstart",()=>this._clearWind())
-        //         map.on("dragend",()=>this._onLayerDidMove())
-        //         map.on("zoomstart",()=>this._clearWind())
-        //         map.on("zoomend",()=>this._onLayerDidMove())
-
-        //         this._onLayerDidMove()
-        //     },
-        //     onRemove: function(map) {
-        //         leaflet.DomUtil.remove(this._canvas)
-        //         // map.off("dragstart",this._clearWind)
-        //         // map.off("dragend",this._onLayerDidMove)
-        //         // map.off("zoomstart",this._clearWind)
-        //         // map.off('zoomend', this._onLayerDidMove)
-        //     },
-        //     _startWindy: function() {
-                
-        //         let bounds = this._map.getBounds();
-        //         let size = this._map.getSize(); // bounds, width, height, extent
-                
-        //         this._windy.start([
-        //             [0, 0],
-        //             [size.x, size.y]
-        //         ], size.x, size.y, [
-        //             [bounds._southWest.lng, bounds._southWest.lat],
-        //             [bounds._northEast.lng, bounds._northEast.lat]
-        //         ]);
-        //     },
-        //     _initWindy:function(){
-        //         if(this._windy) return
-        //         const WindyConstructor:any = Windy
-        //         this._windy = new WindyConstructor({
-        //             ...{
-        //                 canvas: this._canvas,
-        //                 map: this._map
-        //             },
-        //             ...this.options
-        //         })
-        //         this._context = this._canvas.getContext("2d")
-        //     },
-        //     _clearAndRestart: function() {
-        //         if (this._context) this._context.clearRect(0, 0, 3000, 3000);
-        //         if (this._windy) this._startWindy();
-        //     },
-        //     _clearWind: function() {
-        //         if (this._windy) this._windy.stop();
-        //         if (this._context) this._context.clearRect(0, 0, 3000, 3000);
-        //     },
-        //     //-------------------------------------------------------------
-        //     _onLayerDidResize: function(resizeEvent) {
-        //         this._canvas.width = resizeEvent.newSize.x;
-        //         this._canvas.height = resizeEvent.newSize.y;
-        //     },
-        //     //-------------------------------------------------------------
-        //     _onLayerDidMove: function() {
-        //         if(!this._map) return
-
-        //         let tl = this._map.containerPointToLayerPoint([0, 0]);
-        //         leaflet.DomUtil.setPosition(this._canvas, tl);
-
-        //         this._initWindy()
-        //         this._startWindy()
-        //     },
-        // })
-        
-        // return new CustomCanvasLayer()
-        
-        // let vlyr = new test({
-        //     ...option,
-        //     ...{
-        //         displayValues:false,         
-        //         angleConvention: "bearingCCW",
-        //         reverseY: true,
-        //         reverseX: true,
-        //         data: data,
-        //     }
-        // }) as any 
-        // console.log(vlyr)
-
-        let vlyr = leaflet.velocityLayer({
+        let vlyr = new test({
             ...option,
             ...{
                 displayValues:false,         
@@ -726,8 +618,8 @@ export class Layer {
                 reverseY: true,
                 data: data,
             }
-        })
-
+        }) as any 
+        
         return vlyr
     }
 
@@ -749,7 +641,9 @@ export class Layer {
         const icon = leaflet.icon(option.icon)
 
         let markClusterLayer = leaflet.markerClusterGroup({
-            iconCreateFunction: cluster=> icon
+            iconCreateFunction: cluster=> icon,
+            showCoverageOnHover:false,
+            spiderLegPolylineOptions: {opacity:0}
         })
         
         leaflet.geoJSON(data).getLayers().forEach((l:any)=> {
