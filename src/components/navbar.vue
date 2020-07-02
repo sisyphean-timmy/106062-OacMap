@@ -157,6 +157,11 @@ export default {
                 link:"https://ocean.taiwan.gov.tw/oacmap/1090210_%E5%85%AC%E5%91%8A%E7%A6%81%E6%AD%A2%E6%88%96%E9%99%90%E5%88%B6%E6%B0%B4%E5%9F%9F%E9%81%8A%E6%86%A9%E6%B4%BB%E5%8B%95%E6%B5%B7%E5%9F%9F%E7%AF%84%E5%9C%8D.pdf",
                 bg: require('@/assets/danger.jpg'),
             },
+            {
+                title:"海域保險專區",
+                link:"http://www.nlia.org.tw/modules/tadnews/page.php?ncsn=130#A",
+                bg: require('@/assets/insurance.jpg'),
+            },
         ],
         iosGuides:[
             require("@/assets/guide/guidi1.jpg"),
