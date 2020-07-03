@@ -6,26 +6,30 @@
             
         el-button(@click="dialogTitle='相關連結';dialogVisible = true" title="相關連結" :size="size" type="text")
             font-awesome-icon(icon="link" fixed-width) 
-            strong(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 相關連結
+            small(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 相關連結
 
         el-button(@click="dialogTitle='使用條約';dialogVisible = true" title="使用條約" :size="size" type="text")
             font-awesome-icon(icon="info" fixed-width) 
-            strong(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 使用條約
+            small(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 使用條約
 
         el-button(@click="dialogTitle='活動申請';dialogVisible = true" title="活動申請" :size="size" type="text")
             font-awesome-icon(icon="bell" fixed-width) 
-            strong(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 活動申請
+            small(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 活動申請
 
         template(v-if="isAndroid || isIOS")
             el-button(@click="dialogTitle='加至主畫面說明';dialogVisible = true" title="加至主畫面說明" :size="size" type="text")
                 font-awesome-icon(icon="plus-square" fixed-width) 
-                //- strong(v-if="!isMobile" style="margin-left:0.15rem;") 加至主畫面說明
+                //- small(v-if="!isMobile" style="margin-left:0.15rem;") 加至主畫面說明
 
         el-button(@click="oplink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" title="意見回饋" :size="size" type="text")
             font-awesome-icon(icon="envelope" fixed-width) 
-            strong(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 意見回饋
+            small(v-if="!(isAndroid || isIOS)" style="margin-left:0.15rem;") 意見回饋
 
-        small(style="padding:0 0.5rem;color:#fff;") - 瀏覽人次
+        small(style="padding:0 0.5rem;color:#fff;") 
+            span(style="margin-right:0.5rem;")
+                //- font-awesome-icon(icon="eye") 
+                | 瀏覽人次
+            | {{pageviews}}
 
         //- DIALOG
         el-dialog(
@@ -121,11 +125,13 @@ export default {
         }
     },
     async mounted(){
-        await this.getGACount()
+        const {pageviews,users} = await this.getGACount()
+        this.pageviews = pageviews
     },
     data:()=>({
         dialogTitle:"",
         dialogVisible:false,
+        pageviews:0,
         links:[
             {
                 title:"娛樂漁船",

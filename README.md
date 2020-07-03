@@ -53,6 +53,6 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * [leaflet UML](https://leafletjs.com/examples/extending/class-diagram.html)
 
 #### Todo 
-- [x] [leaflet velocity](https://github.com/linghuam/ocean-weather) 合併修改套件到專案 或 改用其他方式(canvas)製作
-- [X] windy API add
-- [X] layer state : 氣象等動態圖層 獨立保存
+- [X] add timeline to handle weather date
+- [X] add windy API ? 
+- [X] isolate weather layer or other dynamic state ?

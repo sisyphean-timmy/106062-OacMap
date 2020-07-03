@@ -9,15 +9,12 @@ import * as leaflet from 'leaflet'
 
 const leafletPip:ILeafletPip = require("@mapbox/leaflet-pip") // leafletPip
 
-/** TODO: check proj reverse */
-import "leaflet-velocity/dist/leafletVelocityReverse" // leaflet.velocityLayer
-
+import {CanvasLayer} from "../velocity/velocity"
 import "leaflet.markercluster" // leaflet.MarkerClusterGroup
 import "proj4leaflet"
 import "leaflet-geometryutil"
 require("leaflet-filelayer")()
 import { Init } from '../init/init';
-import {CanvasLayer as test} from "../velocity/velocity"
 /**
  * 熱力圖
  * https://github.com/Leaflet/Leaflet.heat
@@ -610,7 +607,7 @@ export class Layer {
      * @see https://www.cnblogs.com/tiandi/p/10124095.html
      */
     createVelocityLayer(data:any,option?:any):L.Layer & layer{
-        let vlyr = new test({
+        let vlyr = new CanvasLayer({
             ...option,
             ...{
                 displayValues:false,         
@@ -618,9 +615,8 @@ export class Layer {
                 reverseY: true,
                 data: data,
             }
-        }) as any 
-        
-        return vlyr
+        }) as unknown
+        return vlyr as L.Layer & layer 
     }
 
     /**

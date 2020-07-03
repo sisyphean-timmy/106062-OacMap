@@ -63,12 +63,7 @@ export default {
         },
         getGACount: async context => {
             try {
-                const res = await (await fetch("https://www.leica.com.tw/OacTwGA_Hangfire/ocatwgatotalpageviews.json", {
-                    headers: {
-                        'Cache-Control': 'no-cache'
-                    },
-                })).json()
-                console.log(res)
+                return await (await fetch("https://www.leica.com.tw/OacTwGA_Hangfire/ocatwgatotalpageviews.json")).json()
             } catch (e) {
                 console.error(e)
                 throw (e)
