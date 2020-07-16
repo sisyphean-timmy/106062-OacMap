@@ -41,7 +41,8 @@ export class CanvasLayer extends L.Layer {
     onRemove(map){
         
         map.getPane("overlayPane").removeChild(this._canvas)
-        
+        map.off("mousemove", this.onMouseMove);
+
         this._canvas = null
         
         map.off(this.getEvents(),this)
@@ -117,4 +118,14 @@ export class CanvasLayer extends L.Layer {
         this._windy.stop()
     }
     
+    /** 取得指標位置的資訊 */
+    onMouseMove(cb:(evt:any)=>void){
+        this._map.on("mousemove",(e:any)=>{
+            console.log("mouse move",e)
+            if(e.type === "Point"){
+                const pos = this._map.containerPointToLatLng(L.point(e.containerPoint.x, e.containerPoint.y));
+                const gridValue = this._windy.interpolatePoint(pos.lng, pos.lat);
+            }
+        })
+    }
 }

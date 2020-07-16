@@ -18,6 +18,7 @@ interface layer {
     name:string
     type:string
     catelog:Array<{label:string,value:string}>
+    tag:Array<string>
     visible?:boolean
     opacity?:number
     imgUrl?:string
@@ -33,6 +34,7 @@ interface IQueryResult{
     layerId:layer["id"]
     layerTitle:layer["title"]
     layerCatelog:layer["catelog"]
+    tag:layer["tag"]
     dataId: string
     data:any
     goTo:(option:L.FitBoundsOptions)=>void

@@ -1,6 +1,5 @@
 
 import * as layerDef from "../layerDef.json"
-import * as layerIcon from "../layerIcon.json"
 
 const uuidv4:()=>string = require('uuid/v4')
 
@@ -10,15 +9,21 @@ import * as leaflet from 'leaflet'
 const leafletPip:ILeafletPip = require("@mapbox/leaflet-pip") // leafletPip
 
 import {CanvasLayer} from "../velocity/velocity"
-import "leaflet.markercluster" // leaflet.MarkerClusterGroup
+import "leaflet.markercluster"
+import "leaflet.markercluster/dist/MarkerCluster.css"
+
+import * as HeatmapOverlay from "leaflet-heatmap"
 import "proj4leaflet"
 import "leaflet-geometryutil"
-require("leaflet-filelayer")()
-import { Init } from '../init/init';
-/**
- * 熱力圖
- * https://github.com/Leaflet/Leaflet.heat
- */
+import { Init } from '../init/init'
+
+import "leaflet.idw/archive/leaflet-idw-v0.0.1.js"
+// require("leaflet-filelayer")()
+
+// import georaster from "georaster"
+// const gdal = require("gdal-js")
+// console.log("gdal", gdal)
+
 
 const CATELOGS = [{
     catelog:{
@@ -118,7 +123,8 @@ export class Layer {
             opacity:l.opacity,
             visible:l.visible,
             legendRGBStr:l.legendRGBStr||"145,145,145",
-            catelog:l.catelog
+            catelog:l.catelog,
+            tag:l.tag
         })).reverse()
     }
 
@@ -132,82 +138,95 @@ export class Layer {
             opacity:l.opacity,
             visible:l.visible,
             imgFileName:l.imgUrl,
-            catelog:l.catelog
+            catelog:l.catelog,
+            tag:l.tag
         })).reverse()
     }
 
-    getLayerById(lyrId:string){
-        return this._normalLayerCollection.find(l=>l.id === lyrId)
+    /*** 給定關鍵字匹配內容符合的 popup 內容 並開啟之*/
+    openPopup(keyword:string){
+        
+        let lyrs = this._normalLayerCollection
+
+        lyrs.forEach((l:any)=> {
+            if(l.type !== "clusterMark" || l.title !== "觀光景點資訊") return
+            l.getLayers().forEach(_l =>{
+                if(new RegExp(keyword,"g").test(_l.getPopup().getContent())){
+                    _l.openPopup()
+                }
+            })
+        })
+
     }
 
     constructor(InitIns:Init){
         this.InitIns = InitIns
     }
 
-    async addFileLayer(f,o):Promise<layer>{
+    // async addFileLayer(f,o):Promise<layer>{
         
-        console.log("options",o)
+    //     console.log("options",o)
 
-        const style = {
-            color:o.style.color.hex,
-            fillOpacity:o.style.color.a*0.8
-        }
+    //     const style = {
+    //         color:o.style.color.hex,
+    //         fillOpacity:o.style.color.a*0.8
+    //     }
 
-        /** TODO:建立叢集圖層 */
-        const pointToLayer = (feature, latlng)=>leaflet.circleMarker(latlng, {...{radius: 5},...style})
+    //     /** TODO:建立叢集圖層 */
+    //     const pointToLayer = (feature, latlng)=>leaflet.circleMarker(latlng, {...{radius: 5},...style})
 
-        const loader = leaflet.FileLayer.fileLoader(
-            this.InitIns.map,{
-                layerOptions:{
-                    style:style,
-                    pointToLayer:pointToLayer
-                },
-                addToMap: false,
-                fileSizeLimit:  999999
-            }
-        )
+    //     const loader = leaflet.FileLayer.fileLoader(
+    //         this.InitIns.map,{
+    //             layerOptions:{
+    //                 style:style,
+    //                 pointToLayer:pointToLayer
+    //             },
+    //             addToMap: false,
+    //             fileSizeLimit:  999999
+    //         }
+    //     )
 
-        try{
+    //     try{
 
-            loader.load(f)
+    //         loader.load(f)
 
-            const res = await new Promise((res,rej)=>{
-                loader.on("data:loaded", e=>res(e))
-                loader.on("data:error", e=>rej(e))
-            }) as any
+    //         const res = await new Promise((res,rej)=>{
+    //             loader.on("data:loaded", e=>res(e))
+    //             loader.on("data:error", e=>rej(e))
+    //         }) as any
             
-            let lyr = res.layer as geoJsonLayer
-            lyr.addTo(this.InitIns.map)
-            console.log("fileLayer", lyr)
+    //         let lyr = res.layer as geoJsonLayer
+    //         lyr.addTo(this.InitIns.map)
+    //         console.log("fileLayer", lyr)
 
-            lyr.id = uuidv4()
-            lyr.visible = true
-            lyr.title = o.name
-            lyr.opacity = o.style.color.a
-            lyr.type = "filelayer"
-            lyr.catelog = [{
-                label:"自訂",
-                value:"filelayer"
-            }]
+    //         lyr.id = uuidv4()
+    //         lyr.visible = true
+    //         lyr.title = o.name
+    //         lyr.opacity = o.style.color.a
+    //         lyr.type = "filelayer"
+    //         lyr.catelog = [{
+    //             label:"自訂",
+    //             value:"filelayer"
+    //         }]
 
-            this._normalLayerCollection.push(lyr)
-            return {
-                type:lyr.type,
-                title:lyr.title,
-                name:lyr.title,
-                id:lyr.id,
-                opacity:lyr.opacity,
-                visible:lyr.visible,
-                legendRGBStr:`${o.style.color.rgba.r},${o.style.color.rgba.g},${o.style.color.rgba.b}`,
-                catelog:lyr.catelog
-            }
+    //         this._normalLayerCollection.push(lyr)
+    //         return {
+    //             type:lyr.type,
+    //             title:lyr.title,
+    //             name:lyr.title,
+    //             id:lyr.id,
+    //             opacity:lyr.opacity,
+    //             visible:lyr.visible,
+    //             legendRGBStr:`${o.style.color.rgba.r},${o.style.color.rgba.g},${o.style.color.rgba.b}`,
+    //             catelog:lyr.catelog
+    //         }
 
-        }catch(e){
-            console.error("file layer load err")
-            throw(e)
-        }
+    //     }catch(e){
+    //         console.error("file layer load err")
+    //         throw(e)
+    //     }
 
-    }
+    // }
 
     async addDefault():Promise<void>{
         this._addBaseLayerFromDef()
@@ -396,6 +415,7 @@ export class Layer {
                     layerId:l.id,
                     layerTitle:l.title,
                     layerCatelog:l.catelog,
+                    tag:l.tag,
                     dataId: uuidv4(),
                     data:path.feature.properties,
                     /** @see https://leafletjs.com/reference-1.6.0.html#map-flytobounds */
@@ -444,6 +464,7 @@ export class Layer {
                 lastStyle:{
                     color:path.options.color,
                     fillColor:path.options.color,
+                    weight: 3
                 }
             })
             path.bringToFront()
@@ -492,17 +513,17 @@ export class Layer {
         for (let index = 0; index < layerDef.layers.length; index++) {
             
             const lyr = layerDef.layers[index]
-            
+
+            // 取得圖層分類
             let matched_catelog = []
             CATELOGS.forEach(i=>{
                 if(i.layer.some(_name=>new RegExp(_name,"g").test(lyr.title))){
                     matched_catelog.push(i.catelog)
                 }
             })
-
             if(!matched_catelog.length) console.error(`無法取得${lyr.title}的分類`)
 
-            // 從定義取得檔案 - 暫不快取
+            // 取得圖層內容
             const dataFromDef = await (await fetch(`layers/${lyr.filename}`,{
                 headers: {
                     'Cache-Control': 'no-cache'
@@ -510,6 +531,7 @@ export class Layer {
                 method:"get"
             })).json()
 
+            // 產生圖層
             switch(lyr.type){
                 case "geojson":
 
@@ -536,6 +558,7 @@ export class Layer {
                     geojson.id = uuidv4()
                     geojson.type = lyr.type
                     geojson.catelog = matched_catelog
+                    geojson.tag = lyr.tag
                     geojson.title = lyr.title
                     geojson.visible = lyr.visible
                     geojson.opacity = lyr.pathOptions.fillOpacity
@@ -547,6 +570,59 @@ export class Layer {
                     }
                     this._normalLayerCollection.push(geojson)
                     geojson.visible && geojson.addTo(this.InitIns.map)
+                    break
+                case "heatmap":
+                    let heatDate = []
+                    let max = 999
+                    for (const iterator of dataFromDef.features.filter(i=>/TEMP/ig.test(i.properties.ns1_elemen))) {
+                        const lat = iterator.geometry.coordinates[1]
+                        const lng = iterator.geometry.coordinates[0]
+                        
+                        if(!lat||!lng) return
+                        if(iterator.properties.ns1_value===-99) return 
+
+                        let count = parseFloat(iterator.properties.ns1_value)
+                        if(max === 999) max = count
+                        if(count > max) max = count
+                        heatDate.push([lat,lng,count])
+                    }
+
+                    // const values = [ [ [0, 1, 2], [0, 0, 0], [2, 1, 1] ] ];
+                    // const noDataValue = 3;
+                    // const projection = 4326;
+                    // const xmin = -40;
+                    // const ymax = 14;
+                    // const pixelWidth = 0.00001;
+                    // const pixelHeight = 0.00001;
+                    // const metadata = { noDataValue, projection, xmin, ymax, pixelWidth, pixelHeight };
+                    // const parsedGeoraster = await georaster(values, metadata);
+                    // console.log("[georaster]",parsedGeoraster.toCanvas())
+                    
+
+                    // heatMapData
+                    console.log("[heatMapData]",heatDate,max)
+
+                    /**
+                     * @see https://github.com/spatialsparks/Leaflet.idw
+                     * @see http://www.geonet.ch/leaflet-idw/
+                     */
+                    let hlyr = leaflet.idwLayer(heatDate,
+                        {
+                            opacity: 0.8, cellSize: 10, exp: 2, max: max, min:0,
+                            gradient:{0: 'purple', 0.5: 'blue', 1: 'orange'}
+                        }
+                    )
+                    hlyr.id = uuidv4()
+                    hlyr.type = lyr.type
+                    hlyr.title = lyr.title
+                    hlyr.opacity = 1
+                    hlyr.visible = lyr.visible
+                    hlyr.catelog = matched_catelog
+                    hlyr.tag = lyr.tag
+                    hlyr.dataSet = lyr.dataSet
+                    
+                    this._normalLayerCollection.push(hlyr)
+                    hlyr.visible && hlyr.addTo(this.InitIns.map)
                     break
                 case "velocity":
                     let vlyr = this.createVelocityLayer(
@@ -560,6 +636,7 @@ export class Layer {
                     vlyr.opacity = 1
                     vlyr.visible = lyr.visible
                     vlyr.catelog = matched_catelog
+                    vlyr.tag = lyr.tag 
                     vlyr.dataSet = lyr.dataSet
 
                     this._normalLayerCollection.push(vlyr)
@@ -568,24 +645,19 @@ export class Layer {
                 case "clusterMark":         
                     let cmklyr = this.createClusterMarkersLayer(dataFromDef,{
                         icon:{
-                            iconSize: [30, 30],
-                            iconAnchor: [10, 41],
-                            popupAnchor: [2, -40],
-                            iconUrl: layerIcon['default'][lyr.layerOption.icon],
-                            // shadowSize:[28, 35],
-                            // shadowAnchor: [14, 45],
-                            // shadowUrl:"data:image/png;base64,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"
+                            iconUrl: lyr.layerOption.icon,
                         },
                         featureProperties: lyr.layerOption.featureProperties
                     })
 
                     cmklyr.id = uuidv4()
-                    cmklyr.icon = layerIcon['default'][lyr.layerOption.icon]
+                    cmklyr.icon = lyr.layerOption.icon
                     cmklyr.type = lyr.type
                     cmklyr.title = lyr.title
                     cmklyr.visible = lyr.visible
                     cmklyr.opacity = 1
                     cmklyr.catelog = matched_catelog
+                    cmklyr.tag = lyr.tag
                     cmklyr.dataSet = lyr.dataSet
 
                     this._normalLayerCollection.push(cmklyr)
@@ -601,21 +673,85 @@ export class Layer {
     }
     
     /**
+     * 
      * 建立流量圖
      * leafletVelocity
      * @see https://github.com/danwild/leaflet-velocity
      * @see https://www.cnblogs.com/tiandi/p/10124095.html
+     * 
+     * @param {[{header:any,data:Array<any>}]} data expect format-1
+     * @param {{any}} data format-2
+     * 
      */
-    createVelocityLayer(data:any,option?:any):L.Layer & layer{
+    createVelocityLayer(
+        data:any, 
+        option?:any
+    ):L.Layer & layer{
+        /** 
+         * 預期格式
+         * ucomp -> 緯向
+         * vcomp -> 經向
+         * @param {
+         * [
+         *  ucomp:{header:any{},data:number[]},
+         *  vcomp:{header:any{},data:number[]}
+         * ]
+         * } data 
+         * 
+         * 非預期格式
+         * 依 GRIB2 重組資料  
+         * @see https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/
+         * parameterCategory -> parameterNumber
+         * parameterCategory @see https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2.shtml
+         * parameterNumber @see https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-2.shtml
+         * 
+         */
+        if(!Array.isArray(data)){
+            // generate uv
+            // M-B0071-001
+            data = [
+                {
+                    header:{
+                        parameterCategory:  2,
+                        parameterNumber:   2,
+                        scanMode: 0,
+                        nx: data.nx, // 經向格點數
+                        ny: data.ny, // 緯向格點數
+                        lo1: data.lo1,
+                        la1: data.la1,
+                        lo2: data.lo2,
+                        la2: data.la2,
+                        dx: (data.lo2 - data.lo1) / (data.nx-1), // 經向步長
+                        dy: (data.la1 - data.la2) / (data.ny-1), // 緯向步長
+                    },
+                    data: data.d.X
+                },
+                {
+                    header:{
+                        parameterCategory:  2,
+                        parameterNumber:   3,
+                        scanMode: 0,
+                        nx: data.nx, // 經向格點數
+                        ny: data.ny, // 緯向格點數
+                        lo1: data.lo1,
+                        la1: data.la1,
+                        lo2: data.lo2,
+                        la2: data.la2,
+                        dx: (data.lo2 - data.lo1) / (data.nx-1), // 經向步長
+                        dy: (data.la1 - data.la2) / (data.ny-1), // 緯向步長
+                    },
+                    data: data.d.Y
+                },
+            ]
+        }
         let vlyr = new CanvasLayer({
             ...option,
             ...{
-                displayValues:false,         
-                angleConvention: "bearingCCW",
+                displayValues:false,
                 reverseY: true,
                 data: data,
             }
-        }) as unknown
+        }) as any
         return vlyr as L.Layer & layer 
     }
 
@@ -634,8 +770,16 @@ export class Layer {
         }
         icon:L.IconOptions
     }):L.Layer & layer{
-        const icon = leaflet.icon(option.icon)
 
+        const icon = leaflet.divIcon({
+            html:`
+                <div class="leaflet-mark-icon">
+                    <i class="${option.icon.iconUrl}"></i>
+                </div>
+            `,
+            className: 'my-div-icon'
+        })
+        
         let markClusterLayer = leaflet.markerClusterGroup({
             iconCreateFunction: cluster=> icon,
             showCoverageOnHover:false,
@@ -661,8 +805,11 @@ export class Layer {
                     return true
                 })
             }
-
-            let mark = leaflet.marker(l.getLatLng(),{icon})
+            
+            let mark = leaflet.marker(l.getLatLng(),{
+                icon:icon,
+                bubblingMouseEvents:true
+            })
             mark.bindPopup(`
                 <h3>${l.feature.properties[option.featureProperties.title]}</h3>
                 <small>
@@ -670,12 +817,46 @@ export class Layer {
                 </small>
                 ${content}
             `, {
-                closeButton:false,
                 maxHeight: 300
             })
             markClusterLayer.addLayer(mark)
         })
 
         return markClusterLayer
+    }
+
+    /** heatmap @see https://www.patrick-wied.at/static/heatmapjs */
+    createHeatMap(
+        data:Array<any>, 
+        opt:any
+    ):L.Layer & layer{
+        
+        let hlyr = new HeatmapOverlay({
+            // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+            // if scaleRadius is false it will be the constant radius used in pixels
+            "radius": 0.1,
+            "maxOpacity": 0.5,
+            // scales the radius based on map zoom
+            "scaleRadius": true,
+            // if set to false the heatmap uses the global maximum for colorization
+            // if activated: uses the data maximum within the current map boundaries
+            //   (there will always be a red spot with useLocalExtremas true)
+            "useLocalExtrema": true,
+            // which field name in your data represents the latitude - default "lat"
+            latField: 'lat',
+            // which field name in your data represents the longitude - default "lng"
+            lngField: 'lng',
+            // which field name in your data represents the data value - default "value"
+            valueField: 'count',
+            // gradient: {
+            //     0.0: 'green',
+            //     0.5: 'yellow',
+            //     0.8: 'blue',
+            //     1.0: 'red'
+            // }
+        })
+        hlyr.setData({data});
+        
+        return hlyr as unknown as L.Layer & layer
     }
 }

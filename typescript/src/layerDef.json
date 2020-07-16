@@ -4,32 +4,32 @@
             "title": "OSM",
             "url": "https://gis.sinica.edu.tw/worldmap/file-exists.php?img=OSM-png-{z}-{x}-{y}",
             "imgUrl": "bmOSM.png",
-            "opacity": 0.8,
-            "maxZoom": 15
+            "opacity": 1,
+            "maxZoom": 18
         },
         {
             "type": "wmts",
             "title": "臺灣通用正射影像",
             "url": "https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
             "imgUrl": "bmNlscBase2.jpg",
-            "opacity": 0.8,
-            "maxZoom": 15
+            "opacity": 1,
+            "maxZoom": 18
         },
         {
             "type": "wmts",
             "title": "台灣通用電子地圖(黑底)",
             "url": "https://wmts.nlsc.gov.tw/wmts/EMAP2/default/GoogleMapsCompatible/{z}/{y}/{x}",
             "imgUrl": "bmNlscBaseAlpha.png",
-            "opacity": 0.8,
-            "maxZoom": 15
+            "opacity": 1,
+            "maxZoom": 18
         },
         {
             "type": "wmts",
             "title": "台灣通用電子地圖(灰階)",
             "url": "https://wmts.nlsc.gov.tw/wmts/EMAP01/default/GoogleMapsCompatible/{z}/{y}/{x}",
             "imgUrl": "bmNlscBaseGray.png",
-            "opacity": 0.8,
-            "maxZoom": 15
+            "opacity": 1,
+            "maxZoom": 18
         },
         {
             "type": "wmts",
@@ -37,13 +37,13 @@
             "url": "https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}",
             "imgUrl": "bmNlscBase.png",
             "opacity": 1,
-            "maxZoom": 15
+            "maxZoom": 18
         }
     ],
     "layers": [{
             "title": "水產動植物繁殖保育區",
             "filename": "3.json",
-            "dataSet": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=漁業資源保育",
+            "dataSet": "",
             "visible": false,
             "type": "geojson",
             "tag": ["A", "B", "C", "D"],
@@ -192,11 +192,27 @@
             }
         },
         {
+            "title": "自動氣象站-溫度",
+            "filename": "wsTempture.json",
+            "visible": false,
+            "type": "heatmapxxxx",
+            "tag": [],
+            "layerOption": {}
+        },
+        {
+            "title": "自動氣象站-雨量",
+            "filename": "wsRain.json",
+            "visible": false,
+            "type": "heatmapxxx",
+            "tag": [],
+            "layerOption": {}
+        },
+        {
             "title": "海流",
-            "filename": "ocf2.json",
+            "filename": "netcdfOCMuvTest.json",
             "visible": false,
             "type": "velocity",
-            "tag": [],
+            "tag": ["A", "B", "C", "D"],
             "layerOption": {
                 "velocityScale": 0.1,
                 "lineWidth": 1,
@@ -208,10 +224,10 @@
         },
         {
             "title": "風場",
-            "filename": "ocf.json",
+            "filename": "2020062909_UV_SFC.json",
             "visible": false,
             "type": "velocity",
-            "tag": [],
+            "tag": ["A", "B", "C", "D"],
             "layerOption": {
                 "maxVelocity": 35,
                 "lineWidth": 1,
@@ -227,9 +243,9 @@
             "visible": true,
             "dataSet": "https://data.gov.tw/dataset/7777",
             "type": "clusterMark",
-            "tag": [],
+            "tag": ["A", "B", "C", "D"],
             "layerOption": {
-                "icon": "starSpot",
+                "icon": "fas fa-star",
                 "featureProperties": {
                     "title": "Name",
                     "photo": ["Picture1", "Picture2", "Picture3"],
@@ -240,12 +256,12 @@
         {
             "title": "商港海象觀測站",
             "filename": "21.json",
-            "visible": true,
+            "visible": false,
             "dataSet": "https://isohe.ihmt.gov.tw/station/OpenData/XML/GetObsStationXML.aspx",
             "type": "clusterMark",
             "tag": ["C"],
             "layerOption": {
-                "icon": "weatherStation",
+                "icon": "fas fa-temperature-high",
                 "featureProperties": {
                     "title": "測站中文名稱",
                     "description": ["種類"]
@@ -260,7 +276,7 @@
             "type": "clusterMark",
             "tag": ["A", "B", "C", "D"],
             "layerOption": {
-                "icon": "fish",
+                "icon": "fas fa-fish",
                 "featureProperties": {
                     "title": "漁港名稱",
                     "description": ["漁港名稱", "類別"]

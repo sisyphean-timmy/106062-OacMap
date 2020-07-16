@@ -1,4 +1,12 @@
 declare namespace L {
+    
+    export const idwLayer:(data:Array<any>,option:any)=>any
+
+    export const heatLayer:(data:Array<any>,option:any)=>any
+    
+    export const webGLHeatmap:(opts:any)=>{
+        addDataPoint:(data:Array<[number,number,number]>)=>any,
+    }
 
     /** @see  https://github.com/makinacorpus/Leaflet.FileLayer*/
     export const FileLayer:{

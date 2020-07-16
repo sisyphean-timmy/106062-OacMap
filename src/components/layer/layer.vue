@@ -1,36 +1,37 @@
 <template lang='pug'>
 	.layer
 		.layer__wrapper
-			.layer__filter
-				el-alert(type="success" style="margin-bottom:1rem;line-height:150%;" )
-					h3 
-						font-awesome-icon(icon="exclamation-circle" size="lg" fixed-width)
-						| 您想找什麼 ? 
+			.layer__header
+				slot(name="header")
+				//- 	el-alert(type="success" style="margin-bottom:1rem;line-height:150%;" )
+				//- 		h3 
+				//- 			font-awesome-icon(icon="exclamation-circle" size="lg" fixed-width)
+				//- 			| 您想找什麼 ? 
 
-					p
-						span 點擊地圖上的色塊，來查詢您想知道的資訊，下方的圖層可以控制地圖色塊開關與透明度 。
-				el-input(
-					v-model="layerKeywordModel" 
-					size="small" 
-					placeholder="輸入關鍵字搜尋圖資名稱" 
-					clearable
-				)
-					font-awesome-icon(icon="search" fixed-width slot="prefix")
+				//- 		p
+				//- 			span 點擊地圖上的色塊，來查詢您想知道的資訊，下方的圖層可以控制地圖色塊開關與透明度 。
+				//- 	el-input(
+				//- 		v-model="layerKeywordModel" 
+				//- 		size="small" 
+				//- 		placeholder="輸入關鍵字搜尋圖資名稱" 
+				//- 		clearable
+				//- 	)
+				//- 		font-awesome-icon(icon="search" fixed-width slot="prefix")
 
-				p(style="line-height: 200%;")
-					el-button(
-						v-for="tag in tourismTags"
-						:key="tag"
-						type="info" 
-						round
-						size="mini" 
-						style="padding:0.2rem 0.5rem;margin:0 0.5rem 0 0;"
-					) {{tag}}
-
+				//- 	p(style="line-height: 200%;")
+				//- 		el-button(
+				//- 			v-for="tag in tourismTags"
+				//- 			:key="tag"
+				//- 			type="info" 
+				//- 			round
+				//- 			size="mini" 
+				//- 			style="padding:0.2rem 0.5rem;margin:0 0.5rem 0 0;"
+				//- 		) {{tag}}
+				
 			//- see : https://github.com/Jexordexan/vue-slicksort
 			SlickList.slickList(
 				ref="slickList"
-				v-model="layerListModel"
+				v-model="layerSortableModel"
 				@sort-end="onSortEnd"
 				@sort-start="onSortStart"
 				appendTo="body"
@@ -39,11 +40,33 @@
 				helperClass="dragging"
 				:transitionDuration="300"
 			)
-				.fixedTopList(style="position:relative;" )
-					.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
-						layerItemFixedCard.slickList__card(
-							v-for="layer in layerFixedTop"
-							:key="layer.title"
+				h3 海域與遊憩資訊總覽
+				.col
+					layerWeather
+				.col
+					small 地圖上帶有對應圖示的圓形，在縮放比例尺後可以得到更多關於點的資訊
+						.fixedTopList(style="position:relative;" )
+							.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
+								layerItemFixedCard.slickList__card(
+									v-for="layer in pointerLayer"
+									:key="layer.title"
+									:class="getStatusClassName(layer)"
+									:layer="layer" 
+									:status="layer.status"
+									:dragging="dragging"
+									:useDragger="!isIE"
+									@switch="handleLayerVisibility(layer.id,$event)"
+									@opacitySlide="handleLayerOpacity(layer.id,$event)"
+								)
+				.col
+					small 點擊地圖上的色塊來查詢區域內的資訊，點擊下方圖層來設定顏色或透明度，亦可以拖動來改變順序!
+					SlickItem(
+						v-for="layer,index in layerSortableModel"
+						:key="`${layer.id}`"
+						:index="index"
+						v-loading="updatingLayerList.indexOf(layer.id)>-1"
+					)
+						layerItemCard.slickList__card(
 							:class="getStatusClassName(layer)"
 							:layer="layer" 
 							:status="layer.status"
@@ -52,32 +75,49 @@
 							@switch="handleLayerVisibility(layer.id,$event)"
 							@opacitySlide="handleLayerOpacity(layer.id,$event)"
 						)
-					div(style="display:flex;justify-content:center;position:absolute;left:0;right:0;bottom:-0.8rem;z-index: 99;")
-						el-button(
-							round 
-							type="primary"
-							size="mini" 
-							style="padding:0.15rem 0.3rem;"
-							@click="hideFixedTopList=!hideFixedTopList"
-						) 
-							font-awesome-icon(:icon="hideFixedTopList ? 'chevron-down' : 'chevron-up'" fixed-width style="margin-right:0.25rem;")
-							small {{hideFixedTopList ? '展開' : '收折'}}
-				//- use tabindex for search focus | scrollIntoView
-				SlickItem(
-					v-for="layer,index in layerListModel"
-					:key="`${layer.id}`"
-					:index="index"
-					v-loading="updatingLayerList.indexOf(layer.id)>-1"
-				)
-					layerItemCard.slickList__card(
-						:class="getStatusClassName(layer)"
-						:layer="layer" 
-						:status="layer.status"
-						:dragging="dragging"
-						:useDragger="!isIE"
-						@switch="handleLayerVisibility(layer.id,$event)"
-						@opacitySlide="handleLayerOpacity(layer.id,$event)"
-					)
+
+				//- el-collapse(:value="['預報','標記點','基本圖']")
+				//- 	el-collapse-item(name="預報")
+				//- 		strong(slot="title") 預報
+				//- 		layerWeather
+				//- 	el-collapse-item(name="標記點")
+				//- 		strong(slot="title") 標記點
+				//- 		small 地圖上帶有對應圖示的圓形，在縮放比例尺後可以得到更多關於點的資訊
+				//- 		.fixedTopList(style="position:relative;" )
+				//- 			.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
+				//- 				layerItemFixedCard.slickList__card(
+				//- 					v-for="layer in pointerLayer"
+				//- 					:key="layer.title"
+				//- 					:class="getStatusClassName(layer)"
+				//- 					:layer="layer" 
+				//- 					:status="layer.status"
+				//- 					:dragging="dragging"
+				//- 					:useDragger="!isIE"
+				//- 					@switch="handleLayerVisibility(layer.id,$event)"
+				//- 					@opacitySlide="handleLayerOpacity(layer.id,$event)"
+				//- 				)
+				//- 	//- el-collapse-item(name="圖面")
+				//- 	//- 	strong(slot="title") 圖面
+						
+				//- 	el-collapse-item(name="基本圖")
+				//- 		strong(slot="title") 基本圖
+				//- 		small 點擊地圖上的色塊來查詢區域內的資訊，點擊下方圖層來設定顏色或透明度，亦可以拖動來改變順序!
+				//- 		//- use tabindex for search focus | scrollIntoView
+				//- 		SlickItem(
+				//- 			v-for="layer,index in layerSortableModel"
+				//- 			:key="`${layer.id}`"
+				//- 			:index="index"
+				//- 			v-loading="updatingLayerList.indexOf(layer.id)>-1"
+				//- 		)
+				//- 			layerItemCard.slickList__card(
+				//- 				:class="getStatusClassName(layer)"
+				//- 				:layer="layer" 
+				//- 				:status="layer.status"
+				//- 				:dragging="dragging"
+				//- 				:useDragger="!isIE"
+				//- 				@switch="handleLayerVisibility(layer.id,$event)"
+				//- 				@opacitySlide="handleLayerOpacity(layer.id,$event)"
+				//- 			)
 
 			//- baseMaps
 			.layer__footer
@@ -97,6 +137,8 @@ import layerItemCard from "./layerItemCard"
 import layerBaseMap from "./layerBaseMap"
 
 import layerItemFixedCard from "./layerItemFixedCard"
+import layerWeather from '@/components/layer/layerWeather';
+
 
 export default {
 	name:'layers',
@@ -105,7 +147,8 @@ export default {
 		SlickItem,
 		layerItemCard,
 		layerBaseMap,
-		layerItemFixedCard
+		layerItemFixedCard,
+		layerWeather
 	},
 	data:()=>({
 		dragging:false,
@@ -116,59 +159,52 @@ export default {
 		updatingLayerList:[], // 存放正在更新的圖層名稱或ID
 		//
 		hideFixedTopList: false,
-		//
-		tourismTags:Object.values(require("@/../typescript/src/layerTag.json")['tourism']).reduce((a,c)=>[...a,...c])
 	}),
 	computed:{
 		...mapGetters({
 			state:'layer/layer/state',
 			rootState: 'common/common/state',
+			pointerLayer: 'layer/layer/pointerLayer',
 			sortableLayer: 'layer/layer/sortableLayer',
-			freezedLayer: 'layer/layer/freezedLayer'
+			weatherLayer: 'layer/layer/weatherLayer'
 		}),
 		isIE(){
 			return Boolean(document.documentMode)
 		},
-		activedSubject(){
-			return this.rootState("activedSubject")
-		},
-		layerKeywordModel:{
+		// layerKeywordModel:{
+		// 	get(){
+		// 		return this.layerKeyword
+		// 	},
+		// 	set(str){
+		// 		this.matchKeywordLayers = str ? this.layerSortableModel.filter(lyr=>lyr.title.match(new RegExp(str,"g"))) : []
+		// 		if(this.matchKeywordLayers.length > 0){ //- matched keyword
+		// 			this.$refs.slickList.$children.forEach(comp=>{
+		// 				if(comp.$vnode.elm.innerText === this.matchKeywordLayers[0].title){ // first one
+		// 					document.documentElement.scrollIntoView ? comp.$el.scrollIntoView({behavior: "smooth"}) : c.$el.focus()
+		// 				}
+		// 			})
+		// 		}
+		// 		this.layerKeyword = str
+		// 	}
+		// },
+		layerSortableModel:{
 			get(){
-				return this.layerKeyword
-			},
-			set(str){
-				this.matchKeywordLayers = str ? this.layerListModel.filter(lyr=>lyr.title.match(new RegExp(str,"g"))) : []
-				if(this.matchKeywordLayers.length > 0){ //- matched keyword
-					this.$refs.slickList.$children.forEach(comp=>{
-						if(comp.$vnode.elm.innerText === this.matchKeywordLayers[0].title){ // first one
-							document.documentElement.scrollIntoView ? comp.$el.scrollIntoView({behavior: "smooth"}) : c.$el.focus()
-						}
-					})
-				}
-				this.layerKeyword = str
-			}
-		},
-		/** 可排序的圖層 取geojson*/
-		layerListModel:{
-			get(){
-				return  this.sortableLayer.filter(l=> /geojson/ig.test(l.type) )
+				return this.sortableLayer
 			},
 			set(newSortedLayerArr){
 				this.SNAPSHOT_RAW_LAYER({
 					type:'layer', 
-					payload:[...this.freezedLayer,...this.layerFixedTop,...newSortedLayerArr]
+					payload:[...this.layerUnSortable,...newSortedLayerArr]
 				})
 			}
 		},
-		layerFixedTop(){
-			return  this.sortableLayer.filter(l=> /clusterMark/ig.test(l.type) )
+		layerUnSortable(){
+			return [...this.pointerLayer, ...this.weatherLayer]
 		},
-		/** 不排序的圖層 */
-		freezedLayerCount(){
-			return this.freezedLayer.length + this.layerFixedTop.length
+		layerUnSortableCount(){
+			return this.layerUnSortable.length
 		}
 	},
-	async mounted(){},
 	methods:{
 		...mapMutations({
 			UPDATE_LAYER_OPTIONS:'layer/layer/UPDATE_LAYER_OPTIONS',
@@ -187,12 +223,12 @@ export default {
 			const ni = evt.newIndex 
 			
 			//- 地圖實例順序更新
-			console.log("順序移動 : 索引 " + oi + " 至 " + ni,this.layerListModel[oi])
+			console.log("順序移動 : 索引 " + oi + " 至 " + ni,this.layerSortableModel[oi])
 
 			/** 加上不可排序的長度 來偏移 */
-			const offset_oi = oi + this.freezedLayerCount
-			const offset_ni = ni + this.freezedLayerCount
-			this.$LayerIns.reorderNormalLayer(this.layerListModel[oi].id,offset_oi,offset_ni)
+			const offset_oi = oi + this.layerUnSortableCount
+			const offset_ni = ni + this.layerUnSortableCount
+			this.$LayerIns.reorderNormalLayer(this.layerSortableModel[oi].id,offset_oi,offset_ni)
 
 			this.dragging = false
 			this._toggleLayerWiggle(false) //- dom wiggle effect
@@ -201,7 +237,7 @@ export default {
 		onSortStart(evt){
 			this.dragging = true
 			this._toggleLayerWiggle(true) //- dom wiggle effect
-			this.lastDraggingLyrPtr = this.layerListModel[evt.index]
+			this.lastDraggingLyrPtr = this.layerSortableModel[evt.index]
 		},
 		handleLayerVisibility(id,bool){
 			//- update map instance
@@ -241,11 +277,22 @@ export default {
 
 
 <style lang="scss" scoped>
-	
+
+	.col {
+		border-top: 0.75px solid rgba($info,0.5);
+		padding: 1rem 0;
+	}
+
+	/deep/ .el-collapse-item__content{padding: 0;}
 	.layer{
 		overflow:hidden;
 		margin:-1rem;
-		&__filter{
+		&__wrapper{
+			height:100%;
+			display:flex;
+			flex-direction: column;
+		}
+		&__header{
 			display: flex;
 			flex-direction: column;;
 			margin:1rem;
@@ -255,34 +302,20 @@ export default {
 				}
 			}
 		}
-		&__wrapper{
-			height:100%;
-			display:flex;
-			flex-direction: column;
-		}
-		&__header{
-			display:flex;
-			padding: 0.5rem 1rem;
-			@include boxShadow;
-			z-index: 1;
-		}
 		&__footer{
 			z-index: 1;
 		}
 	}
 	.fixedTopList{
-		margin-top: 1rem;
 		position: relative;
-		border-top: 1px solid #d7d7d7;
-		border-bottom: 1px solid #d7d7d7;
-		&__collapse{
-			max-height: 50vh;
-			overflow: hidden;
-			will-change: max-height;
-			&--hide{
-				max-height: 0vh;
-			}
-		}
+		// &__collapse{
+		// 	max-height: 50vh;
+		// 	overflow: hidden;
+		// 	will-change: max-height;
+		// 	&--hide{
+		// 		max-height: 0vh;
+		// 	}
+		// }
 	}
 	.slickList{ 
 		padding: 0 1rem;

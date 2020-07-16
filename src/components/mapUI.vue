@@ -3,11 +3,12 @@
 		transition(name="slide-fade" mode="out-in")
 			//- 圖層操作
 			el-card.content-card(v-if="layerVisibility")
-				pageHeader(
-					:title="commonState('activedSubject')"
-					@back="SET_CARD_VISIBLE({key:'layer',bool:false})"
-				)
 				layer(key="layer")
+					pageHeader(
+						slot="header"
+						:title="commonState('activedSubject')"
+						@back="SET_CARD_VISIBLE({key:'layer',bool:false})"
+					)
 
 			//- 查詢結果
 			el-card.content-card(
@@ -19,11 +20,15 @@
 		//- CUSTOM CONER UI
 		.tr
 			navbar(:isMobile="isMobile")
-			layerWeather
 		.tl
 			tools
 		.br
+			div(style="display:flex;align-items:center;")
+				.scaleCoordInfo(ref="scaleCoordInfo")
+				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
 		.bl
+			img(style="max-width:180px;" src="@/assets/logo.png")
+		.mask
 
 </template> 
 
@@ -31,14 +36,10 @@
 
 import Vue from 'vue'
 
-
 import navbar from "@/components/navbar"
 import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import tools from "@/components/tools"
-
-import layerWeather from "@/components/layer/layerWeather"
-
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
@@ -57,8 +58,7 @@ export default {
 		layer,
 		pageHeader,
 		navbar,
-        layerWeather,
-        tools
+		tools
 	},
 	computed:{
 		...mapGetters({
@@ -72,40 +72,25 @@ export default {
 		resultVisibility(){
 			return  this.commonState("resultCardVisible")
 		},
+		pageviews(){
+			return this.commonState("GACount").pageviews
+		}
 	},
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
 		})
+	},
+	mounted(){
+		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
+		this.$InitIns.mountCoordDom(this.$refs.scaleCoordInfo)
 	}
 }
 </script>
 
 <style lang="scss" scoped>
-		
-	/deep/{
-		.el-button{
-			margin: 0;
-		}
-		.vc-chrome{
-			width: auto;
-			padding: 1rem 0;
-			box-shadow: none;
-			background: transparent;
-		}
-		.vc-chrome-saturation-wrap {
-			width: 100%;
-			padding-bottom: 25%;
-		}
-		.el-input__inner{
-			padding-left: 3rem;
-			border-radius:1rem;
-		}
-	}
-	
-	/**
-	.content-card 
-	*/
+
+	/**	.content-card 	*/
 	.content-card{
 		will-change:width;
 		position: fixed;
@@ -130,7 +115,7 @@ export default {
 
 	.tr,.tl,.br,.bl{
 		position:  absolute;
-		z-index: 1;
+		z-index: 2;
 		&>*{
 			position: relative;
 		}
@@ -189,7 +174,5 @@ export default {
 			}
 		}
 	}
-	
 
-    
 </style>

@@ -70,18 +70,43 @@ export default {
     },
     getters: {
         state: state => key => state[key],
-        /** TODO: freezedLayer 改為海象氣象圖層 */
-        sortableLayer: (state, g, rg) => {
-            const activedSubject = rg["common/common"]["activedSubject"]
-            const subjects = rg["common/common"]["subjects"]
-            const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => /filelayer/ig.test(l.type) || /geojson|clusterMark/ig.test(l.type) && l.catelog.some(c => cateLogs.indexOf(c.value) > -1))
+        _currentTag: (state, getters, rootGetters) => {
+            return rootGetters["common/common"]["currentTag"]
+                // const activedSubject = rootGetters["common/common"]["activedSubject"]
+                // const tags = rootGetters["common/common"]["currentTag"]
+                // return subjects.find(i => i.label === activedSubject).value
         },
-        freezedLayer: (state, g, rg) => {
-            const activedSubject = rg["common/common"]["activedSubject"]
-            const subjects = rg["common/common"]["subjects"]
-            const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => !(/filelayer|geojson|clusterMark/ig.test(l.type)) && l.catelog.some(c => cateLogs.indexOf(c.value) > -1))
-        }
+        /** 可排序的圖層 */
+        sortableLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /filelayer|geojson/ig.test(l.type) && tagMatch
+            })
+        },
+        /** 預報 */
+        weatherLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /heatmap|velocity/ig.test(l.type) && tagMatch
+            })
+        },
+        /** 點狀 */
+        pointerLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /cluster/ig.test(l.type) && tagMatch
+            })
+        },
+
+        /** TODO:圖面 整面的 */
     }
 }

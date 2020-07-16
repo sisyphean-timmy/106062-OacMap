@@ -17,6 +17,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(fas, fab, far)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
+/** @see https://github.com/FortAwesome/vue-fontawesome#processing-i-tags-into-svg-using-font-awesome*/
+import { dom } from '@fortawesome/fontawesome-svg-core'
+dom.watch()
+
 // VUEX
 import store from './store'
 

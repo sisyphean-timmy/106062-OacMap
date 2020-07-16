@@ -1,6 +1,8 @@
 <template lang="pug">
 
 #app
+
+	//- Windy Map
 	template(v-if="windyOption.visible")
 		el-button(
 			type="danger"
@@ -10,28 +12,19 @@
 		) 
 			font-awesome-icon(icon="chevron-left" fixed-width tansform="left-2")
 			strong 返回
-
-		iframe#windy(
-			:style="`height:${ifh}px`"
-			frameborder="0"
-			:src="`https://embed.windy.com/?${windyOption.location}`"
-		)
-
-	template(v-else)
+			
+		div(v-loading="windyLoading")
+			iframe#windy(
+				frameborder="0"
+				:style="`height:${ifh}px`"
+				:src="`https://embed.windy.com/?${windyOption.location}`"
+			)
+	//- UI
+	template(v-else-if="mapConstructed")
 		component(:is="isMobile ? 'mapUIxs' : 'mapUI'")
 
+	//- Map
 	#viewDiv(:style="windyOption.visible ? 'z-index:-10;' : ''")
-
-	//- 掛載到地圖的UI內
-	template(v-if="!isMobile")
-		div(ref="tl")
-		div(ref="tr")
-		div(ref="bl")
-			.logo
-				img(src="./assets/logo.png")
-			.mask
-		div(ref="br")
-			.scaleCoordInfo(ref="scaleCoordInfo")
 
 </template>
 
@@ -51,6 +44,8 @@ export default {
 	name: 'app',
 	data:()=>({
 		loading:null,
+		windyLoading: true,
+		mapConstructed:false
 	}),
 	components:{
 		mapUI,
@@ -60,9 +55,22 @@ export default {
 		...mapGetters({
 			isMobile:"common/common/isMobile",
 			windyOption:"common/common/windyOption",
+			commonState: "common/common/state",
 		}),
 		ifh(){ // iframe 高度 減 上方按鈕高度 
 			return window.innerHeight - 32
+		},
+	},
+	watch:{
+		"windyOption.visible":{
+			handler(bool){
+				if(!bool) return 
+				this.windyLoading = true
+				this.$nextTick(()=>{
+					const Iframe = this.$el.querySelector("#windy")
+					Iframe.onload = ()=> this.windyLoading = false
+				})
+			}
 		}
 	},
 	async mounted(){
@@ -78,23 +86,10 @@ export default {
 			await this.initBeforeMapMounted(this) // Action before mount
 	
 			Vue.prototype.$InitIns = new Init("viewDiv",{
-				center:["23.830576","121.201172"],
-				zoom: 8
+				center:["23.830576","121.20172"],
+				zoom: 7
 			})
-	
-			// 將 vue template UI DOM 掛載入 leaflet map 的 UI DOM
-			if(!this.isMobile){
-				let map = this.$InitIns.map.getContainer()
-				map.querySelector('.leaflet-bottom.leaflet-left').appendChild(this.$refs.bl)
-				map.querySelector('.leaflet-bottom.leaflet-right').appendChild(this.$refs.br)
-				map.querySelector('.leaflet-top.leaflet-left').appendChild(this.$refs.tl)
-				map.querySelector('.leaflet-top.leaflet-right').appendChild(this.$refs.tr)
-		
-				// mount scale and coord info
-				this.$refs.scaleCoordInfo.appendChild(this.$InitIns.getScaleDom())
-				this.$refs.scaleCoordInfo.appendChild(this.$InitIns.setCoordWhenMouseMove())
-			}
-			
+
 			// 載入圖層
 			await this.layerHandler()
 
@@ -111,7 +106,7 @@ export default {
 			this.eventHandler()
 
 			// 開啟圖層側邊欄
-			!this.isMobile && this.SET_CARD_VISIBLE({key:'layer',bool:true})
+			// !this.isMobile && this.SET_CARD_VISIBLE({key:'layer',bool:true})
 
 			await this.initAfterMapMounted(this) // Action after mount
 
@@ -119,8 +114,9 @@ export default {
 			console.error(e)
 			this.$alert(`地圖載入過程發生錯誤 : ${e}`,{type:"error"})
 		}finally{
-			console.log("map loaded")
+			console.log("[map loaded & constructed]")
 			this.loading.close()
+			this.mapConstructed = true
 		}
 	},
 	methods:{
@@ -141,6 +137,7 @@ export default {
 			/** evt @see https://leafletjs.com/reference-1.6.0.html#mouseevent-latlng */
 
 			map.on("click",evt=>{
+				console.log("[ map clicked ]", evt)
 				let qResult = this.$LayerIns.queryByLatLng(evt.latlng)
 				if(!qResult.length) return
 
@@ -162,7 +159,6 @@ export default {
 				history.replaceState(null, document.title, `?loc=${locStr}`)
 			}
 
-			setLocation()
 			map.on('moveend', evt=>setLocation())
 			
 		},
@@ -214,35 +210,6 @@ export default {
 	height: 100%;
 	width: 100%;
 	z-index: 0;
-}
-
-.logo{
-	z-index: 1;
-	position: fixed;
-	left: 1rem;
-	right: 0;
-	bottom: 0.8rem;
-	pointer-events: none;
-	img{
-		max-width: 200px;
-	}
-}
-
-.mask{
-	z-index: 0;
-	pointer-events: none;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	width: 100%;
-	height: 80px;
-	background:linear-gradient(360deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 38%, rgba(0, 0, 0, 0.25) 60%, rgba(0, 0, 0, 0) 100%);
-}
-
-.scaleCoordInfo{
-	display:flex;
-	align-items: center;
 }
 
 </style>

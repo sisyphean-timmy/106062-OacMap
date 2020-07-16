@@ -6,25 +6,26 @@
 		@click.native="handleOpacitySlider"
 	)
 		.icon
-			img(:src="layer.icon")
+			i(:class="layer.icon")
 
 		.layer-card__content
 			.layer-card__content__head
 				//- 名稱
 				strong(style="line-height:200%;")
 					div(style="display:flex;align-items:center;")
-						span {{layer.title}}
+						span {{/商港海象觀測站/.test(layer.title) ? `${layer.title}(更新中)` : layer.title}}
 				div(ref="outterButton" style="display:flex;align-items:center;")
 					//- 開關
 					el-switch(
-						:value="layer.visible"
+						:disabled="/商港海象觀測站/.test(layer.title)"
+						:value="/商港海象觀測站/.test(layer.title) ? false : layer.visible"
 						:title="layer.visible?'關閉圖層':'開啟圖層'"
 						@change="$emit('switch',$event)"
 					)
 					el-button(
 						type="text" 
 						title="圖層來源網址"
-						:disabled="!layer.dataSet" 
+						:disabled="!layer.dataSet || /商港海象觀測站/.test(layer.title)"
 						style="padding:0 0 0 0.5rem;"
 						@click="openDataSource(layer.dataSet)" 
 					)
@@ -100,13 +101,8 @@ export default {
 	
 	.icon{
 		padding: 0 1rem;
-		cursor: -webkit-grab;
-		cursor: grab;
+		color: $primary;
 		z-index: 2;
-		img{
-			height: 1.2rem;
-			width: 1.2rem;
-		}
 	}
 	
 	.layer-card{

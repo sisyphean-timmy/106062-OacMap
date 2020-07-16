@@ -25,6 +25,13 @@ module.exports = {
                 }
             ]
         },
+        iconPaths: {
+            favicon32: './img/icon/manifest-icon-192.png',
+            favicon16: './img/icon/manifest-icon-192.png',
+            appleTouchIcon: './img/icon/manifest-icon-192.png',
+            maskIcon: './img/icon/manifest-icon-192.png',
+            msTileImage: './img/icon/manifest-icon-192.png'
+        },
         /** configure the workbox plugin @see https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-window.Workbox */
         workboxPluginMode: 'InjectManifest',
         workboxOptions: {
