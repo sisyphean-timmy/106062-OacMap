@@ -9,6 +9,7 @@ const ZIP = require("node-zip")
 const Togeojson = require('togeojson')
 
 const bodyParser = require('body-parser');
+const { count } = require('console');
 
 app.use('/demo', express.static('demo'))
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -94,7 +95,25 @@ const handleCWBTyphoonData = async()=>{
 
             }
         }
-        return result
+
+        // 整理
+        let filtered = {}
+        filtered["颱風消息"] = result["颱風消息"] //feature
+
+        const ptr = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]
+        console.log(result["颱風路徑"]["cwbtyphfcst"]["announcement"])
+        const props = ptr.typhoon.properties
+        filtered["颱風路徑"] = {
+            time:ptr['@published'],
+            count:ptr['@typhcount'],
+            name:props.typhname,
+            data:{
+                curr:ptr.typhoon.typhdata.curr.point,
+                fcst:ptr.typhoon.typhdata.fcst.point,
+                past:ptr.typhoon.typhdata.past.point
+            }
+        }
+        return filtered
     }catch(e){
         console.error(e)
     }

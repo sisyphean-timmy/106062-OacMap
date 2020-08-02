@@ -19,6 +19,10 @@ notification
     white-space: pre-line;
     background-color: $aux; //- rgba(255, 255, 255, 0.8)
     color: $text;
+    &__group{
+        display: flex;
+        align-items: center;
+    }
 }
 
 

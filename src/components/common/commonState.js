@@ -61,10 +61,13 @@ export default {
             
             await context.dispatch("getGACount")
             
+            componentContext.$notify.close()
             componentContext.$notify({
                 title: "颱風警報",
-                message: "哈比克",
+                // message: "哈比克",
+                showClose:false,
                 type: "warning",
+                offset: 80,
                 duration:0,
                 position:"bottom-right"
             })

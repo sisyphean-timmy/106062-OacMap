@@ -49,7 +49,48 @@ export class TyphoonLayer extends L.Layer implements ILayer{
             const json = await this.fetchData()
             console.log(json)
 
-            L.geoJSON(json["颱風消息"]).addTo(map)
+            L.geoJSON(json["颱風消息"],{
+                pointToLayer:(geoJsonPoint, latlng)=>{
+                    const mk = L.circleMarker(latlng,{
+                        color:"black",
+                        radius:2.5
+                    })
+                    mk.bindPopup(`${JSON.stringify(geoJsonPoint.properties)}`)
+                    return mk
+                },
+                onEachFeature:(feature, layer:L.GeoJSON)=>{
+                    
+                    if(feature.geometry.type === "Polygon"){
+                        if(/預測/g.test(feature.properties.name)){
+                            layer.setStyle({
+                                opacity:0.5,
+                                fillColor:"#ffff55",
+                                color:"red",
+                                weight: 2
+                            })
+                        }else{ // current
+                            layer.setStyle({
+                                opacity:0.8,
+                                color:"#ffffff",
+                                fillColor:"",
+                                weight: 3
+                            })
+                        }
+                    }
+                    if(feature.geometry.type === "LineString"){
+                        /**TODO: get start and current point 's extent
+                         * if point in the extent : past path -> use solid style
+                         */
+                        layer.setStyle({
+                            dashArray: '5, 10',
+                            lineCap: 'square',
+                            opacity:0.5,
+                            color:"black",
+                            weight: 2
+                        })
+                    }
+                }
+            }).addTo(map)
 
         })()
         return this
