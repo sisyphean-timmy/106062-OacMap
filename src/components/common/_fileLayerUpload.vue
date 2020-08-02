@@ -40,29 +40,6 @@ export default {
 			const f = this.fileList.find(f=>f.uid === uid)
 			f.style.color = evt
 		},
-		async handleUpload(){
-			if(!this.fileList.length) return 
-			let ptr = this.fileList[0]
-			try{
-				
-				const subjects = this.commonState("subjects")
-				const activedSubjects = this.commonState("activedSubject")
-				
-				const lyr = await this.$LayerIns.addFileLayer(ptr.raw,{
-					name:ptr.name,
-					style:ptr.style
-				})
-				this.SNAPSHOT_RAW_LAYER({
-					type:"layer",
-					payload:lyr
-				})
-				this.layerCategoryVisible = false
-				this.$alert(`圖資上傳成功 : ${ptr.name}`,{type:"success"})
-				
-			}catch(e){
-				this.$alert("發生錯誤 : "+e,{type:"error"})
-			}
-		},
 		removeFile(uid){
 			const f = this.fileList.find(f=>f.uid === uid)
 			const i = this.fileList.indexOf(f)

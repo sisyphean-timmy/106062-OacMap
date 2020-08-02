@@ -3,6 +3,17 @@ export default {
     state: {
         layer: [],
         baseLayer: [],
+        // 已啟用的天氣圖層的包含的時間陣列
+        activedWeatherLyr: {
+            id: '',
+            times: []
+        },
+        // 圖例
+        legend: {
+            label: "",
+            colorScaleLabel: [],
+            colorScaleValue: [],
+        }
     },
     actions: {},
     mutations: {
@@ -26,7 +37,7 @@ export default {
         /**
          * 更新一般圖層屬性
          * @param {string} id
-         * @param {object} payload 已定義的欲更新之圖層屬性(選填)
+         * @param {object} payload 已定義的欲更新之圖層屬性
          */
         UPDATE_LAYER_OPTIONS: (state, { id, payload }) => {
             try {
@@ -45,12 +56,12 @@ export default {
         /**
          * 更新底圖圖層屬性
          * @param {string} id
-         * @param {object} payload 已定義的欲更新之圖層屬性(選填)
+         * @param {object} payload 已定義的欲更新之圖層屬性
          */
         UPDATE_BASELAYER_OPTIONS: (state, { id, payload }) => {
             try {
                 /** 底圖屬性的 更新 只作用在 "可見的圖層" */
-                if (Object.keys(payload).includes('visible')) {
+                if (Object.keys(payload).indexOf('visible') > -1) {
                     state['baseLayer'].forEach(bLyr => bLyr.visible = bLyr.id === id)
                     delete payload['visible']
                 }
@@ -66,22 +77,64 @@ export default {
             } catch (e) {
                 throw new Error(e)
             }
+        },
+        /** 紀錄啟用的氣象圖層資訊 */
+        SET_ACTIVED_WEATHER_DATA: (state, { id, times = [], legend = {} }) => {
+
+            // 時間資訊
+            state.activedWeatherLyr.id = id
+            const t = state.activedWeatherLyr.times
+            t.splice(0, t.length, ...times)
+
+            // 圖例資訊
+            const LL = state.legend.colorScaleLabel
+            const LC = state.legend.colorScaleValue
+
+            state.legend.label = legend.label || ""
+            const P_LL = legend.colorScaleLabel || []
+            const P_LC = legend.colorScaleValue || []
+            LL.splice(0, LL.length, ...P_LL)
+            LC.splice(0, LC.length, ...P_LC)
+
         }
     },
     getters: {
         state: state => key => state[key],
-        /** TODO: freezedLayer 改為海象氣象圖層 */
-        sortableLayer: (state, g, rg) => {
-            const activedSubject = rg["common/common"]["activedSubject"]
-            const subjects = rg["common/common"]["subjects"]
-            const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => /filelayer/ig.test(l.type) || /geojson|clusterMark/ig.test(l.type) && l.catelog.some(c => cateLogs.includes(c.value)))
+        _currentTag: (state, getters, rootGetters) => {
+            return rootGetters["common/common"]["currentTag"]
+                // const activedSubject = rootGetters["common/common"]["activedSubject"]
+                // const tags = rootGetters["common/common"]["currentTag"]
+                // return subjects.find(i => i.label === activedSubject).value
         },
-        freezedLayer: (state, g, rg) => {
-            const activedSubject = rg["common/common"]["activedSubject"]
-            const subjects = rg["common/common"]["subjects"]
-            const cateLogs = subjects.find(i => i.label === activedSubject).value
-            return state.layer.filter(l => !(/filelayer|geojson|clusterMark/ig.test(l.type)) && l.catelog.some(c => cateLogs.includes(c.value)))
+        /** 可排序的圖層 */
+        sortableLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /filelayer|geojson/ig.test(l.type) && tagMatch
+            })
+        },
+        /** 預報 */
+        weatherLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /heatmap|velocity|gradient/ig.test(l.type) && tagMatch
+            })
+        },
+        /** 點狀 */
+        pointerLayer: (state, getters) => {
+            return state.layer.filter(l => {
+                let tagMatch = true
+                if (getters._currentTag) {
+                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
+                }
+                return /cluster|mark/ig.test(l.type) && tagMatch
+            })
         }
     }
 }

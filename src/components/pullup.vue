@@ -4,7 +4,7 @@
             :style="`bottom:${offsetBottom}px`"
             :reservedHeight='reservedHeightModel'
             :headerHeight="headerHeightModel"
-            :height="height||'70vh'"
+            :height="caculatedHeight||'70vh'"
             backgroundColor='#ffffff'
             ref="pullup"
         ) 
@@ -55,6 +55,7 @@ export default {
         evtDomMain:null, // dom ptr
         evtDomBody:null, // dom ptr
         headerHeight: 18,  // 頁首高度
+        caculatedHeight:""
     }),
     watch:{
         value:{
@@ -108,6 +109,15 @@ export default {
             this.ptr.toggleDown()
             this.$emit('input',this.isClosed?'close':'bottom')
         },
+        caculatePullupHeight(){
+			setTimeout(()=>{
+				// if(!this.$refs.pullup) return
+				let hpx = this.$refs.pullup.$el.querySelector('.pullup__wrapper').clientHeight
+				let hvh = Math.round(hpx * 100 / window.innerHeight)
+				console.log(`caculatePullupHeight new height : ${hpx}px,${hvh}vh`)
+				this.caculatedHeight = `${ hvh < 70 ? hvh : 70 }vh`
+			},250)
+		},
         handleTouchEnd(e){
             if(this.isClosed){
                 return
@@ -135,7 +145,7 @@ export default {
             if(this.evtDomBody.clientHeight + this.evtDomBody.scrollTop === this.evtDomBody.scrollHeight){
                 this.$emit("scrollEnd")
             }
-        }
+        },
     },
     mounted(){
         this.ptr = this.$refs.pullup
@@ -179,7 +189,7 @@ export default {
         }
         .panel-handle{
             &:after {
-                background-color: $text !important;
+                background-color: rgba($text,0.3) !important;
             }
         }
         .panel-body{

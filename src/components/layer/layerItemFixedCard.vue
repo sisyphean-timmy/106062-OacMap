@@ -3,10 +3,9 @@
 	el-card.layer-card(
 		shadow="hover"
 		:class="isOutScaleStyle ? 'layer-card--outscale' : !layer.visible ? 'layer-card--disabled ' :'layer-card--default'"
-		@click.native="handleOpacitySlider"
 	)
 		.icon
-			img(:src="layer.icon")
+			i(:class="layer.icon")
 
 		.layer-card__content
 			.layer-card__content__head
@@ -14,33 +13,33 @@
 				strong(style="line-height:200%;")
 					div(style="display:flex;align-items:center;")
 						span {{layer.title}}
-				div(ref="buttonNotTriggerShowOpacity" style="display:flex;align-items:center;")
+				div(ref="outterButton" style="display:flex;align-items:center;")
 					//- 開關
 					el-switch(
+						:disabled="false"
 						:value="layer.visible"
 						:title="layer.visible?'關閉圖層':'開啟圖層'"
 						@change="$emit('switch',$event)"
 					)
-					el-button(
-						type="text" 
-						title="圖層來源網址"
-						:disabled="!layer.dataSet" 
-						style="padding:0 0 0 0.5rem;"
-						@click="openDataSource(layer.dataSet)" 
+					el-tooltip(
+						placement="right"
 					)
-						font-awesome-icon(icon="info-circle")
+						el-button(
+							type="text" 
+							title="圖層來源網址"
+							:disabled="!layer.dataSet"
+							style="padding:0 0 0 0.5rem;"
+						)
+							font-awesome-icon(icon="question-circle")
 
-		//-
-		el-dialog(
-			v-if="dataSetDialogVisible"
-			@close="dataSetDialogVisible=false"
-			:title="dataSetDialogTitle"
-			visible
-			show-close
-			append-to-body	
-			center
-		)
-			span {{dataSetDialogDetail}}
+						.dataSetLink(slot="content")
+							strong 資料來源
+							div(v-for="i,index in layer.dataSet")
+								a(
+									target="_blank"
+									:href="i.value"
+								) {{i.label}}
+
 </template>
 
 <script>
@@ -58,10 +57,8 @@ export default {
 		
 	},
 	data:()=>({
-		detailVisibility:false,
 		//-
 		dataSetDialogVisible:false,
-		dataSetDialogTitle:"",
 		dataSetDialogDetail:"",
 	}),
 	props:{
@@ -79,16 +76,6 @@ export default {
 		}
 	},
 	methods:{
-		...mapMutations({
-			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
-		}),
-		handleOpacitySlider(evt){
-			if(evt.path.includes(this.$refs.buttonNotTriggerShowOpacity)) return
-			this.detailVisibility = !this.detailVisibility
-		},
-		openDataSource(dataUrl){
-			window.open(dataUrl,"_blank")
-		}
 	},
 }
 </script>
@@ -97,25 +84,35 @@ export default {
 
 
 <style lang="scss" scoped>
-	
+
+	.dataSetLink{
+		width:auto;
+		max-width:250px;
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		line-height: 200%;
+		&>*{
+			margin: 0 0.5rem;
+		}
+		a{
+			color:$primary;
+		}
+	}
+
 	.icon{
 		padding: 0 1rem;
-		cursor: -webkit-grab;
-		cursor: grab;
+		color: $primary;
 		z-index: 2;
-		img{
-			height: 1.2rem;
-			width: 1.2rem;
-		}
 	}
 	
 	.layer-card{
 		margin: 1rem auto;
 		box-sizing: border-box;
-		position: relative;
-		cursor: pointer;
+        position: relative;
 		/deep/ {
 			.el-card__body{
+                font-size: 1rem;
 				padding:0.35rem 0.6rem;
 				display:flex;
 				align-items: center;

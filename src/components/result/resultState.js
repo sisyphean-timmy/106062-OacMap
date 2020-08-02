@@ -87,6 +87,17 @@ export default {
             let keysHasData = Object.keys(ptr).filter(k => ptr[k].length)
             keysHasData.forEach(k => cnt += ptr[k].length)
             return cnt
+        },
+        allR2: state => {
+            let data = []
+            Object.values(state.history).forEach(arr => {
+                arr.forEach(i => {
+                    if (!data.some(ei => ei.dataId === i.dataId)) {
+                        data.push(i)
+                    }
+                })
+            })
+            return data.length
         }
     }
 }

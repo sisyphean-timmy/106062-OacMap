@@ -1,13 +1,16 @@
 
 {
+    "exclude": [
+        "typescript/src/**/_temp"
+    ],
     "include": [
-        "typescript/src/**/*"
+        "typescript/src/**/*",
     ],
     "compilerOptions": {
-        "experimentalDecorators": true,
-        "sourceMap": true,
         // "jsx": "react",
         // "jsxFactory": "tsx",
+        // "experimentalDecorators": true,
+        "sourceMap": true,
         "outDir": "typescript/dist", 
         "moduleResolution": "node",
         "resolveJsonModule": true,
@@ -15,6 +18,7 @@
         "module":"esnext",
         "typeRoots": [
             "node_modules/@types",
+            "typescript/src/@types"
         ]
     }
 }

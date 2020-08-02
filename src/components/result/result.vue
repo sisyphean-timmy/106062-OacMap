@@ -164,8 +164,16 @@ export default {
             DELETE_RESULT:"result/result/DELETE_RESULT",
             INIT_NEWADD:"result/result/INIT_NEWADD",
             SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
+            UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
         }),
         locate(evt){
+            
+            // 定位時連動打開圖層可視
+            this.UPDATE_LAYER_OPTIONS({
+                id:evt.layerId,
+                payload:{visible:true}
+            })
+
             let dom = document.querySelector(".content-card")
             const LOffset = dom ? dom.clientWidth : 0
             evt.goTo({
@@ -213,6 +221,7 @@ export default {
             flex-wrap:wrap;
             line-height: 150%;
             margin: 0 0 1rem 0;
+            width: 100%;
             .link{
                 color: darken($primary, 20);
                 font-weight: bold;

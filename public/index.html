@@ -4,8 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no,minimal-ui">
-    <!-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch"></script>
+    <style>
+        * {
+            -ms-overflow-style: none;
+        }
+    </style>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
     <script>
         window.dataLayer = window.dataLayer || [];
 
@@ -15,17 +24,9 @@
         gtag('js', new Date());
         gtag('config', 'UA-170467042-1');
     </script>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-170467042-1"></script>
 
-    <!--[if !IE]>-->
-    <!--@see https://github.com/vuejs-templates/webpack/issues/474-->
-    <script src="https://cdn.polyfill.io/v2/polyfill.js?features=fetch"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <style>
-        * {
-            -ms-overflow-style: none;
-        }
-    </style>
     <link rel="icon" type="image/png" sizes="196x196" href="img/icon/favicon-196.png">
 
     <link rel="apple-touch-icon" sizes="180x180" href="img/icon/apple-icon-180.png">
@@ -55,13 +56,13 @@
     <link rel="apple-touch-startup-image" href="img/icon/apple-splash-1334-750.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
     <link rel="apple-touch-startup-image" href="img/icon/apple-splash-640-1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
     <link rel="apple-touch-startup-image" href="img/icon/apple-splash-1136-640.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
-    <!--<![endif]-->
-    <title>海域遊憩活動一站式資訊平臺</title>
+
+    <title>海域整合資訊</title>
 </head>
 
 <body>
     <noscript>
-        <strong>We're sorry but hccgmap doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        <strong>It doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
