@@ -24,7 +24,7 @@ dom.watch()
 // VUEX
 import store from './store'
 
-// import './registerServiceWorker'
+import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
