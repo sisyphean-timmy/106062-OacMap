@@ -2,6 +2,8 @@ const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 const { InjectManifest } = require('workbox-webpack-plugin');
 const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
+const fs = require('fs');
+
 const ENV = "https://ocean.taiwan.gov.tw"
 
 module.exports = {
@@ -57,7 +59,7 @@ module.exports = {
          * 參考(\node_modules\@vue\cli-plugin-pwa)
          * @see https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-webpack-plugin.InjectManifest
          */
-        if (process.env.NODE_ENV !== 'production') {
+        /*if (process.env.NODE_ENV !== 'production') {
             config.plugins.push(
                 new InjectManifest({
                     swSrc: 'public/sw.js',
@@ -69,7 +71,7 @@ module.exports = {
                     ]
                 })
             )
-        }
+        }*/
     },
     chainWebpack: config => {
 
@@ -95,8 +97,9 @@ module.exports = {
     devServer: {
         /** 自簽SSL證書 */
         https: true,
-        // key: fs.readFileSync('./cert/server.key'),
-        // cert: fs.readFileSync('./cert/server.crt'),
+        key: fs.readFileSync('./cert/server.key'),
+        cert: fs.readFileSync('./cert/server.crt'),
+        disableHostCheck: true,
         /** 代理 */
         // secure: true, // https 接口
         // changeOrigin: true, // 包含域名
