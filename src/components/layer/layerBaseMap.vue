@@ -50,7 +50,7 @@
 					el-image(
 						fit="cover" 
 						:alt="'選擇'+lyr.name"
-						:src="require('@/assets/basemap/'+lyr.imgFileName)"
+						:src="require('@/assets/basemap/'+lyr.imgUrl)"
 					)
 					strong {{ lyr.name }}
 
@@ -102,7 +102,7 @@ export default {
 			return this.currentLayer.id
 		},
 		currentImgPath(){
-			return require('@/assets/basemap/'+this.currentLayer.imgFileName)
+			return require('@/assets/basemap/'+this.currentLayer.imgUrl)
 		},
 		currentOpacity(){
 			return Number(Number(this.currentLayer.opacity*100).toFixed(0))
@@ -126,7 +126,7 @@ export default {
 		handleBaseLayerOpacity(opacity){
 			console.log("baseMap opacity chaged : ", opacity)
 			//- update map instance
-			this.$LayerIns.setOpacity(this.currentID,opacity)
+			this.$LayerIns.setOpts(this.currentID,{opacity})
 			//- update state snapshot
 			this.UPDATE_BASELAYER_OPTIONS({
 				id:this.currentID,

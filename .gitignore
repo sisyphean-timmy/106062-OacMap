@@ -5,6 +5,9 @@ node_modules
 /public/img/icon
 *.mp4
 
+backend/ocm
+backend/layer
+
 # local env files
 .env.local
 .env.*.local

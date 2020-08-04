@@ -1,0 +1,399 @@
+{
+    "baseLayers": [{
+            "type": "wmts",
+            "title": "OSM",
+            "url": "https://gis.sinica.edu.tw/worldmap/file-exists.php?img=OSM-png-{z}-{x}-{y}",
+            "imgUrl": "bmOSM.png",
+            "opacity": 1,
+            "maxZoom": 18
+        },
+        {
+            "type": "wmts",
+            "title": "臺灣通用正射影像",
+            "url": "https://wmts.nlsc.gov.tw/wmts/PHOTO2/default/GoogleMapsCompatible/{z}/{y}/{x}",
+            "imgUrl": "bmNlscBase2.jpg",
+            "opacity": 1,
+            "maxZoom": 18
+        },
+        {
+            "type": "wmts",
+            "title": "台灣通用電子地圖(黑底)",
+            "url": "https://wmts.nlsc.gov.tw/wmts/EMAP2/default/GoogleMapsCompatible/{z}/{y}/{x}",
+            "imgUrl": "bmNlscBaseAlpha.png",
+            "opacity": 1,
+            "maxZoom": 18
+        },
+        {
+            "type": "wmts",
+            "title": "台灣通用電子地圖(灰階)",
+            "url": "https://wmts.nlsc.gov.tw/wmts/EMAP01/default/GoogleMapsCompatible/{z}/{y}/{x}",
+            "imgUrl": "bmNlscBaseGray.png",
+            "opacity": 1,
+            "maxZoom": 18
+        },
+        {
+            "type": "wmts",
+            "title": "台灣通用電子地圖",
+            "url": "https://wmts.nlsc.gov.tw/wmts/EMAP/default/GoogleMapsCompatible/{z}/{y}/{x}",
+            "imgUrl": "bmNlscBase.png",
+            "opacity": 1,
+            "maxZoom": 18
+        }
+    ],
+    "layers": [{
+            "title": "各類海洋保護區",
+            "url": "./layers/3.json",
+            "visible": false,
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(205, 147, 251)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "沿海一般保護區",
+            "url": "./layers/4.json",
+            "visible": true,
+            "type": "geojson",
+            "tag": [],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(228, 214, 161)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "沿海自然保護區",
+            "url": "./layers/5.json",
+            "visible": true,
+            "type": "geojson",
+            "tag": [],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(228, 155, 161)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "人工魚礁區及保護礁區",
+            "url": "./layers/2.json",
+            "dataSet": [{ "label": "人工魚礁區及保護礁區", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=漁業資源保育" }],
+            "visible": false,
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(235, 244, 154)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "海上平台設置範圍",
+            "url": "./layers/6.json",
+            "visible": false,
+            "type": "geojson",
+            "tag": [],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(164, 244, 153)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "水域遊憩範圍",
+            "url": "./layers/8.json",
+            "visible": true,
+            "type": "geojson",
+            "tag": [],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(50, 147, 126)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "漁港商港公告釣點",
+            "url": "./layers/1.json",
+            "visible": false,
+            "type": "geojson",
+            "tag": ["A"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(255, 0, 0)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "港區範圍",
+            "url": "./layers/7.json",
+            "dataSet": [{ "label": "港區範圍", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?pn=10" }],
+            "visible": true,
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(51, 136, 255)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "定置漁場",
+            "url": "./layers/9.json",
+            "dataSet": [{ "label": "定置漁場", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=其他" }],
+            "visible": true,
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(103, 58, 183)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "養殖箱網",
+            "url": "./layers/22.json",
+            "dataSet": [{ "label": "養殖箱網", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=其他" }],
+            "visible": true,
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(139, 195, 74)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "開放垂釣之漁港",
+            "dataSet": [{ "label": "開放垂釣之漁港", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?k=其他" }],
+            "url": "./layers/11.json",
+            "visible": true,
+            "type": "geojson",
+            "tag": ["C"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(156, 39, 176)",
+                "weight": 2
+            }
+        },
+        {
+            "title": "交通船、遊艇40呎以下",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_5_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "交通船、遊艇40至80呎",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_6_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "交通船、遊艇80至120呎",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_7_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "巡防艇20噸以下、漁船CT2以下",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_1_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "巡防艇20至60 噸、漁船CT3",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_2_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "巡防艇60噸以上、漁船CT4至CT6",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_3_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "巡防艦、巡護船、漁船CT7至CT8",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_4_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "動力小船",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeWRF_8_CONF_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "異常波浪潛勢",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeOFW_risk_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor"
+            }
+        },
+        {
+            "title": "OCM模式預報-海表鹽度",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSALT_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "OCM模式預報-海表高度",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmWL_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "OCM模式預報-海表溫度",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSST_Now/json/index.json",
+            "visible": false,
+            "type": "gradient",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "WIFI_10米風資料",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/PDSWind/index.json",
+            "visible": false,
+            "type": "velocity",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "臺灣海域預報-波浪週期",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
+            "visible": false,
+            "type": "wavePeriodGradient",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "臺灣海域預報-波浪浪高",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
+            "visible": false,
+            "type": "waveHeightGradient",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "OCM模式預報-表面海流",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmUV/json/index.json",
+            "visible": false,
+            "type": "velocity",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "velocityScale": 0.1,
+                "lineWidth": 1,
+                "colorScale": ["#4a4a4a"],
+                "particleMultiplier": 0.002,
+                "opacity": 0.97,
+                "frameRate": 60
+            }
+        },
+        {
+            "title": "颱風路徑",
+            "url": "http://localhost:3000/typhoon",
+            "visible": true,
+            "tag": [],
+            "dataSet": [{ "label": "", "value": "" }],
+            "type": "typhoonLayer"
+        },
+        {
+            "title": "觀光景點資訊",
+            "url": "./layers/scenic_spot_C_f_2km.json",
+            "visible": true,
+            "dataSet": [{ "label": "觀光景點資訊", "value": "https://data.gov.tw/dataset/7777" }],
+            "type": "markScenicSpot",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "icon": "fas fa-star",
+                "featureProperties": {
+                    "title": "Name",
+                    "photo": ["Picture1", "Picture2", "Picture3"],
+                    "description": ["description", "Toldescribe"]
+                }
+            }
+        },
+        {
+            "title": "遊艇泊位統計",
+            "url": "./layers/20.json",
+            "dataSet": [{ "label": "遊艇泊位統計", "value": "https://data.gov.tw/dataset/126692" }],
+            "visible": true,
+            "type": "clusterMark",
+            "tag": [],
+            "layerOption": {
+                "icon": "fas fa-ship"
+            }
+        },
+        {
+            "title": "商港海象觀測站",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/isoheStation/json/isoheStations.json",
+            "visible": true,
+            "dataSet": [{ "label": "商港海象觀測站", "value": "https://isohe.ihmt.gov.tw/station/OpenData/XML/GetObsStationXML.aspx" },
+                { "label": "基隆港氣象資訊", "value": "https://data.gov.tw/dataset/127851" },
+                { "label": "蘇澳港氣象資訊", "value": "https://data.gov.tw/dataset/127855" },
+                { "label": "花蓮港氣象資訊", "value": "https://data.gov.tw/dataset/127852" },
+                { "label": "臺中港氣象資訊", "value": "https://data.gov.tw/dataset/127831" },
+                { "label": "高雄港氣象資訊", "value": "https://data.gov.tw/dataset/127853" },
+                { "label": "臺北港氣象資訊", "value": "https://data.gov.tw/dataset/127836" },
+                { "label": "布袋港氣象資訊", "value": "https://data.gov.tw/dataset/127840" },
+                { "label": "安平港氣象資訊", "value": "https://data.gov.tw/dataset/127846" },
+                { "label": "馬祖南竿氣象資訊", "value": "https://data.gov.tw/dataset/127847" }
+            ],
+            "type": "markIsoheStation",
+            "tag": ["C"],
+            "layerOption": {
+                "icon": "fas fa-temperature-high"
+            }
+        },
+        {
+            "title": "臺灣地區漁港資料",
+            "url": "./layers/19.json",
+            "visible": true,
+            "dataSet": [{ "label": "臺灣地區漁港資料", "value": "https://www.fa.gov.tw/cht/OpenData/index.aspx?pn=10" }],
+            "type": "clusterMark",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "icon": "fas fa-fish",
+                "featureProperties": {
+                    "title": "漁港名稱",
+                    "description": ["漁港名稱", "類別"]
+                }
+            }
+        }
+    ]
+}

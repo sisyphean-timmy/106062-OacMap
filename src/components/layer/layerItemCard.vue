@@ -7,6 +7,7 @@
 	)
 		
 		.dragger(
+			v-if="!isIE"
 			v-handle
 			:style="isRetrival?'color:red;':''"
 			@click.stop="emitDeActiveLayer(layer)"
@@ -44,25 +45,34 @@
 						//- 	br
 
 						div(style="display:flex;align-items:center;")
-							.color-legendRGBStr(:style="`backgroundColor:${colorModel};`")
+							.color-legendColor(:style="`backgroundColor:${colorModel};`")
 							span {{layer.title}}
 
-					div(ref="buttonNotTriggerShowOpacity" style="display:flex;align-items:center;")
-						//- 開關
+					div(ref="outterButton" style="display:flex;align-items:center;")
 						el-switch(
 							:value="layer.visible"
 							:title="layer.visible?'關閉圖層':'開啟圖層'"
 							@change="$emit('switch',$event)"
 						)
 
-						el-button(
-							type="text" 
-							title="圖層來源網址"
-							style="padding:0 0 0 0.5rem;"
-							:disabled="!layer.dataSet" 
-							@click="openDataSource(layer.dataSet)" 
+						el-tooltip(
+							placement="right"
 						)
-							font-awesome-icon(icon="info-circle")
+							el-button(
+								type="text" 
+								title="圖層來源網址"
+								:disabled="!layer.dataSet"
+								style="padding:0 0 0 0.5rem;"
+							)
+								font-awesome-icon(icon="question-circle")
+
+							.dataSetLink(slot="content")
+								strong 資料來源
+								div(v-for="i,index in layer.dataSet")
+									a(
+										target="_blank"
+										:href="i.value"
+									) {{i.label}}
 
 				div(v-if="detailVisibility && layer.visible && !isOutScaleStyle")
 					transition(name="fade")
@@ -80,14 +90,13 @@
 
 <script>
 
+/** 調色、顏色功能 IE 不支援 : 移除 */
 import { mapGetters, mapMutations } from 'vuex'
 import { HandleDirective } from 'vue-slicksort'
 
 let colorConverter = (!document.documentMode) ? require("color-convert") : "";
 
-/**
- * @see https://www.npmjs.com/package/vue-color
- */
+/** @see https://www.npmjs.com/package/vue-color */
 import {Slider as colorSliderPicker} from "vue-color"
 
 /**
@@ -115,10 +124,6 @@ export default {
 			type:String,
 			validator: status => status === "" || status === "simple" || status === "outScale"
 		},
-		useDragger: {
-			type:Boolean,
-			default:true
-		},
 		isRetrival:{
 			type: Boolean,
 		}
@@ -128,7 +133,7 @@ export default {
 			rootState:"common/common/state"
 		}),
 		isIE(){
-			return this.rootState("isIE")
+			return Boolean(document.documentMode)
 		},
 		dragAvaliable(){
 			return this.layer.type === "geojson"
@@ -140,8 +145,14 @@ export default {
 					return `#efefef`
 				}
 
-				if(!colorConverter) return `#000000`
-				let rgb = this.layer.legendRGBStr.split(",")
+				if(!colorConverter){
+					if(this.isIE){
+						return `rgb(${this.layer.legendColor})`
+					}
+					return `#000000`
+				} 
+
+				let rgb = this.layer.legendColor.split(",")
 				let hslArr = colorConverter.rgb.hsl(rgb)
 				let result = {
 					hsl:{
@@ -161,14 +172,14 @@ export default {
 				console.log("color", color)
 
 				// update map 
-				this.$LayerIns.setStyle(this.layer.id,{
+				this.$LayerIns.setOpts(this.layer.id,{
 					color:color.hex
 				})
 				// update state
 				this.UPDATE_LAYER_OPTIONS({
 					id:this.layer.id,
 					payload:{
-						legendRGBStr:`${color.rgba.r},${color.rgba.g},${color.rgba.b}`
+						legendColor:`${color.rgba.r},${color.rgba.g},${color.rgba.b}`
 					}
 				})
 
@@ -185,14 +196,8 @@ export default {
 				transform: `scale(${ this.handleOpacityFloat },1)`
 			}
 		},
-		mapScale(){
-			return this.rootState('scale')
-		},
 		isSimpleStyle(){
 			return this.status === 'simple'
-		},
-		mapScale(){
-			return this.rootState('scale')
 		},
 		isOutScaleStyle(){
 			return this.status === 'outScale'
@@ -203,16 +208,13 @@ export default {
 			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
 		}),
 		handleOpacitySlider(evt){
-			if(evt.path.includes(this.$refs.buttonNotTriggerShowOpacity)) return
+			if(this.$refs.outterButton.contains(evt.target)) return
 			this.detailVisibility = !this.detailVisibility
 		},
 		emitDeActiveLayer(layer){
 			if(this.isRetrival){
 				this.$emit("deActiveLayer",layer)
 			}
-		},
-		openDataSource(dataUrl){
-			window.open(dataUrl,"_blank")
 		}
 	},
 }
@@ -229,6 +231,7 @@ export default {
 		cursor: pointer;
 		/deep/ {
 			.el-card__body{
+                font-size: 1rem;
 				padding:0.35rem 0.6rem;
 				display:flex;
 				align-items: center;
@@ -302,7 +305,7 @@ export default {
 		z-index: 2;
 	}
 
-	.color-legendRGBStr{
+	.color-legendColor{
 		border:2px solid #ffffff;
 		border-radius: 100%;
 		margin-right: 0.5rem;
@@ -310,6 +313,20 @@ export default {
 		height:0.9rem;
 		// box-shadow: 0 0 1px 2px rgba(0,0,0,0.1);
 	}
-
+	
+	.dataSetLink{
+		width:auto;
+		max-width:250px;
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		line-height: 200%;
+		&>*{
+			margin: 0 0.5rem;
+		}
+		a{
+			color:$primary;
+		}
+	}
 
 </style>

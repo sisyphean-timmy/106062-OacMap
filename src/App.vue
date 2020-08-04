@@ -1,6 +1,33 @@
 <template lang="pug">
-
 #app
+	//- DIALOG - 主畫面說明
+	el-dialog(
+		:title="dialogTitle"
+		v-if="dialogVisibility"
+		@close="dialogTitle = '';dialogVisibility = false"
+		visible
+		show-close
+		append-to-body	
+		center
+		:top="'10vh'"
+	)
+		template(v-if="dialogTitle === '加至主畫面說明'")
+			addToHome(@close="dialogTitle = '';dialogVisibility = false")
+		template(v-else-if="dialogTitle === '搜尋'")
+			searchAndFilterLayer(@close="dialogTitle = '';dialogVisibility = false")
+
+	//- DRAWER
+	el-drawer(
+		v-if="drawerVisibility"
+		:title="drawerTitle"
+		:size="isMobile?'100%':'30%'"
+		:visible="true"
+		direction="rtl"
+		@close="drawerTitle='';drawerVisibility = false"
+	)
+		info(v-if="drawerTitle==='相關資訊'")
+
+	//- Windy Map
 	template(v-if="windyOption.visible")
 		el-button(
 			type="danger"
@@ -9,29 +36,57 @@
 			@click="SET_WINDY_OPTION({visible:false})"
 		) 
 			font-awesome-icon(icon="chevron-left" fixed-width tansform="left-2")
-			strong 返回 {{test}}
+			strong 返回
+			
+		div(v-loading="windyLoading")
+			iframe#windy(
+				frameborder="0"
+				:style="`height:${ifh}px`"
+				:src="`https://embed.windy.com/?${windyOption.location}`"
+			)
 
-		iframe#windy(
-			:style="`height:${ifh}px`"
-			frameborder="0"
-			:src="`https://embed.windy.com/?${windyOption.location}`"
+	//- UI and alerts
+	template(v-else-if="mapConstructed")
+		.topAlert(v-if="typhoonAlert.length" @click="typhoonAlert.splice(0,typhoonAlert.legnth)")
+			div(style="display:flex;")
+				strong
+					font-awesome-icon(icon="exclamation-triangle" fixed-width size="1x")
+					| 颱風警報 
+				div(v-marquee="{width:'70vw',play:true}") 
+					| {{Object.values(typhoonAlert[0]).join()}}
+
+		component(
+			:is="isMobile ? 'mapUIxs' : 'mapUI'"
+			@openDrawer="drawerVisibility=true;drawerTitle='相關資訊'"
+			@openSearchDialog="dialogVisibility=true;dialogTitle='搜尋'"
 		)
 
-	template(v-else)
-		component(:is="isMobile ? 'mapUIxs' : 'mapUI'")
-
+	//- Map
 	#viewDiv(:style="windyOption.visible ? 'z-index:-10;' : ''")
 
-	//- 掛載到地圖的UI內
-	template(v-if="!isMobile")
-		div(ref="tl")
-		div(ref="tr")
-		div(ref="bl")
-			.logo
-				img(src="./assets/logo.png")
-			.mask
-		div(ref="br")
-			.scaleCoordInfo(ref="scaleCoordInfo")
+	//- Mark Template - mounted by render function by "markClick" event
+	div(ref="mark")
+
+	pullup(
+		ref='pullup'
+		v-if="popupData"
+		:reservedHeight='0'
+		height=""
+		style="z-index:10;position:absolute;bottom: 0;"
+	)
+		el-button.close(
+			style="position: absolute;left: auto;top: -2rem;bottom:auto;right: 1rem;"
+			@click="popupData = null" 
+			circle 
+			type="danger" 
+			size="mini"
+		)
+			font-awesome-icon(icon="times" fixed-width)
+
+		isoheStation(
+			:data="popupData"
+			@caculateHeight="$refs.pullup.caculatePullupHeight()"
+		)
 
 </template>
 
@@ -44,25 +99,81 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 import mapUI from "@/components/mapUI"
 import mapUIxs from "@/components/mapUIxs"
 
-import {Init} from "@/../typescript/dist/init/init"
+import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
+import addToHome from "@/components/dialog/addToHome"
+import info from "@/components/drawer/info"
+
+import pullup from "@/components/pullup"
+import isoheStation from "@/components/mark/isoheStation"
+
+import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
+import { marquee } from '@/directives/directives';
+
+const layerDef = require("@/layerDef.json")
+
+Vue.prototype.$openLink = link=>window.open(link,"_blank")
 
 export default {
 	name: 'app',
+	directives:{
+		marquee
+	},
 	data:()=>({
 		loading:null,
+		windyLoading: true,
+		mapConstructed:false,
+		//
+		popupData:null,
+		//
+		dialogVisibility:false,
+		dialogTitle:"",
+		// 
+		drawerVisibility:false,
+		drawerTitle:"",
+		//
+		typhoonAlert: []
 	}),
 	components:{
 		mapUI,
-		mapUIxs
+		mapUIxs,
+		addToHome,
+		info,
+		pullup,
+		isoheStation,
+		searchAndFilterLayer
 	},
 	computed:{
 		...mapGetters({
 			isMobile:"common/common/isMobile",
 			windyOption:"common/common/windyOption",
+			commonState: "common/common/state",
 		}),
 		ifh(){ // iframe 高度 減 上方按鈕高度 
 			return window.innerHeight - 32
+		}
+	},
+	watch:{
+		"windyOption.visible":{
+			handler(bool){
+				if(!bool) return 
+				this.windyLoading = true
+				this.$nextTick(()=>{
+					const Iframe = this.$el.querySelector("#windy")
+					Iframe.onload = ()=> this.windyLoading = false
+				})
+			}
+		},
+		popupData:{
+			handler(){
+				this.$nextTick(()=>{
+					if(!this.$refs.pullup) return
+					this.SET_CARD_VISIBLE({key:"result",bool:false})
+					this.SET_CARD_VISIBLE({key:"layer",bool:false})
+					this.$refs.pullup.toggleUp()
+					this.$refs.pullup.caculatePullupHeight()
+				})
+			}
 		}
 	},
 	async mounted(){
@@ -78,23 +189,10 @@ export default {
 			await this.initBeforeMapMounted(this) // Action before mount
 	
 			Vue.prototype.$InitIns = new Init("viewDiv",{
-				center:["23.830576","121.201172"],
-				zoom: 8
+				center:["23.830576","121.20172"],
+				zoom: 7
 			})
-	
-            // 將 vue template UI DOM 掛載入 leaflet map 的 UI DOM
-			if(!this.isMobile){
-				let map = this.$InitIns.map.getContainer()
-				map.querySelector('.leaflet-bottom.leaflet-left').appendChild(this.$refs.bl)
-				map.querySelector('.leaflet-bottom.leaflet-right').appendChild(this.$refs.br)
-				map.querySelector('.leaflet-top.leaflet-left').appendChild(this.$refs.tl)
-				map.querySelector('.leaflet-top.leaflet-right').appendChild(this.$refs.tr)
-		
-				// mount scale and coord info
-				this.$refs.scaleCoordInfo.appendChild(this.$InitIns.getScaleDom())
-				this.$refs.scaleCoordInfo.appendChild(this.$InitIns.setCoordWhenMouseMove())
-			}
-			
+
 			// 載入圖層
 			await this.layerHandler()
 
@@ -105,13 +203,13 @@ export default {
 				const lng = locArr[1]
 				const zoom = locArr[2]
 				this.$InitIns.map.setView({lat,lng},zoom)
-            } 
-            
-            // 初始化相關事件
-            this.eventHandler()
+			} 
+			
+			// 初始化相關事件
+			this.eventHandler()
 
-            // 開啟圖層側邊欄
-			!this.isMobile && this.SET_CARD_VISIBLE({key:'layer',bool:true})
+			this.dialogVisibility = true
+			this.dialogTitle = "加至主畫面說明"
 
 			await this.initAfterMapMounted(this) // Action after mount
 
@@ -119,8 +217,8 @@ export default {
 			console.error(e)
 			this.$alert(`地圖載入過程發生錯誤 : ${e}`,{type:"error"})
 		}finally{
-			console.log("map loaded")
 			this.loading.close()
+			this.mapConstructed = true
 		}
 	},
 	methods:{
@@ -138,48 +236,108 @@ export default {
 
 			const map = this.$InitIns.map
 
-			/** evt @see https://leafletjs.com/reference-1.6.0.html#mouseevent-latlng */
+			map.on({
+				"typhoonAlert":({data})=>{
+					this.typhoonAlert.push(...data)
+				},
+				"moveend":evt=>{
+					/** 移動後記錄位置 */
+					const lat = map.getCenter().lat
+					const lng = map.getCenter().lng
+					const zoom = map.getZoom()
+					
+					const locStr = `${lat},${lng},${zoom}`
 
-			map.on("click",evt=>{
-				let qResult = this.$LayerIns.queryByLatLng(evt.latlng)
-				if(!qResult.length) return
+					localStorage.setItem("location",`${locStr}`)
+					this.SET_WINDY_OPTION({location:`${locStr}`})
 
-				this.SET_RESULT(qResult)
-				this.SET_CARD_VISIBLE({key:'layer',bool:false})
-				this.SET_CARD_VISIBLE({key:'result',bool:true})
+					history.replaceState(null, document.title, `?loc=${locStr}`)
+				},
+				"geojsonClick":({result})=>{
+					console.log("[geojsonClick Result]", result)
+					if(!result.length) return
+					this.SET_RESULT(result)
+					this.SET_CARD_VISIBLE({key:'layer',bool:false})
+					this.SET_CARD_VISIBLE({key:'result',bool:true})
+				},
+				"markerClick":({dataType,layer,data,event})=>{
+					console.log("[markerClick]",{dataType,layer,data,event})
+					switch(dataType){
+						case "isoheStation":
+							/** 
+							 * Render fn : 
+							 * layer --> bindPopup( vue component ) ---latency---> openPopup()  
+							 */
+							// const vm = new Vue({
+							//     render: h => h(markss, {
+							//         // style: {
+							//         //     display: context.rootState['tool/tool']['activedId'] === 'googleStreetView' ? 'block' : 'none'
+							//         // },
+							//         props: {data
+							//             // width: 450,
+							//             // position: {
+							//             //     x: window.innerWidth,
+							//             //     y: 0,
+							//             //     z: 9999
+							//             // }
+							//         },
+							//         // on: {
+							//         //     close: event => context.dispatch("deActiveDispatcher")
+							//         // }
+							//     })
+							// }).$mount()
+							// setTimeout(()=>{
+							//     layer.bindPopup(vm.$el).openPopup()
+							// },100)
+							this.popupData = data //TODO: will be replace
+							break
+						case "scenicSpot":
+						default:
+							setTimeout(()=>layer.openPopup(),100)
+					}
+				}
 			})
 
-			const setLocation = () => {
-				const lat = map.getCenter().lat
-				const lng = map.getCenter().lng
-				const zoom = map.getZoom()
-				
-				const locStr = `${lat},${lng},${zoom}`
-
-				localStorage.setItem("location",`${locStr}`)
-				this.SET_WINDY_OPTION({location:`${locStr}`})
-
-				history.replaceState(null, document.title, `?loc=${locStr}`)
-			}
-
-			setLocation()
-			map.on('moveend', evt=>setLocation())
-			
 		},
 		async layerHandler(){
 			
-			Vue.prototype.$LayerIns = new Layer(this.$InitIns)
-			await this.$LayerIns.addDefault() /** 增加 預設靜態文件 依定義檔 ( TS中 ) */
+			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map)
+			
+			await this.$LayerIns.addLayer(layerDef.layers)
+			this.$LayerIns.addBaseLayer(layerDef.baseLayers)
 
 			console.log("%c $layerIns:","background:red;", this.$LayerIns)
 
 			this.SNAPSHOT_RAW_LAYER({
 				type:"baseLayer",
-				payload: this.$LayerIns.getBaseLayers()
+				payload: this.$LayerIns.baseLayerColletion.map(l=>({
+					type:l.type,
+					id:l.id,
+					title:l.title,
+					name:l.title,
+					dataSet: l.dataSet,
+					opacity:l.opacity,
+					visible:l.visible,
+					imgUrl:l.imgUrl,
+					catelog:l.catelog,
+					tag:l.tag
+				})).reverse()
 			})
 			this.SNAPSHOT_RAW_LAYER({
 				type:"layer",
-				payload: this.$LayerIns.getNormalLayers()
+				payload: this.$LayerIns.normalLayerCollection.map(l=>({
+					type:l.type,
+					title:l.title,
+					name:l.title,
+					id:l.id,
+					icon:l.icon,
+					dataSet: l.dataSet,
+					opacity:l.opacity,
+					visible:l.visible,
+					legendColor:l.legendColor||"145,145,145",
+					catelog:l.catelog,
+					tag:l.tag
+				})).reverse()
 			})
 			
 		}
@@ -196,17 +354,12 @@ export default {
 	z-index:999;
 }
 
-/deep/ {
-	.leaflet-popup-content-wrapper{
-		height: 500px;
-		overflow: scroll;
-	}
-}
-
 #viewDiv {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
+	right: auto;
+	bottom: auto;
 	padding: 0;
 	margin: 0;
 	height: 100%;
@@ -214,33 +367,35 @@ export default {
 	z-index: 0;
 }
 
-.logo{
-	z-index: 1;
-	position: fixed;
-	left: 1rem;
-	right: 0;
-	bottom: 0.8rem;
-	pointer-events: none;
-	img{
-		max-width: 200px;
-	}
-}
 
-.mask{
-	z-index: 0;
-	pointer-events: none;
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
+.topAlert{
+	animation-name: sparkle;
+	animation-duration: 800ms;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	//
+    display: flex;
+    align-items: center;
+	justify-content: center;
 	width: 100%;
-	height: 80px;
-	background:linear-gradient(360deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 38%, rgba(0, 0, 0, 0.25) 60%, rgba(0, 0, 0, 0) 100%);
+	//
+	font-size: 0.8rem;
+	padding: 0.5rem 0;
+	position: fixed;
+	z-index: 2;
+	background-color: lighten($warning,20);
+	color: darken($warning,10);
 }
-
-.scaleCoordInfo{
-	display:flex;
-	align-items: center;
+@keyframes sparkle{
+	0% {
+		background-color: rgba(lighten($warning,20),1);
+	}
+	50% {
+		background-color: rgba(lighten($warning,20),0.5);
+	}
+	100% {
+		background-color: rgba(lighten($warning,20),1);
+	}
 }
 
 </style>
