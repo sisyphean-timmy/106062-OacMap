@@ -1,3 +1,27 @@
+
+//import { register } from 'register-service-worker'
+
+if ("serviceWorker" in navigator) {
+	if (navigator.serviceWorker.controller) {
+		console.log("[PWA] active service worker found, no need to register");
+		navigator.serviceWorker.getRegistration().then(function (reg) {
+			console.log("[PWA] try update service worker");
+			reg.update();
+		});
+	} else {
+		// Register the service worker
+		navigator.serviceWorker.register("sw.js", {
+			scope: "./"
+		})
+		.then(function (reg) {
+			console.log("[PWA] Service worker has been registered for scope: " + reg.scope);
+			localStorage.setItem('pwa', 'install')
+		});
+		// Load controlled and uncontrolled pages once the worker is active.
+		//navigator.serviceWorker.ready.then(reload);
+	}
+}
+
 import Vue from 'vue'
 import App from './App.vue'
 import 'normalize.css'
@@ -24,7 +48,7 @@ dom.watch()
 // VUEX
 import store from './store'
 
-import './registerServiceWorker'
+// import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
@@ -33,3 +57,4 @@ new Vue({
     store,
     render: h => h(App),
 }).$mount('#app')
+
