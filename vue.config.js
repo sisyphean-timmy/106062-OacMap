@@ -1,10 +1,17 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-const { InjectManifest } = require('workbox-webpack-plugin');
+//const { InjectManifest } = require('workbox-webpack-plugin');
 const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const fs = require('fs');
 
 const ENV = "https://ocean.taiwan.gov.tw"
+
+
+const {gitDescribe, gitDescribeSync} = require('git-describe');
+process.env.VUE_APP_GIT_HASH = gitDescribeSync().hash
+process.env.VUE_APP_VERSION = require('./package.json').version
+process.env.VUE_APP_BUILDTIME = (new Date()).toISOString()
+process.env.VUE_APP_BUILD = `v${process.env.VUE_APP_VERSION}-${process.env.VUE_APP_GIT_HASH}-${process.env.VUE_APP_BUILDTIME}`
 
 module.exports = {
     /** @see https://cli.vuejs.org/core-plugins/pwa.html#configuration */
@@ -37,10 +44,15 @@ module.exports = {
             msTileImage: './img/icon/manifest-icon-192.png'
         },
         /** configure the workbox plugin @see https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-window.Workbox */
-        workboxPluginMode: 'InjectManifest',
+        /*workboxPluginMode: 'InjectManifest',
         workboxOptions: {
             // InjectManifest 模式中 swSrc 屬性必須指定 sw 位置
             swSrc: 'public/sw.js',
+        }*/
+        workboxPluginMode: 'InjectManifest',
+        workboxOptions: {
+            importWorkboxFrom: 'disabled',
+            swSrc: 'src/sw-manifest.js',
         }
     },
     configureWebpack: config => {
@@ -75,6 +87,12 @@ module.exports = {
     },
     chainWebpack: config => {
 
+        config.plugin('copy')
+            .before('sw-copy').end()
+
+        config.plugin('pwa')
+            .after('sw-copy').end()
+
         if (process.env.NODE_ENV === 'production') {
             config.plugins.delete('preload');
             config.plugins.delete('prefetch');
@@ -93,6 +111,21 @@ module.exports = {
             .use('worker-loader')
             .loader('worker-loader')
             .end()
+
+	const injectStr =
+            `const ACACHE = 'acache-${process.env.VUE_APP_BUILD}';\n` +
+	    `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
+        config.plugin('sw-copy')
+            .before('pwa')
+            .use(require('copy-webpack-plugin'), [[{
+              from: 'src/sw.js',
+              to: 'sw.js',
+              transform(content, path) {
+                return injectStr + content; //Promise.resolve(optimize(content));
+              },
+          }]]).end()
+
+
     },
     devServer: {
         /** 自簽SSL證書 */
