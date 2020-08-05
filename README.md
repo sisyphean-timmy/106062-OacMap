@@ -59,12 +59,13 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 
 #### TODO
-- [X] test windy look tool btns functionality
+- [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
+- [X] test windy look weather layers' functionality
 - [X] `timeslider.vue` check real 50% of value to control dir of current tooltip label
-- [X] add mark's popup dom from `markClick` event `app.vue` , check unbind event
 - [X] clsuter Mark DOMs performance ?
 - [X] scss in typescript : `declare module.*scss`
-- [X] add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
+- [X] top area for alert messages ( typhoon alert、 offline msg ...etc ? )
+- [X] check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
 ``` js
 const loader = L.FileLayer.fileLoader(...)
 loader.loadData(file ,"filename.kmz") // file in leaflet-filelayer wasn't converted string

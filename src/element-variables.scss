@@ -259,12 +259,14 @@ DRAWER
     }
     &__header {
         margin-bottom: 0.5rem;
-        padding-bottom: 1rem;
-        padding-top: 1rem;
+        padding: 1rem;
     }
     &__body {
-        padding: 0 0.5rem;
+        padding: 0 1rem;
         overflow-y: auto;
+    }
+    &__close-btn {
+        padding: 0;
     }
 }
 

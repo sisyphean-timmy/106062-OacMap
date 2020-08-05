@@ -38,7 +38,7 @@
 			tools
 
 		.br
-			timeSlider
+			layerWeatherTool
 
 			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:0.5rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
@@ -62,7 +62,7 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
 import {resize} from "@/directives/directives"
 
-import timeSlider from "@/components/common/timeSlider"
+import layerWeatherTool from "@/components/layer/layerWeatherTool"
 
 export default {
 	name:"mapui",
@@ -77,7 +77,7 @@ export default {
 		layerWeather,
 		pageHeader,
 		tools,
-		timeSlider
+		layerWeatherTool
 	},
 	computed:{
 		...mapGetters({

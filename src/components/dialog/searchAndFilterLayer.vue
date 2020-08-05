@@ -16,14 +16,14 @@
             :label="i.label" 
             :value="i.value"
         )
-        //- template(slot="prefix")
-        //-     el-button(
-        //-         style="position:absolute;"
-        //-         circle
-        //-         type="primary" 
-        //-     )
-        //-         .tools__button
-        //-             font-awesome-icon(icon="search" fixed-width size="lg")
+        template(slot="prefix")
+            el-button(
+                style="position:absolute;"
+                circle
+                type="primary" 
+            )
+                .tools__button
+                    font-awesome-icon(icon="swimmer" fixed-width size="lg")
 </template>
 
 <script>
@@ -34,7 +34,6 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 export default {
     name :"search",
     data:()=>({
-		keywordLabel:"",
     }),
     computed:{
         ...mapGetters({
@@ -43,32 +42,28 @@ export default {
         }),
         selectedTagModel:{
 			get(){
-				return this.keywordLabel
+				return this.commonState("currentTag").label
 			},
-			set(obj){
+			set({label,value}){
 				
-				const selected_val  = obj.value
-				this.keywordLabel = obj.label
-
-				this.SET_CURRENT_TAG(selected_val)
+				this.SET_CURRENT_TAG({label,value})
 				this.SET_CARD_VISIBLE({key:'layer',bool:true})
 				
 				this.layerState("layer").forEach(l => {
 					let visible = l.visible
-					if(Array.isArray(l.tag) && selected_val){
-						const curr = this.commonState("currentTag")
-						if(l.tag.indexOf(curr) === -1){
+					if(Array.isArray(l.tag) && value){
+						if(l.tag.indexOf(this.commonState("currentTag").value) === -1){
 							visible = false
 						}
 					}else{
-						console.error("error selected_val",selected_val)
+						console.error("error {value}",value)
 						console.error("error tag in layer",l)
 					}
 					console.log(l.title,visible)
 					this.$LayerIns.setVisible(l.id,visible)
                 })
                 
-                this.$emit("close")
+                this.$parent.$emit("close")
 			}
 		},
 		tags(){
@@ -111,7 +106,7 @@ export default {
 					left:0;
 				}
 				&__inner{
-					padding-left: 50px;
+					padding-left: 55px;
 					border-radius: 999px !important;
 					box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
 				}

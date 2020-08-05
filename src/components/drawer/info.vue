@@ -1,9 +1,10 @@
 <template lang="pug">
 div
-    el-collapse
+    el-collapse(:value="'相關連結'")
         el-collapse-item(
             v-for="tab in ['相關連結','活動申請','使用條約']"
             :key="tab"
+            :name="tab"
         ) 
             strong(slot="title") {{tab}}
             template(v-if="tab === '相關連結'")
@@ -38,17 +39,23 @@ div
                     p 使用者進入本系統，視同同意上開使用規範。本系統所有資料僅限正常查詢、瀏覽使用，未經本會同意之大量抄錄或複製資料行為，將依違反著作權法及妨礙電腦使用罪辦理
                     el-divider
                     small 本系統版權及管理機關為海洋委員會。
-
-    p(style="display:flex;justify-content: flex-end;")
-        el-button(
+    
+    .info__footer
+        el-link(
             @click="$openLink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" 
             title="意見回饋" 
             size="mini"
-            plain
-            round
         )
             font-awesome-icon(icon="envelope" fixed-width)
-            small 意見回饋
+            small  意見回饋
+        el-divider(direction="vertical")
+        el-link(
+            @click="resetLocalStorageThenEmit" 
+            title="加到主畫面說明"
+            size="mini"
+        )
+            font-awesome-icon(icon="mobile-alt" fixed-width)
+            small  加到主畫面說明
 
 </template>
 
@@ -102,9 +109,17 @@ export default {
         photoLink
     },
     methods:{
+        resetLocalStorageThenEmit(){
+            localStorage.setItem("neverShowAddToScreen", false)
+            this.$parent.$emit('close')
+            this.$parent.$emit('openAddToHomeScreen')
+        }
     }
 }
 
 </script>
-
-<style></style>
+<style lang="scss" scoped>
+.info__footer{
+    margin: 2.5rem 1rem;
+}
+</style>

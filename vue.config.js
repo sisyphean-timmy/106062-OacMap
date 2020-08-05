@@ -16,7 +16,7 @@ process.env.VUE_APP_BUILD = `v${process.env.VUE_APP_VERSION}-${process.env.VUE_A
 module.exports = {
     /** @see https://cli.vuejs.org/core-plugins/pwa.html#configuration */
     pwa: {
-        name: '海洋遊憩整合資訊平台',
+        name: '海域整合資訊',
         themeColor: '#0b4873',
         msTileColor: '#F5F7FA',
         appleMobileWebAppCapable: 'yes',

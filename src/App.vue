@@ -12,9 +12,9 @@
 		:top="'10vh'"
 	)
 		template(v-if="dialogTitle === '加至主畫面說明'")
-			addToHome(@close="dialogTitle = '';dialogVisibility = false")
+			addToHome
 		template(v-else-if="dialogTitle === '搜尋'")
-			searchAndFilterLayer(@close="dialogTitle = '';dialogVisibility = false")
+			searchAndFilterLayer
 
 	//- DRAWER
 	el-drawer(
@@ -24,8 +24,12 @@
 		:visible="true"
 		direction="rtl"
 		@close="drawerTitle='';drawerVisibility = false"
+		@openAddToHomeScreen="dialogTitle = '加至主畫面說明';dialogVisibility = true"
 	)
-		info(v-if="drawerTitle==='相關資訊'")
+		template(v-if="drawerTitle==='相關資訊'")
+			info
+		template(v-else-if="drawerTitle==='海情/海象資訊'")
+			layerWeatherDeatil
 
 	//- Windy Map
 	template(v-if="windyOption.visible")
@@ -102,6 +106,7 @@ import mapUIxs from "@/components/mapUIxs"
 import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
 import addToHome from "@/components/dialog/addToHome"
 import info from "@/components/drawer/info"
+import layerWeatherDeatil from "@/components/drawer/layerWeatherDeatil"
 
 import pullup from "@/components/pullup"
 import isoheStation from "@/components/mark/isoheStation"
@@ -141,7 +146,8 @@ export default {
 		info,
 		pullup,
 		isoheStation,
-		searchAndFilterLayer
+		searchAndFilterLayer,
+		layerWeatherDeatil
 	},
 	computed:{
 		...mapGetters({
@@ -168,8 +174,8 @@ export default {
 			handler(){
 				this.$nextTick(()=>{
 					if(!this.$refs.pullup) return
-					this.SET_CARD_VISIBLE({key:"result",bool:false})
-					this.SET_CARD_VISIBLE({key:"layer",bool:false})
+					// this.SET_CARD_VISIBLE({key:"result",bool:false})
+					// this.SET_CARD_VISIBLE({key:"layer",bool:false})
 					this.$refs.pullup.toggleUp()
 					this.$refs.pullup.caculatePullupHeight()
 				})
@@ -208,8 +214,10 @@ export default {
 			// 初始化相關事件
 			this.eventHandler()
 
-			this.dialogVisibility = true
-			this.dialogTitle = "加至主畫面說明"
+			if(this.isMobile){
+				this.dialogVisibility = true
+				this.dialogTitle = "加至主畫面說明"
+			}
 
 			await this.initAfterMapMounted(this) // Action after mount
 
