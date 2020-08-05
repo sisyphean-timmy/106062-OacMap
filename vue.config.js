@@ -133,6 +133,7 @@ module.exports = {
         key: fs.readFileSync('./cert/server.key'),
         cert: fs.readFileSync('./cert/server.crt'),
         disableHostCheck: true,
+        public: 'lvh.me:8080',
         /** 代理 */
         // secure: true, // https 接口
         // changeOrigin: true, // 包含域名
