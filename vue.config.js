@@ -1,11 +1,13 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-//const { InjectManifest } = require('workbox-webpack-plugin');
+    //const { InjectManifest } = require('workbox-webpack-plugin');
 const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+
+const fs = require('fs');
 
 const ENV = "https://ocean.taiwan.gov.tw"
 
 
-const {gitDescribe, gitDescribeSync} = require('git-describe');
+const { gitDescribe, gitDescribeSync } = require('git-describe');
 process.env.VUE_APP_GIT_HASH = gitDescribeSync().hash
 process.env.VUE_APP_VERSION = require('./package.json').version
 process.env.VUE_APP_BUILDTIME = (new Date()).toISOString()
@@ -69,7 +71,7 @@ module.exports = {
          * 參考(\node_modules\@vue\cli-plugin-pwa)
          * @see https://developers.google.com/web/tools/workbox/reference-docs/latest/module-workbox-webpack-plugin.InjectManifest
          */
-        if (process.env.NODE_ENV !== 'production') {
+        /*if (process.env.NODE_ENV !== 'production') {
             config.plugins.push(
                 new InjectManifest({
                     swSrc: 'public/sw.js',
@@ -81,7 +83,7 @@ module.exports = {
                     ]
                 })
             )
-        }
+        }*/
     },
     chainWebpack: config => {
 
@@ -110,26 +112,29 @@ module.exports = {
             .loader('worker-loader')
             .end()
 
-	const injectStr =
+        const injectStr =
             `const ACACHE = 'acache-${process.env.VUE_APP_BUILD}';\n` +
-	    `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
+            `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
         config.plugin('sw-copy')
             .before('pwa')
-            .use(require('copy-webpack-plugin'), [[{
-              from: 'src/sw.js',
-              to: 'sw.js',
-              transform(content, path) {
-                return injectStr + content; //Promise.resolve(optimize(content));
-              },
-          }]]).end()
+            .use(require('copy-webpack-plugin'), [
+                [{
+                    from: 'src/sw.js',
+                    to: 'sw.js',
+                    transform(content, path) {
+                        return injectStr + content; //Promise.resolve(optimize(content));
+                    },
+                }]
+            ]).end()
 
 
     },
     devServer: {
         /** 自簽SSL證書 */
         https: true,
-        // key: fs.readFileSync('./cert/server.key'),
-        // cert: fs.readFileSync('./cert/server.crt'),
+        key: fs.readFileSync('./cert/server.key'),
+        cert: fs.readFileSync('./cert/server.crt'),
+        disableHostCheck: true,
         /** 代理 */
         // secure: true, // https 接口
         // changeOrigin: true, // 包含域名

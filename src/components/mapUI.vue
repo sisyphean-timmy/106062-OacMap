@@ -116,7 +116,7 @@ export default {
 		left: 0;    
 		bottom: auto;
 		right: auto;
-		width: 400px;
+		width: 420px;
 		height: 100%;
 		overflow-y:auto !important;
 		/deep/ {

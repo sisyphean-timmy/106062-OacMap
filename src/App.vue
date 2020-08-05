@@ -57,8 +57,8 @@
 
 		component(
 			:is="isMobile ? 'mapUIxs' : 'mapUI'"
-			@openDrawer="drawerVisibility=true;drawerTitle='相關資訊'"
-			@openSearchDialog="dialogVisibility=true;dialogTitle='搜尋'"
+			@openDrawer="drawerVisibility=true;drawerTitle=($event||'相關資訊')"
+			@openSearchDialog="dialogVisibility=true;dialogTitle=($event||'搜尋')"
 		)
 
 	//- Map
@@ -383,18 +383,18 @@ export default {
 	padding: 0.5rem 0;
 	position: fixed;
 	z-index: 2;
-	background-color: lighten($warning,20);
-	color: darken($warning,10);
+	background-color: lighten($danger,20);
+	color: darken($danger,10);
 }
 @keyframes sparkle{
 	0% {
-		background-color: rgba(lighten($warning,20),1);
+		background-color: rgba(lighten($danger,20),1);
 	}
 	50% {
-		background-color: rgba(lighten($warning,20),0.5);
+		background-color: rgba(lighten($danger,20),0.8);
 	}
 	100% {
-		background-color: rgba(lighten($warning,20),1);
+		background-color: rgba(lighten($danger,20),1);
 	}
 }
 

@@ -4,9 +4,9 @@
     transition-group(name='slide-fade-up' class="col" mode="out-in")
         //- grouped parent
         template(v-for="group in normalWLyrGroupModel")
-            el-button.layerWeather__btn(
+            el-button(
                 v-if="group.name"
-                :class="getGroupClassName(group.name)"
+                :class="getGroupBtnClassName(group.name)"
                 @click="activedGroupName === group.name ? activedGroupName = '' :activedGroupName = group.name"
                 :type="activedGroupName&&activedGroupName === group.name?'danger':''"
                 :title="group.name"
@@ -14,14 +14,14 @@
                 size="mini"
                 circle
             )
-                strong.layerWeather__label(v-if="textLabelVisible") {{group.name}}*
-                div
+                div(style="display: flex;align-items: center;")
+                    strong.layerWeather__label(v-if="textLabelVisible") {{group.name}}*
                     font-awesome-icon(:icon="activedGroupName&&activedGroupName === group.name?'chevron-up':group.icon" fixed-width)
             //- child layers in group
             template(v-if="activedGroupName === group.name || !group.name" )
-                el-button.layerWeather__btn(
+                el-button(
                     v-for="lyr in group.data"
-                    :class="getGroupClassName(group.name)"
+                    :class="getGroupBtnClassName(group.name)"
                     @click="openNormalLyr(lyr.id,group.name)"
                     :key="lyr.title"
                     :title="lyr.title"
@@ -29,17 +29,17 @@
                     size="mini"
                     circle
                 )
-                    transition(name="fade")
-                        strong.layerWeather__label(
-                            v-if="textLabelVisible"
-                            :class="{'layerWeather__label--actived': activedLayerId === lyr.id}"
-                        )
-                            template(v-if="activedLayerId === lyr.id && loading")
-                                i.el-icon-loading
-                                | 載入中
-                            template(v-else)
-                                | {{lyr.title}}
-                    div
+                    div(style="display: flex;align-items: center;")
+                        transition(name="fade")
+                            strong.layerWeather__label(
+                                v-if="textLabelVisible"
+                                :class="{'layerWeather__label--actived': activedLayerId === lyr.id}"
+                            )
+                                template(v-if="activedLayerId === lyr.id && loading")
+                                    i.el-icon-loading
+                                    |   載入中
+                                template(v-else)
+                                    | {{lyr.title}}
                         font-awesome-icon(:icon="lyr.icon" fixed-width)
     .col
         //- fixed : windy
@@ -68,6 +68,17 @@
             div
                 font-awesome-icon(:icon="textLabelVisible?'chevron-circle-right':'chevron-circle-left'" fixed-width )
 
+        //- detail
+        el-button(
+            style="margin: 0 0 0.5rem 0;"
+            title="詳細資料"
+            size="mini"
+            circle
+            type="text"
+        )
+            div
+                font-awesome-icon(icon="plus" fixed-width )
+
 </template>
 
 <script>
@@ -93,6 +104,12 @@ export default {
         textLabelVisible:true,
 		loading:false
 	}),
+	props:{
+		isMobile:{
+			type:Boolean,
+			default:false		
+		}
+	},
 	components:{
     },
     watch:{
@@ -156,12 +173,12 @@ export default {
 			SET_ACTIVED_WEATHER_DATA:"layer/layer/SET_ACTIVED_WEATHER_DATA",
 			SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
         }),
-        getGroupClassName(groupMame){
-            if(!this.activedGroupName){
-                return ""
-            }else if(this.activedGroupName !== groupMame){
-                return 'layerWeather__btn--unfocus'
-            }
+        getGroupBtnClassName(groupMame){
+			let name = this.isMobile?'layerWeather__btn--mobile':'layerWeather__btn'
+            if(this.activedGroupName && this.activedGroupName !== groupMame){
+				name+=` ${name}--unfocus`
+			}
+			return name
         },
 		closeAllNormalLyr(){
 			this.normalWLyr.forEach(l=>{
@@ -260,8 +277,8 @@ export default {
         color:#fff;
         background: $primary;
         text-shadow: none;
-        font-size: 1rem;
         transition: 0.2s ease all;
+        max-width: 200px;
     }
 
     .col{
@@ -297,13 +314,18 @@ export default {
         }
         
         &__label{
-            color: darken($info, 10);
+            color: darken($info, 20);
             background: lighten($info,20);
             position:absolute;
             right:130%;
             // text-shadow: 2px 2px 9px rgba(0,0,0,0.8);
-            padding: 0.2rem 0.4rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 0.5rem;
+            
+            max-width: 120px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            text-align: left;
             &--actived {
                 @include activeStyle;
             }
