@@ -1,6 +1,6 @@
 <template lang="pug">
-//- 天氣
-.layerWeather(v-loading="loading")
+
+.layerWeatherDetail(v-loading="loading")
     .col
         el-button(
             @click="SET_WINDY_OPTION({visible:true});$parent.$emit('close')"
@@ -8,8 +8,17 @@
             round
         )
             div(style="display: flex;align-items: center;")
-                img(src="@/assets/windy_icon.png" style="max-width:1rem;margin-right:0.5rem;")
+                img(src="@/assets/windy_icon.png" style="max-width:1.2rem;margin-right:0.5rem;")
                 strong Windy 地圖
+
+        el-button(
+            @click="$openLink('https://safesee.cwb.gov.tw/V2/')"
+            size="mini"
+            round
+        )
+            div(style="display: flex;align-items: center;")
+                img(src="@/assets/safesee.png" style="max-width:1.2rem;margin-right:0.5rem;")
+                strong 台灣海象災防平台
                 
     transition-group(name='slide-fade-up' class="col" mode="out-in")
         //- grouped parent
@@ -47,15 +56,11 @@ const ICON_ENUM = {
     "鹽度":"tachometer-alt"
 }
 export default {
-    name:"layerWeather",
+    name:"layerWeatherDetail",
 	data:()=>({
-		loading:false
+		loading:false,
 	}),
 	props:{
-		isMobile:{
-			type:Boolean,
-			default:false		
-		}
 	},
 	components:{
     },
@@ -84,31 +89,44 @@ export default {
             const lyrs = this.normalWLyr
             return [
                 {
-                    name:"OCM 預報",
-                    icon:"tachometer-alt",
-                    data: lyrs.filter(i=>/OCM/g.test(i.title))
-                },
-                {
-                    name:"船級作業風險",
-                    icon:"ship",
-                    data: lyrs.filter(i=>/巡防艇|巡護船|動力小船/g.test(i.title))
-                },
-                {
-                    name:"船級舒適度",
-                    icon:"ship",
-                    data: lyrs.filter(i=>/交通船/g.test(i.title))
-                },
-                {
-                    name:"波浪",
-                    icon:"wave-square",
-                    data: lyrs.filter(i=>/海域預報|異常波浪/g.test(i.title))
-                },
-                {
-                    name:"",
-                    data: lyrs.filter(i=>!(/OCM|巡防艇|巡護船|交通船|海域預報|海域預報|異常波浪|動力小船/g.test(i.title)))
+                    name:"海象",
+                    data:lyrs.filter(i=>/OCM模式|臺灣海域預報/g.test(i.title))
                 }
+                // {
+                //     name:"氣象",
+                //     data:lyrs.filter(i=>/10米風資料_WIFI/g.test(i.title))
+                // }
             ]
         }
+        // normalWLyrGroupModel(){
+        //     const lyrs = this.normalWLyr
+        //     return [
+        //         {
+        //             name:"",
+        //             data: lyrs.filter(i=>!(/OCM|巡防艇|巡護船|交通船|海域預報|海域預報|異常波浪|動力小船/g.test(i.title)))
+        //         },
+        //         {
+        //             name:"OCM 預報",
+        //             icon:"tachometer-alt",
+        //             data: lyrs.filter(i=>/OCM/g.test(i.title))
+        //         },
+        //         {
+        //             name:"船級作業風險",
+        //             icon:"ship",
+        //             data: lyrs.filter(i=>/巡防艇|巡護船|動力小船/g.test(i.title))
+        //         },
+        //         {
+        //             name:"船級舒適度",
+        //             icon:"ship",
+        //             data: lyrs.filter(i=>/交通船/g.test(i.title))
+        //         },
+        //         {
+        //             name:"波浪",
+        //             icon:"wave-square",
+        //             data: lyrs.filter(i=>/海域預報|異常波浪/g.test(i.title))
+        //         }
+        //     ]
+        // }
 	},
 	methods:{
 		...mapMutations({
@@ -134,17 +152,17 @@ export default {
             try{
                 this.loading = true
 
-                const activedLyr = this.$LayerIns.normalLayerCollection.find(l=>l.id === id)
-                console.log("[activedWLyr Ins]",activedLyr)
+                const lyrAwaitToActive = this.$LayerIns.normalLayerCollection.find(l=>l.id === id)
+                console.log("[lyrAwaitToActive Ins]",lyrAwaitToActive)
 
-                if(this.activedLayer && this.activedLayer.id === activedLyr.id){// self then close all
+                if(this.activedLayer && this.activedLayer.id === lyrAwaitToActive.id){// self then close all
                     this.closeAllNormalLyr()
                     return
                 }
-
+                
                 // 更新狀態及實例
                 this.normalWLyr.forEach(l=>{  
-                    const visible = l.id === activedLyr.id
+                    const visible = l.id === lyrAwaitToActive.id
                     this.$LayerIns.setVisible(l.id,visible)
                     this.UPDATE_LAYER_OPTIONS({
                         id:l.id,
@@ -154,7 +172,7 @@ export default {
 
                 let payload = {id}
                 // 取得 legend 、保存到狀態、重設圖層實例
-                const legend = DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(activedLyr.title))
+                const legend = DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(lyrAwaitToActive.title))
                 console.log("[activedWLyr legend]",legend)
                 if(legend){
                     const new_legend = {
@@ -164,7 +182,7 @@ export default {
                     }
 
                     // 重新設定 顏色尺度
-                    activedLyr.setOption({
+                    lyrAwaitToActive.setOption({
                         minIntensity:Number(legend.colorScaleLabel[0]),
                         maxIntensity:Number(legend.colorScaleLabel[legend.colorScaleLabel.length-1]),
                         colorScale:legend.colorScaleValue
@@ -179,14 +197,14 @@ export default {
                 }
 
                 // 等待完全建構、提交到狀態保存
-                await new Promise(res=>activedLyr.once("loaded",()=>res()))
-                payload.times = activedLyr.times
+                await new Promise(res=>lyrAwaitToActive.once("loaded",()=>res()))
+                payload.times = lyrAwaitToActive.times
                 this.SET_ACTIVED_WEATHER_DATA(payload)
 
                 this.$parent.$emit('close')
 
             }catch(e){
-                console.error("openNormalLyr() err"+e)
+                console.error("openNormalLyr()"+e)
             }finally{
                 this.loading = false
             }

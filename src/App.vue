@@ -1,6 +1,6 @@
 <template lang="pug">
 #app
-	//- DIALOG - 主畫面說明
+	//- DIALOG
 	el-dialog(
 		:title="dialogTitle"
 		v-if="dialogVisibility"
@@ -16,21 +16,24 @@
 		template(v-else-if="dialogTitle === '搜尋'")
 			searchAndFilterLayer
 
-	//- DRAWER :withHeader="false"
+	//- DRAWER
 	el-drawer(
 		v-if="drawerVisibility"
 		:title='drawerTitle'
-		:size="isMobile?'100%':'400px'"
+		:size="drawerSize||isMobile?'100%':'400px'"
 		:visible="true"
-		direction="rtl"
-		@close="drawerTitle='';drawerVisibility = false"
+		:direction="drawerDir"
+		@close="drawerTitle='';drawerVisibility = false;drawerDir = 'rtl';drawerSize=''"
+		ref="drawer"
 	)
 		template(v-if="drawerTitle==='海情/海象資訊'")
-			layerWeatherDeatil
-		info(v-else :value="drawerTitle")
+			layerWeatherDetail
+		template(v-else-if="drawerTitle")
+			info(:value="drawerTitle")
+		div(v-else) Empty
 
 	//- Windy Map
-	template(v-if="windyOption.visible")
+	div(v-if="windyOption.visible" style="position:fixed;z-index:999;left:0;right:0;")
 		el-button(
 			type="danger"
 			plain
@@ -47,48 +50,28 @@
 				:src="`https://embed.windy.com/?${windyOption.location}`"
 			)
 
-	//- UI and alerts
-	template(v-else-if="mapConstructed")
-		.topAlert(v-if="typhoonAlert.length" @click="typhoonAlert.splice(0,typhoonAlert.legnth)")
-			div(style="display:flex;")
-				strong
-					font-awesome-icon(icon="exclamation-triangle" fixed-width size="1x")
-					| 颱風警報 
-				div(v-marquee="{width:'70vw',play:true}") 
-					| {{Object.values(typhoonAlert[0]).join()}}
+	//- UI and top msg
+	.topNotify(
+		ref="topNotify"
+		v-if="alertData.length"
+	)
+		div(style="display:flex;" @click="alertData.splice(0,alertData.length)")
+			strong
+				font-awesome-icon(icon="exclamation-triangle" fixed-width size="1x")
+				| 颱風警報 
+			div(v-marquee="{width:'70vw',play:true}") 
+				| {{Object.values(alertData[0]).join()}}
+	component(
+		v-if="mapConstructed" 
+		ref="mapUI" 
+		:is="isMobile ? 'mapUIxs' : 'mapUI'"
+	)
 
-		component(
-			:is="isMobile ? 'mapUIxs' : 'mapUI'"
-			@openDrawer="drawerVisibility=true;drawerTitle=($event||'相關資訊')"
-			@openDialog="dialogVisibility=true;dialogTitle=($event||'搜尋')"
-		)
-
-	//- Map
+	//- Map Container
 	#viewDiv(:style="windyOption.visible ? 'z-index:-10;' : ''")
 
-	//- Mark Template - mounted by render function by "markClick" event
+	//- Mark Template - reserve for "markClick" event 
 	div(ref="mark")
-
-	pullup(
-		ref='pullup'
-		v-if="popupData"
-		:reservedHeight='0'
-		height=""
-		style="z-index:10;position:absolute;bottom: 0;"
-	)
-		el-button.close(
-			style="position: absolute;left: auto;top: -2rem;bottom:auto;right: 1rem;"
-			@click="popupData = null" 
-			circle 
-			type="danger" 
-			size="mini"
-		)
-			font-awesome-icon(icon="times" fixed-width)
-
-		isoheStation(
-			:data="popupData"
-			@caculateHeight="$refs.pullup.caculatePullupHeight()"
-		)
 
 </template>
 
@@ -100,21 +83,17 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 
 import mapUI from "@/components/mapUI"
 import mapUIxs from "@/components/mapUIxs"
-import markss from "@/components/mark/mark"
 
 import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
 import addToHome from "@/components/dialog/addToHome"
 import info from "@/components/drawer/info"
-import layerWeatherDeatil from "@/components/drawer/layerWeatherDeatil"
+import layerWeatherDetail from "@/components/drawer/layerWeatherDetail"
 
-import pullup from "@/components/pullup"
 import isoheStation from "@/components/mark/isoheStation"
 
 import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
 import { marquee } from '@/directives/directives';
-
-Vue.prototype.$openLink = link=>window.open(link,"_blank")
 
 
 export default {
@@ -127,26 +106,24 @@ export default {
 		windyLoading: true,
 		mapConstructed:false,
 		//
-		popupData:null,
-		//
 		dialogVisibility:false,
 		dialogTitle:"",
 		// 
 		drawerVisibility:false,
 		drawerTitle:"",
+		drawerDir:'rtl',
+		drawerSize:"",
 		//
-		typhoonAlert: []
+		alertData:[]
 	}),
 	components:{
-		markss,
 		mapUI,
 		mapUIxs,
 		addToHome,
 		info,
-		pullup,
 		isoheStation,
 		searchAndFilterLayer,
-		layerWeatherDeatil
+		layerWeatherDetail
 	},
 	computed:{
 		...mapGetters({
@@ -168,17 +145,6 @@ export default {
 					Iframe.onload = ()=> this.windyLoading = false
 				})
 			}
-		},
-		popupData:{
-			handler(){
-				this.$nextTick(()=>{
-					if(!this.$refs.pullup) return
-					// this.SET_CARD_VISIBLE({key:"result",bool:false})
-					// this.SET_CARD_VISIBLE({key:"layer",bool:false})
-					this.$refs.pullup.toggleUp()
-					this.$refs.pullup.caculatePullupHeight()
-				})
-			}
 		}
 	},
 	async mounted(){
@@ -193,6 +159,15 @@ export default {
 
 			await this.initBeforeMapMounted(this) // Action before mount
 	
+			Vue.prototype.$openLink = link=>window.open(link,"_blank")
+			Vue.prototype.$openDrawer = evt=>{
+				this.drawerVisibility=true
+				this.drawerTitle=(evt||'相關資訊')
+			}
+			Vue.prototype.$openDialog=evt=>{
+				this.dialogVisibility=true
+				this.dialogTitle=(evt||'搜尋')
+			}
 			Vue.prototype.$InitIns = new Init("viewDiv",{
 				center:["23.830576","121.20172"],
 				zoom: 7
@@ -238,7 +213,6 @@ export default {
 			SET_RESULT:"result/result/SET_RESULT",
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
 			SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
-			// // SET_MARK_DATA:"common/common/SET_MARK_DATA"
 		}),
 		async eventHandler(){
 
@@ -246,7 +220,14 @@ export default {
 
 			map.on({
 				"typhoonAlert":({data})=>{
-					this.typhoonAlert.push(...data)
+					//- render to ref.mapUI's top
+                    this.alertData.push(data)
+                    
+					this.$nextTick(()=>{
+						this.$refs.mapUI.$el.querySelectorAll(".tr,.tl").forEach(node => {
+							node.style.top = this.$refs.topNotify.clientHeight +12+ "px"
+						})
+					})
 				},
 				"moveend":evt=>{
 					/** 移動後記錄位置 */
@@ -268,36 +249,19 @@ export default {
 					this.SET_CARD_VISIBLE({key:'layer',bool:false})
 					this.SET_CARD_VISIBLE({key:'result',bool:true})
 				},
-				"markerClick":({dataType,layer,data,event})=>{
+				"markerClick": async ({dataType,layer,data,event})=>{
 					console.log("[markerClick]",{dataType,layer,data,event})
 					switch(dataType){
 						case "isoheStation":
-							/** 
-							 * Render fn : 
-							 * layer --> bindPopup( vue component ) ---latency---> openPopup()  
-							 */
-							// const vm = new Vue({
-							//     render: h => h(markss, {
-							//         // style: {
-							//         //     display: context.rootState['tool/tool']['activedId'] === 'googleStreetView' ? 'block' : 'none'
-							//         // },
-							//         props: {data
-							//             // width: 450,
-							//             // position: {
-							//             //     x: window.innerWidth,
-							//             //     y: 0,
-							//             //     z: 9999
-							//             // }
-							//         },
-							//         // on: {
-							//         //     close: event => context.dispatch("deActiveDispatcher")
-							//         // }
-							//     })
-							// }).$mount()
-							// setTimeout(()=>{
-							//     layer.bindPopup(vm.$el).openPopup()
-							// },100)
-							this.popupData = data //TODO: will be replace
+							/** layer.bindPopup( dom ) ---latency---> openPopup() */
+							this.drawerDir = "btt"
+							this.drawerVisibility = true
+							const component = await new Promise(res=>this.$nextTick(()=>res(this.$refs.drawer)))
+							new Vue({
+								render: h => h(isoheStation, {
+									props: {data},
+								})
+							}).$mount(component.$slots.default[0])
 							break
 						case "scenicSpot":
 						default:
@@ -379,34 +343,16 @@ export default {
 }
 
 
-.topAlert{
-	animation-name: sparkle;
-	animation-duration: 800ms;
-	animation-iteration-count: infinite;
-	animation-timing-function: ease-in-out;
-	//
+.topNotify{
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 100%;
-	//
+	width: 100vw;
+	padding:0.5rem 1rem;
+	position: relative;
 	font-size: 0.8rem;
-	padding: 0.3rem 0;
-	position: fixed;
 	z-index: 2;
-	background-color: lighten($danger,20);
+	background-color: rgba(lighten($danger,20),0.9);
 	color: darken($danger,10);
 }
-@keyframes sparkle{
-	0% {
-		background-color: rgba(lighten($danger,20),1);
-	}
-	50% {
-		background-color: rgba(lighten($danger,20),0.8);
-	}
-	100% {
-		background-color: rgba(lighten($danger,20),1);
-	}
-}
-
 </style>

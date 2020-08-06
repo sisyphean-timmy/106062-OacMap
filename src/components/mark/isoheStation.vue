@@ -56,7 +56,7 @@
 			template(v-if="data.type==='wave' && dataModel")
 				el-card.dataCard(
 					v-for="v,k in wave_enmu_name"
-					@click.native="mouseEnterIndex = -1;selectedWave = k;$emit('caculateHeight')"
+					@click.native="mouseEnterIndex = -1;selectedWave = k"
 					:key="k"
 					shadow="hover"
 					:class="{'dataCard--actived':(k===selectedWave)}"
@@ -130,12 +130,16 @@ export default {
 			handler(bool){
 				if(bool){
 					this.$nextTick(()=>{
-						this.BScrollInstance = new BScroll(this.$refs.bsScroll,{
-							scrollX: true,
+                        this.BScrollInstance = new BScroll(this.$refs.bsScroll,{
+                            scrollX: true,
 							probeType: 3, // listening scroll hook
 							stopPropagation:true,
 							tap:'tap'
 						})
+                        this.BScrollInstance.on("scroll",(e)=>{
+                            console.log(this.BScrollInstance)
+                            this.BScrollInstance.getCurrentPage()
+                        })
 					})
 				}else{
 					this.BScrollInstance && this.BScrollInstance.destroy()

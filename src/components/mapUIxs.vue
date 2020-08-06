@@ -20,45 +20,29 @@ div
 		v-model="pullupStatus"
 		@move="toggleUIFade(1-$event)"
 		style="z-index:10;position:absolute;bottom: 0;"
+        @click.native="$refs.pullup.caculatePullupHeight()"
 	) 
 		result
-
 		template(slot="fixedFooter")
-			template(v-if="isTimeInActivedWeatherLayer")
-				layerWeatherTool
-			template(v-else)
-				.mask
-				.footer
-					img(style="width:120px;" src="@/assets/logo.png")
-					.footer__r
-						.scaleCoordInfo(ref="scaleCoordInfo")
-						small(style="margin-left:0.5rem;") 人次 {{pageviews}}
+			.footer
+				img(style="width:120px;" src="@/assets/logo.png")
+				.footer__r
+					.scaleCoordInfo(ref="scaleCoordInfo")
+					small(style="margin-left:0.5rem;") 人次 {{pageviews}}
+				.mask(style="z-index: -1;position: absolute;width: 100%;")
+			layerWeatherTool
 
 	//- CUSTOM CONER UI
 	.tr
-		navbar
-		//- //- 海域遊憩活動一站式資訊平臺
-		//- div(style="margin-bottom:1rem;")
-		//- 	el-button(
-		//- 		@click="$emit('openDrawer')" 
-		//- 		title="海域遊憩活動一站式資訊平臺"
-		//- 		size="mini"
-		//- 		circle
-		//- 		type="warning"
-		//- 		style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
-		//- 	)
-		//- 		strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
-		//- 		div
-		//- 			font-awesome-icon(icon="bell" fixed-width)
-		//- //- 海情
-		//- layerWeather
+		toolTopRight
 	.tl
-		tools(@resultClick="resultClick")
+		tools
 
 </template> 
 
 <script>
 
+import toolTopRight from "@/components/toolTopRight"
 import tools from "@/components/tools"
 import pullup from "@/components/pullup"
 
@@ -66,19 +50,13 @@ import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import pageHeader from '@/components/common/pageHeader'
 import isoheStation from "@/components/mark/isoheStation"
-import navbar from "@/components/navbar"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import layerWeatherTool from "@/components/layer/layerWeatherTool"
-import layerWeather from "@/components/layer/layerWeather"
 
 export default {
 	name:"mapuixs",
 	props:{
-		popupData:{
-			type:Object,
-			default:null
-		}
 	},
 	data:()=>({
 		layerToolVisible:false,
@@ -94,73 +72,23 @@ export default {
 		tools,
 		layer,
 		layerWeatherTool,
-		layerWeather,
-		navbar
-	},
-	watch:{
-		allResultLength:{
-			handler(cnt){
-				if(cnt && this.$refs.pullup){
-					this.$refs.pullup.toggleUp()
-					this.$refs.pullup.caculatePullupHeight()
-				}
-			}
-		},
-		popupData:{
-			handler(){
-				this.$nextTick(()=>{
-					if(this.$refs.pullup){
-						this.SET_CARD_VISIBLE({key:"result",bool:false})
-						this.$refs.pullup.toggleUp()
-						this.$refs.pullup.caculatePullupHeight()
-					}
-				})
-			}
-		},
-		isTimeInActivedWeatherLayer:{
-			handler(bool){
-				this.$nextTick(()=>{
-					const dom = this.$refs.scaleCoordInfo
-					if(!bool && dom){
-						this.$InitIns.mountScaleDom(dom)
-					}
-				})
-			},
-			immediate:true
-		}
-	},
+		toolTopRight
+    },
 	computed:{
 		...mapGetters({
-			isMobile:"common/common/isMobile",
-			allResultLength:"result/result/allResultLength",
-			commonState:"common/common/state",
-			layerState:"layer/layer/state",
-			weatherLayer:"layer/layer/weatherLayer"
+			commonState:"common/common/state"
 		}),
-		isTimeInActivedWeatherLayer(){
-			return this.layerState("activedWeatherLyr")["times"].length
-		},
 		layerVisibility(){
-			let bool = this.commonState("layerCardVisible")
-			this.toggleUIFade(!bool) 
-			return bool
-		},
-		resultVisibility(){
-			let bool = this.commonState("resultCardVisible")
-			return bool
+			return this.commonState("layerCardVisible")
 		},
 		pageviews(){
 			return this.commonState("GACount").pageviews
 		}
-	},
+    },
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
 		}),
-		resultClick(){
-			this.SET_CARD_VISIBLE({key:'result',bool:true})
-			this.$refs.pullup.toggleUp()
-		},
 		/** UI 隨資訊卡片上下拉動 淡出、入 @overload +1 */
 		toggleUIFade(boolOrNumber){
 			if(!this.uiDoms) return
@@ -200,6 +128,22 @@ export default {
 	},
 	mounted(){
 		this.uiDoms = document.querySelectorAll(".tr,.tl")
+        this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
+        /** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
+        this.$store.subscribe(async (mutation, state) => {
+            if(mutation.type === "common/common/SET_CARD_VISIBLE"){
+                const {key,bool}= mutation.payload
+                if(key!=="result") return
+                const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))
+                if(bool){
+                    pullup.toggleUp()
+                    pullup.caculatePullupHeight()
+                }else{
+                    pullup.toggleDown()
+                    this.pullupStatus = "close"
+                }
+            }
+        })
 	}
 }
 </script>
@@ -208,9 +152,8 @@ export default {
 
 
 	.footer{
-		margin: 0 0.5rem 1rem 0.5rem;
-		z-index:1;
-		position:relative;
+		position: relative;
+		padding: 0 0.5rem 1rem 0.5rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;

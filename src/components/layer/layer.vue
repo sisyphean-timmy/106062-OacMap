@@ -15,9 +15,6 @@
 				helperClass="dragging"
 				:transitionDuration="300"
 			)
-				//- h3 海域與遊憩資訊總覽
-				//- .col
-				//- 	layerWeather
 				.col
 					small 地圖上帶有對應圖示的圓形，在縮放比例尺後可以得到更多關於點的資訊
 						.fixedTopList(style="position:relative;" )
@@ -87,7 +84,6 @@ import layerItemCard from "./layerItemCard"
 import layerBaseMap from "./layerBaseMap"
 
 import layerItemFixedCard from "./layerItemFixedCard"
-// import layerWeather from '@/components/layer/layerWeather';
 
 
 export default {
@@ -98,7 +94,6 @@ export default {
 		layerItemCard,
 		layerBaseMap,
 		layerItemFixedCard,
-		// layerWeather
 	},
 	data:()=>({
 		dragging:false,

@@ -1,9 +1,10 @@
-const marqueeTimeRamp = 15
+const marqueeRamp = 2
+const marqueeFPS = 10
 
 export default {
     bind(el, binding, vnode) {
 
-        // console.log("[vue marquee directive binding]", binding)
+        console.log("marquee binding", binding)
 
         //- force set style 
         el.style.cssText = `
@@ -14,21 +15,39 @@ export default {
             white-space: nowrap;
         `
 
-        let interval = null
+	const FRAME_TIME = 1000 / marqueeFPS;
+        let requestAnimationFrame = window.requestAnimationFrame || function (fn) { return setTimeout(fn, FRAME_TIME)}
+	let cancelAnimationFrame = window.cancelAnimationFrame || clearInterval
+
+	let animationLoop;
+	let then = Date.now();
+	let frame = function () {
+		animationLoop = requestAnimationFrame(frame);
+		var now = Date.now();
+		var delta = now - then;
+		if (delta > FRAME_TIME) {
+			then = now - (delta % FRAME_TIME);
+			update()
+		}
+	};
+
+	let update = function () {
+		//- 文字沒溢出
+		if (Math.abs(el.clientWidth - el.scrollWidth) <= 0) return
+		if ((el.clientWidth - el.scrollWidth + el.scrollLeft) === 0) { // end
+			el.scrollLeft = 0
+		}
+		el.scrollLeft += marqueeRamp
+	}
 
         if (binding.value.play) { // auto playMode
-            interval = setInterval(() => {
-                if ((el.clientWidth - el.scrollWidth + el.scrollLeft) === 0) { // end
-                    el.scrollLeft = 0
-                }
-                el.scrollLeft++
-            }, marqueeTimeRamp)
+            frame()
             return
         }
 
         el.onmouseenter = () => {
 
-            clearInterval(interval)
+            cancelAnimationFrame(animationLoop)
 
             if (!el) return
 
@@ -37,13 +56,11 @@ export default {
             //- 文字沒溢出
             if (Math.abs(el.clientWidth - el.scrollWidth) <= 0) return
 
-            interval = setInterval(() => {
-                el.scrollLeft++
-            }, marqueeTimeRamp)
+            frame()
         }
 
         el.onmouseleave = () => {
-            clearInterval(interval)
+            cancelAnimationFrame(animationLoop)
             el.style.textOverflow = 'ellipsis'
             el.scrollLeft = 0
         }

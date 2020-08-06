@@ -19,12 +19,12 @@
 
 		//- CUSTOM CONER UI
 		.tr
-			navbar
+			toolTopRight
 		.tl
 			tools
 		.br
 			layerWeatherTool
-			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:0.5rem;")
+			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:1rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
 				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
 		.bl
@@ -39,14 +39,12 @@ import Vue from 'vue'
 
 import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
-import layerWeather from "@/components/layer/layerWeather"
 import tools from "@/components/tools"
-import navbar from "@/components/navbar"
+import toolTopRight from "@/components/toolTopRight"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
 import {resize} from "@/directives/directives"
-import pullup from "@/components/pullup"
 import isoheStation from "@/components/mark/isoheStation"
 
 import layerWeatherTool from "@/components/layer/layerWeatherTool"
@@ -57,15 +55,13 @@ export default {
 		resize
 	},
 	data:()=>({
-		pullupHeight:""
 	}),
 	components:{
 		result,
 		layer,
-		layerWeather,
 		pageHeader,
 		tools,
-		navbar,
+		toolTopRight,
 		layerWeatherTool
 	},
 	computed:{
@@ -127,12 +123,12 @@ export default {
 		}
 	}
 	.tr,.tl{
-		top: 2rem;
+		top: 1rem;
 		bottom: auto;
 	}
 	.br,.bl{
 		top: auto;
-		bottom: 2rem;
+		bottom: 1rem;
 	}
 	.tl,.bl{
 		left: 1rem;
