@@ -62,7 +62,7 @@ div
                                 template(v-if="activeName==='全部'||dataId")
                                     el-tag(size="small" effect="dark") {{scope.singleCaseData.layerCatelog.map(i=>i.label).join('、')}}
                                     el-divider(direction="vertical")
-                                div(v-marquee) {{scope.singleCaseData.layerTitle}}
+                                div(v-marquee="{width:'100%'}") {{scope.singleCaseData.layerTitle}}
 
                         template(slot="detail")
                             .table(v-if="dataId")

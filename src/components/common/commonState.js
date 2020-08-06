@@ -17,7 +17,10 @@ export default {
         resultCardVisible: false,
         // 主題 紀錄之狀態
         activedSubject: "海域遊憩活動一站式資訊平臺",
-        currentTag: "",
+        currentTag: {
+            label: '',
+            value: ''
+        },
         // subjects: [{
         //         label: "海域遊憩活動一站式資訊平臺",
         //         desc: "整合所有海域相關資訊: 海象、 遊憩景點、 港阜範圍 生態保護區， 等",
@@ -58,19 +61,7 @@ export default {
             })
         },
         initAfterMapMounted: async(context, componentContext) => {
-            
             await context.dispatch("getGACount")
-            
-            componentContext.$notify.close()
-            componentContext.$notify({
-                title: "颱風警報",
-                // message: "哈比克",
-                showClose:false,
-                type: "warning",
-                offset: 80,
-                duration:0,
-                position:"bottom-right"
-            })
         },
         getGACount: async context => {
             try {
@@ -110,7 +101,10 @@ export default {
         /** 主題變更 */
         CHANGE_SUBJECT: (state, subject) => state.activedSubject = subject,
         /** 主題標籤變更 */
-        SET_CURRENT_TAG: (state, tag) => state.currentTag = tag,
+        SET_CURRENT_TAG: (state, { label, value }) => {
+            state.currentTag.label = label
+            state.currentTag.value = value
+        },
         /** 統計人次 */
         SET_GA_COUNT: (state, payload) => state.GACount = payload
     },

@@ -102,38 +102,26 @@ export default {
         state: state => key => state[key],
         _currentTag: (state, getters, rootGetters) => {
             return rootGetters["common/common"]["currentTag"]
-                // const activedSubject = rootGetters["common/common"]["activedSubject"]
-                // const tags = rootGetters["common/common"]["currentTag"]
-                // return subjects.find(i => i.label === activedSubject).value
         },
         /** 可排序的圖層 */
         sortableLayer: (state, getters) => {
             return state.layer.filter(l => {
-                let tagMatch = true
-                if (getters._currentTag) {
-                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
-                }
-                return /filelayer|geojson/ig.test(l.type) && tagMatch
+                const { value } = getters._currentTag
+                return /filelayer|geojson/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
             })
         },
         /** 預報 */
         weatherLayer: (state, getters) => {
             return state.layer.filter(l => {
-                let tagMatch = true
-                if (getters._currentTag) {
-                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
-                }
-                return /heatmap|velocity|gradient/ig.test(l.type) && tagMatch
+                const { value } = getters._currentTag
+                return /heatmap|velocity|gradient/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
             })
         },
         /** 點狀 */
         pointerLayer: (state, getters) => {
             return state.layer.filter(l => {
-                let tagMatch = true
-                if (getters._currentTag) {
-                    tagMatch = l.tag.indexOf(getters._currentTag) > -1
-                }
-                return /cluster|mark/ig.test(l.type) && tagMatch
+                const { value } = getters._currentTag
+                return /cluster|mark/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
             })
         }
     }

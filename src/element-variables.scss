@@ -17,9 +17,14 @@ notification
 
 .el-notification {
     white-space: pre-line;
-    background-color: $aux; //- rgba(255, 255, 255, 0.8)
-    color: $text;
-    &__group{
+    background-color: rgba($text, 0.5);
+    border-color: transparent;
+    color: $white;
+    width: auto;
+    &__title {
+        color: $white; //- rgba(255, 255, 255, 0.8)
+    }
+    &__group {
         display: flex;
         align-items: center;
     }
@@ -247,8 +252,22 @@ DIALOG
 DRAWER
 */
 
-.el-drawer__header {
-    margin-bottom: 0;
+.el-drawer {
+    &__title {
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    &__header {
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+    }
+    &__body {
+        padding: 0 1rem;
+        overflow-y: auto;
+    }
+    &__close-btn {
+        padding: 0;
+    }
 }
 
 

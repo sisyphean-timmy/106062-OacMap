@@ -8,7 +8,9 @@
     "serve": "nodemon ./index.js"
   },
   "nodemonConfig": {
-    "ignore": ["**/export/*"]
+    "ignore": [
+      "**/export/*"
+    ]
   },
   "author": "",
   "license": "ISC",

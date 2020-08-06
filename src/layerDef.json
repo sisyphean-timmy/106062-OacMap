@@ -293,13 +293,25 @@
             "url": "https://ocean.taiwan.gov.tw/OpenData/PDSWind/index.json",
             "visible": false,
             "type": "velocity",
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "maxVelocity": 35,
+                "lineWidth": 2,
+                "colorScale": ["#fff"]
+            }
+        },
+        {
+            "title": "臺灣海域預報-波浪週期",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
+            "visible": false,
+            "type": "wavePeriodGradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "波浪預報模式資料-臺灣海域預報資料",
+            "title": "臺灣海域預報-波浪浪高",
             "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
             "visible": false,
-            "type": "waveGradientLayer",
+            "type": "waveHeightGradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
@@ -321,6 +333,7 @@
             "title": "颱風路徑",
             "url": "http://localhost:3000/typhoon",
             "visible": true,
+            "tag": [],
             "dataSet": [{ "label": "", "value": "" }],
             "type": "typhoonLayer"
         },

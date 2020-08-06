@@ -149,6 +149,10 @@ slide-fade
 slide-fade-up
 */
 
+.slide-fade-up-move {
+    transition: all .2s ease-in-out;
+}
+
 .slide-fade-up-enter-active {
     transition: all .2s ease-in-out;
 }
@@ -173,14 +177,13 @@ slide-fade-up
     overflow-y: auto;
 }
 
-.velocity-overlay,.gradient-overlay {
+.velocity-overlay,
+.gradient-overlay {
     z-index: 1 !important;
 }
 
-.leaflet-div-icon {
-    border: none;
-    height: 0px;
-    width: 0px;
+.leaflet-control-scale-line {
+    border-width: 1px;
 }
 
 .leaflet-mark-icon {
@@ -198,6 +201,12 @@ slide-fade-up
     background-color: #fff;
     position: relative;
     left: -10px;
+}
+
+.leaflet-div-icon {
+    border: none !important;
+    height: 0px !important;
+    width: 0px !important;
 }
 
 .mask {

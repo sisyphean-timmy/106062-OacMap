@@ -7,6 +7,17 @@ export class Init {
     currentLocationMarkLayer:L.Marker
 
     constructor(container:string|HTMLElement,mapOption:L.MapOptions = {}){
+        
+        console.log("[L.CRS]",Object.getOwnPropertyDescriptor(L.CRS, "scale"));
+        console.log("[L.CRS]",Object.getOwnPropertyDescriptor(L.CRS, "Simple"));
+
+        (<any>L.CRS).scale = (<any>L.CRS).EPSG3857.scale = (<any>L.CRS).EPSG3395.scale = (<any>L.CRS).EPSG4326.scale = (<any>L.CRS).EPSG900913.scale = (<any>L.CRS).Earth.scale = function (zoom) {
+            return 256 * Math.pow(2, zoom)
+        };
+        (<any>L.CRS).Simple = function(zoom) {
+            return Math.pow(2, zoom)
+        };
+
         this.map = L.map(container,{
             ...mapOption,
             ...{
@@ -15,6 +26,7 @@ export class Init {
                 preferCanvas:true
             }
         })
+
     }
 
     addMark(latlng:L.LatLng):L.Marker{
@@ -59,10 +71,10 @@ export class Init {
 
         let updateCoord = (lng=0,lat=0) => {
             textLabel.innerHTML = `
-                <strong>
+                <small>
                     <span>經度</span> ${lng.toFixed(3)}
                     <span>緯度</span> ${lat.toFixed(3)}
-                </strong>
+                </small>
             `
         }
         updateCoord(this.map.getCenter().lng,this.map.getCenter().lat) // init

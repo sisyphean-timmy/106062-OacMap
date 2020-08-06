@@ -24,12 +24,12 @@ app.all('*', function(req, res, next) {
 });
 app.get("/PROXY", async(req, res) => {
     const result = await (await fetch(req.query.url)).json()
-    /** request SafeSee data : 異常波浪潛勢 : 0 取代為 空字串，表示無資料 */
-    // if (/SafeSee/g.test(req.query.url) && !(/index/g.test(req.query.url))) {
-    //     if (/SafeSeeOFW_risk_Now/g.test(req.query.url)) {
-    //         result[0].data = result[0].data.map(i => i === 0 ? '' : i)
-    //     }
-    // }
+        /** request SafeSee data : 異常波浪潛勢 : 0 取代為 空字串，表示無資料 */
+        // if (/SafeSee/g.test(req.query.url) && !(/index/g.test(req.query.url))) {
+        //     if (/SafeSeeOFW_risk_Now/g.test(req.query.url)) {
+        //         result[0].data = result[0].data.map(i => i === 0 ? '' : i)
+        //     }
+        // }
     res.send(result)
 })
 
@@ -37,9 +37,9 @@ app.get("/typhoon", async(req, res) => {
     res.send(await handleCWBTyphoonData())
 })
 
-const handleCWBTyphoonData = async()=>{
-    try{
-        
+const handleCWBTyphoonData = async() => {
+    try {
+
         // TEST
         // const data = fs.readFileSync("typhoon/W-C0034-002.kmz")
 
@@ -48,76 +48,95 @@ const handleCWBTyphoonData = async()=>{
         const DIR = "./typhoon/export/"
 
         const FILE_NAMES = { /** @see https://opendata.cwb.gov.tw/dataset/warning?page=1 */
-            "W-C0034-001.CAP":"颱風警報",
-            "W-C0034-002.KMZ":"颱風消息",
-            "W-C0034-003.KMZ":"颱風侵襲機率",
-            "W-C0034-004.JSON":"颱風路徑",
-            "W-C0034-005.JSON":"熱帶氣旋路徑"
+            // "W-C0034-001.CAP": "颱風警報",
+            "W-C0034-002.KMZ": "颱風消息",
+            // "W-C0034-003.KMZ": "颱風侵襲機率",
+            "W-C0034-004.JSON": "颱風路徑",
+            // "W-C0034-005.JSON": "熱帶氣旋路徑"
         }
 
-        const streams = Object.keys(FILE_NAMES).map(async name=>{
+        const streams = Object.keys(FILE_NAMES).map(async name => {
             const ext = name.match(/\.\w+$/)[0].substring(1)
             return {
-                name:name,
-                ext:ext,
-                stream:await fetch(`${URI}${name}${AUTH_KEY}&downloadType=WEB&format=${ext}`)
+                name: name,
+                ext: ext,
+                stream: await fetch(`${URI}${name}${AUTH_KEY}&downloadType=WEB&format=${ext}`)
             }
         })
         const streams_reslove = await Promise.all(streams)
 
         let result = {}
 
-        for (const {name,ext,stream} of streams_reslove) {
-            if(/json/ig.test(ext)){
-                // fs.writeFileSync(DIR+name,await stream.text())
-                result[FILE_NAMES[name]] = await stream.json()
-            }
-            else if(/cap/ig.test(ext)){ // xml
+        for (const { name, ext, stream }
+            of streams_reslove) {
+            if (/json/ig.test(ext)) {
+                const json = await stream.json()
+                    // fs.writeFileSync(DIR + name, JSON.stringify(json))
+                result[FILE_NAMES[name]] = json
+            } else if (/cap/ig.test(ext)) { // xml
                 const str = XmlParser.xml2json(await stream.text(), {
                     compact: true,
                     spaces: 4
                 })
+
                 // fs.writeFileSync(DIR+name.replace(/\.cap$/ig,".json"),str)
                 result[FILE_NAMES[name]] = JSON.parse(str)
-            }
-            else if(/kmz/ig.test(ext)){
-                const buffer = await(await stream.blob()).arrayBuffer()
+            } else if (/kmz/ig.test(ext)) {
+                const buffer = await (await stream.blob()).arrayBuffer()
                 const unzip = new ZIP(buffer)
-                const f = Object.values(unzip['files']).find(f=>/\.kml$/.test(f.name))
-                if(!f) throw("can't find kml in kmz")
-                
+                const f = Object.values(unzip['files']).find(f => /\.kml$/.test(f.name))
+                if (!f) throw ("can't find kml in kmz")
+
                 const str = f.asText()
                 const DOMParser = require('xmldom').DOMParser
                 const kml = new DOMParser().parseFromString(str)
-                const geojson = Togeojson.kml(kml,{ styles: true });
+
+                const geojson = Togeojson.kml(kml, { styles: true });
                 // fs.writeFileSync(DIR+f.name.replace(/\.kml$/,".json"),JSON.stringify(geojson))
                 result[FILE_NAMES[name]] = geojson
 
+                /** export kml to json/geojson */
+                // const jsonStr = XmlParser.xml2json(str, {
+                //     compact: true,
+                //     spaces: 4
+                // })
+                // fs.writeFileSync(DIR + f.name.replace(/\.kml$/, ".json"), jsonStr)
+                // fs.writeFileSync(DIR + f.name.replace(/\.kml$/, "_geo.json"), JSON.stringify(geojson))
             }
         }
 
-        // 整理
-        let filtered = {}
-        filtered["颱風消息"] = result["颱風消息"] //feature
+        /**
+         * 輸出 002 geojson 不夠的屬性從 004 加入到其 feature.properties
+         * 沒有颱風時 ?? 資料格式是如何?
+         * console.log(result["颱風路徑"]["cwbtyphfcst"]["announcement"])
+         */
+        const PROPS_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["properties"]
+        const CURR_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["curr"]["point"]
+        const FCST_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["fcst"]["point"]
+        const PAST_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["past"]["point"]
 
-        const ptr = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]
-        console.log(result["颱風路徑"]["cwbtyphfcst"]["announcement"])
-        const props = ptr.typhoon.properties
-        filtered["颱風路徑"] = {
-            time:ptr['@published'],
-            count:ptr['@typhcount'],
-            name:props.typhname,
-            data:{
-                curr:ptr.typhoon.typhdata.curr.point,
-                fcst:ptr.typhoon.typhdata.fcst.point,
-                past:ptr.typhoon.typhdata.past.point
-            }
+        console.clear()
+
+        const features = result["颱風消息"].features
+
+        const { typhname, typhno } = PROPS_004
+        // const {} = CURR_004
+        // const {} = FCST_004
+        // const {} = PAST_004
+
+        result["颱風消息"].properties = {
+            name: typhname.map(i => i["@value"]).join(),
+            no: typhno,
+            data: null,
+            desc: features[features.length - 1]["properties"]["description"]
         }
-        return filtered
-    }catch(e){
+
+        return result["颱風消息"]
+    } catch (e) {
         console.error(e)
     }
 }
+handleCWBTyphoonData()
 
 /** 取得 netcdf binary file (arrayBuffer) */
 const fetchNCUV = async({

@@ -30,16 +30,16 @@ export default {
         el.style.willChange = 'width,left' //- improve performance
 
         let start = false
-        let max = window.innerWidth * 0.7
-        let min = window.innerWidth * 0.3
+        let max = window.innerWidth * 0.9
+        let min = defalutWidth
         resizeBar.onmousedown = evt => {
             start = true
         }
         window.onmousemove = evt => {
             el.style.transition = "none"
-            if (start && evt.screenX <= max && evt.screenX >= min) {
-                el.style.width = evt.screenX - el.offsetLeft + "px"
-                resizeBar.style.left = evt.screenX + "px"
+            if (start && evt.clientX <= max && evt.clientX >= min) {
+                el.style.width = evt.clientX - el.offsetLeft + "px"
+                resizeBar.style.left = evt.clientX + "px"
             }
         }
         resizeBar.onmouseup = evt => {
@@ -64,7 +64,7 @@ export default {
     inserted(el, binding, vnode) {
 
         defalutWidth = el.clientWidth //- save default width when inserted()
-
+        console.log(defalutWidth)
         if (!binding.value) {
             return
         }

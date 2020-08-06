@@ -17,33 +17,30 @@
 			)
 				result
 
-		pullup(
-			ref='pullup'
-			v-if="popupData"
-			:reservedHeight='0'
-			:height="pullupHeight"
-			style="z-index:10;position:absolute;bottom: 0;"
-		)
-			el-button.close(
-				style="position: absolute;left: auto;top: -2rem;bottom:auto;right: 1rem;"
-				@click="$emit('close')" circle type="danger" size="mini"
-			)
-				font-awesome-icon(icon="times" fixed-width)
-
-			isoheStation(
-				:data="popupData"
-				@caculateHeight="$refs.pullup.caculatePullupHeight()"
-			)
-
 		//- CUSTOM CONER UI
 		.tr
-			navbar(:isMobile="isMobile")
+			//- 海域遊憩活動一站式資訊平臺
+			div(style="margin-bottom:1rem;")
+				el-button(
+					@click="$emit('openDrawer')" 
+					title="海域遊憩活動一站式資訊平臺"
+					size="mini"
+					circle
+					type="warning"
+					style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
+				)
+					strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
+					div
+						font-awesome-icon(icon="bell" fixed-width)
+			//- 海情
+			layerWeather
 		.tl
 			tools
-		.br
-			timeSlider
 
-			div(style="display:flex;align-items:center;justify-content:flex-end;")
+		.br
+			layerWeatherTool
+
+			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:0.5rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
 				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
 		.bl
@@ -56,9 +53,9 @@
 
 import Vue from 'vue'
 
-import navbar from "@/components/navbar"
 import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
+import layerWeather from "@/components/layer/layerWeather"
 import tools from "@/components/tools"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
@@ -69,14 +66,10 @@ import isoheStation from "@/components/mark/isoheStation"
 
 import timeSlider from "@/components/common/timeSlider"
 
+import layerWeatherTool from "@/components/layer/layerWeatherTool"
+
 export default {
 	name:"mapui",
-	props:{
-		popupData:{
-			type:Object,
-			default:null
-		}
-	},
 	directives:{
 		resize
 	},
@@ -86,31 +79,13 @@ export default {
 	components:{
 		result,
 		layer,
+		layerWeather,
 		pageHeader,
-		navbar,
 		tools,
-		pullup,
-		isoheStation,
-		timeSlider
-	},
-	watch:{
-		popupData:{
-			handler(){
-				this.$nextTick(()=>{
-					if(this.$refs.pullup){
-						this.SET_CARD_VISIBLE({key:"result",bool:false})
-						this.SET_CARD_VISIBLE({key:"layer",bool:false})
-						this.$refs.pullup.toggleUp()
-						this.$refs.pullup.caculatePullupHeight()
-					}
-				})
-			}
-		}
+		layerWeatherTool
 	},
 	computed:{
 		...mapGetters({
-			isMobile:"common/common/isMobile",
-			allResultLength:"result/result/allResultLength",
 			commonState:"common/common/state"
 		}),
 		layerVisibility(){
@@ -146,7 +121,7 @@ export default {
 		left: 0;    
 		bottom: auto;
 		right: auto;
-		width: 400px;
+		width: 420px;
 		height: 100%;
 		overflow-y:auto !important;
 		/deep/ {
@@ -168,7 +143,7 @@ export default {
 		}
 	}
 	.tr,.tl{
-		top: 1rem;
+		top: 2rem;
 		bottom: auto;
 	}
 	.br,.bl{

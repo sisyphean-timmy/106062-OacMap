@@ -1,13 +1,12 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
-//const { InjectManifest } = require('workbox-webpack-plugin');
+const { InjectManifest } = require('workbox-webpack-plugin');
 const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 const fs = require('fs');
 
 const ENV = "https://ocean.taiwan.gov.tw"
 
-
-const {gitDescribe, gitDescribeSync} = require('git-describe');
+const { gitDescribe, gitDescribeSync } = require('git-describe');
 process.env.VUE_APP_GIT_HASH = gitDescribeSync().hash
 process.env.VUE_APP_VERSION = require('./package.json').version
 process.env.VUE_APP_BUILDTIME = (new Date()).toISOString()
@@ -16,7 +15,7 @@ process.env.VUE_APP_BUILD = `v${process.env.VUE_APP_VERSION}-${process.env.VUE_A
 module.exports = {
     /** @see https://cli.vuejs.org/core-plugins/pwa.html#configuration */
     pwa: {
-        name: '海洋遊憩整合資訊平台',
+        name: '海域整合資訊',
         themeColor: '#0b4873',
         msTileColor: '#F5F7FA',
         appleMobileWebAppCapable: 'yes',
@@ -112,18 +111,20 @@ module.exports = {
             .loader('worker-loader')
             .end()
 
-	const injectStr =
+        const injectStr =
             `const ACACHE = 'acache-${process.env.VUE_APP_BUILD}';\n` +
-	    `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
+            `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
         config.plugin('sw-copy')
             .before('pwa')
-            .use(require('copy-webpack-plugin'), [[{
-              from: 'src/sw.js',
-              to: 'sw.js',
-              transform(content, path) {
-                return injectStr + content; //Promise.resolve(optimize(content));
-              },
-          }]]).end()
+            .use(require('copy-webpack-plugin'), [
+                [{
+                    from: 'src/sw.js',
+                    to: 'sw.js',
+                    transform(content, path) {
+                        return injectStr + content; //Promise.resolve(optimize(content));
+                    },
+                }]
+            ]).end()
 
 
     },
