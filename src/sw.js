@@ -38,7 +38,7 @@ async function assetsFromCache(req) {
 	}
 
 	if (req.url.match(/\/\?.*$/)) {  // remove '/?xxxxx...'
-		req = '/';
+		req = './';
 	}
 	var resp = await cache.match(req) || fetch(req);
 	return resp;
