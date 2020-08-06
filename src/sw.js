@@ -3,8 +3,8 @@
 var assets = null;
 
 self.addEventListener('install', function(evt) {
-	console.log('[Service Worker] is being installed.');
-//	self.skipWaiting();
+	console.log('[Service Worker] is being installed.', ACACHE);
+	//self.skipWaiting();
 
 	try {
 		importScripts("sw-manifest.js");
@@ -59,5 +59,9 @@ self.addEventListener('activate', function(ev) {
 			);
 		})
 	);
+});
+
+self.addEventListener('message', async function (ev) {
+	if (ev.data === 'skipWaiting') return self.skipWaiting();
 });
 
