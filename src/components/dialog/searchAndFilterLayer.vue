@@ -28,12 +28,12 @@
 
 <script>
 
-const tourismTags = require("@/layerTag.json")['tourism']
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 
 export default {
     name :"search",
     data:()=>({
+        layerTag:null
     }),
     computed:{
         ...mapGetters({
@@ -67,9 +67,10 @@ export default {
 			}
 		},
 		tags(){
+            if(!layerTag) return
 			let qSearchs = []
-			Object.keys(tourismTags).forEach(k => {
-				tourismTags[k].forEach(v=>{
+			Object.keys(layerTag.tourism).forEach(k => {
+				layerTag.tourism[k].forEach(v=>{
 					qSearchs.push({label: v,value: {
 						label: v,
 						value: k
@@ -78,6 +79,10 @@ export default {
 			})
 			return qSearchs
 		}
+    },
+    async created(){
+        /** get layerTag (index) */
+        this.layerTag = await(await fetch('./layerTag.json')).json()
     },
     methods:{
 		...mapMutations({
