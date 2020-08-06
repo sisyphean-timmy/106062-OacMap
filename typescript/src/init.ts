@@ -15,7 +15,7 @@ export class Init {
             return 1 << (zoom+8)
         };
         (<any>L.CRS).Simple = function(zoom) {
-            return 1 << t
+            return 1 << zoom
         };
 
         this.map = L.map(container,{
