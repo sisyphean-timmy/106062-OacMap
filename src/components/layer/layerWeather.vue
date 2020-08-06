@@ -65,7 +65,7 @@ div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
                                 v-if="textLabelVisible"
                                 :class="{'layerWeather__label--actived': activedLayer && activedLayer.id === lyr.id}"
                             )
-                                template(v-if="activedLayer && activedLayer.id === lyr.id && loading")
+                                template(v-if="loadingLayerId===lyr.id")
                                     i.el-icon-loading
                                     |   載入中
                                 template(v-else)
@@ -132,7 +132,7 @@ export default {
 	data:()=>({
         activedGroupName:"",
         textLabelVisible:true,
-		loading:false
+		loadingLayerId:""
 	}),
 	props:{
 		// isMobile:{
@@ -237,12 +237,12 @@ export default {
             })
 		},
 		async openNormalLyr(id,groupName){
-			if(this.loading) return
+			if(this.loadingLayerId) return
             try{
-                this.loading = true
-
+                
                 const activedLyr = this.$LayerIns.normalLayerCollection.find(l=>l.id === id)
                 console.log("[activedWLyr Ins]",activedLyr)
+                this.loadingLayerId = activedLyr.id
                 
                 if(this.activedLayer && this.activedLayer.id === activedLyr.id){// self then close all
                     this.closeAllNormalLyr()
@@ -294,7 +294,7 @@ export default {
             }catch(e){
                 console.error("openNormalLyr() err"+e)
             }finally{
-                this.loading = false
+                this.loadingLayerId = ""
             }
 		}
 	}
