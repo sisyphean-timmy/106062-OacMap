@@ -14,7 +14,7 @@ import {
 } from "./gradient/gradientLayer"
 
 import { VelocityLayer } from "./velocity/L.VelocityLayer"
-import { FileLayer} from "./fileLayer"
+// import { FileLayer} from "./fileLayer"
 import { TyphoonLayer } from "./typhoonLayer"
 import { 
     clusterMarkerLayer,
@@ -171,7 +171,7 @@ export class Layer {
                     "markIsoheStation":IsoheStationLayer,
                     "wavePeriodGradient":WavePeriodGradientLayer,
                     "waveHeightGradient":WaveHeightGradientLayer,
-                    "fileLayer":FileLayer,
+                    // "fileLayer":FileLayer,
                     "typhoonLayer":TyphoonLayer
                 }
                 const lyrIns = new mapFn[lyrOpts.type]({

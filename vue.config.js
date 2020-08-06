@@ -2,7 +2,7 @@ const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
     //const { InjectManifest } = require('workbox-webpack-plugin');
 const bundleAnalyzer = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
-const fs = require('fs');
+// const fs = require('fs');
 
 const ENV = "https://ocean.taiwan.gov.tw"
 
@@ -131,15 +131,16 @@ module.exports = {
     },
     devServer: {
         /** 自簽SSL證書 */
-        https: true,
-        key: fs.readFileSync('./cert/server.key'),
-        cert: fs.readFileSync('./cert/server.crt'),
+        // https: true,
+        // key: fs.readFileSync('./cert/server.key'),
+        // cert: fs.readFileSync('./cert/server.crt'),
         disableHostCheck: true,
-        public: 'lvh.me:8080',
+        // public: 'lvh.me:8080',
         /** 代理 */
         // secure: true, // https 接口
         // changeOrigin: true, // 包含域名
         // pathRewrite:{} // 重寫路由
+        writeToDisk: true,
         proxy: {
             '/OpenData': {
                 target: ENV + '/OpenData/',
