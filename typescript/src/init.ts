@@ -12,10 +12,10 @@ export class Init {
         console.log("[L.CRS]",Object.getOwnPropertyDescriptor(L.CRS, "Simple"));
 
         (<any>L.CRS).scale = (<any>L.CRS).EPSG3857.scale = (<any>L.CRS).EPSG3395.scale = (<any>L.CRS).EPSG4326.scale = (<any>L.CRS).EPSG900913.scale = (<any>L.CRS).Earth.scale = function (zoom) {
-            return 256 * Math.pow(2, zoom)
+            return 1 << (zoom+8)
         };
         (<any>L.CRS).Simple = function(zoom) {
-            return Math.pow(2, zoom)
+            return 1 << t
         };
 
         this.map = L.map(container,{
