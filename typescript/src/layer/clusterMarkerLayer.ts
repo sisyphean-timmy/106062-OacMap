@@ -73,7 +73,7 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         return await(await fetch(this.lyrOpts.url)).json()
     }
     onRemove(map){
-        this.markerClusterGroup.removeFrom(map)
+        this.markerClusterGroup.clearLayers().removeFrom(map)
         return this
     }    
     
@@ -159,48 +159,50 @@ export class IsoheStationLayer extends BaseCluster {
                 for (const k of Object.keys(DataSet)) {
                     const {Data,location} = DataSet[k]
                     const {Latitude,Longitude} = location
-                    const mk = L.marker(
-                        L.latLng(Latitude,Longitude),{
-                            icon:L.divIcon({
-                                html:new Vue({
-                                render: h => h(
-                                    "div",
-                                    {class:"leaflet-mark-icon"},
-                                    [
-                                        h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
-                                            props:{
-                                                icon:this.icon
-                                            }
-                                        })
-                                    ]
-                                )
-                            }).$mount().$el as HTMLElement})
-                        }
-                    )
-                    mk.on("click",e=>{
-                        let result  = {
-                            title:"",
-                            type:"",
-                            data:Data
-                        }
-                        if(/tide/ig.test(k)){
-                            result.title = Name+"潮汐"
-                            result.type = "tide"
-                        }else if(/history/ig.test(k)){
-                            result.title = Name+"波浪及海流"
-                            result.type = "wave"
-                        }else if(/wind/ig.test(k)){
-                            result.title = Name+"風力"
-                            result.type = "wind"
-                        }
-                        this._map.fireEvent("markerClick",{
-                            dataType: "isoheStation",
-                            layer: mk,
-                            data: result,
-                            event:e
+                    if(Latitude&&Longitude){
+                        const mk = L.marker(
+                            L.latLng(Latitude,Longitude),{
+                                icon:L.divIcon({
+                                    html:new Vue({
+                                    render: h => h(
+                                        "div",
+                                        {class:"leaflet-mark-icon"},
+                                        [
+                                            h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                                                props:{
+                                                    icon:this.icon
+                                                }
+                                            })
+                                        ]
+                                    )
+                                }).$mount().$el as HTMLElement})
+                            }
+                        )
+                        mk.on("click",e=>{
+                            let result  = {
+                                title:"",
+                                type:"",
+                                data:Data
+                            }
+                            if(/tide/ig.test(k)){
+                                result.title = Name+"潮汐"
+                                result.type = "tide"
+                            }else if(/history/ig.test(k)){
+                                result.title = Name+"波浪及海流"
+                                result.type = "wave"
+                            }else if(/wind/ig.test(k)){
+                                result.title = Name+"風力"
+                                result.type = "wind"
+                            }
+                            this._map.fireEvent("markerClick",{
+                                dataType: "isoheStation",
+                                layer: mk,
+                                data: result,
+                                event:e
+                            })
                         })
-                    })
-                    this.markerClusterGroup.addLayer(mk)
+                        this.markerClusterGroup.addLayer(mk)
+                    }
                 }
             }
             this.markerClusterGroup.addTo(map)

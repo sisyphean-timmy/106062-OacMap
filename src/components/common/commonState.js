@@ -54,8 +54,52 @@ export default {
         }
     },
     actions: {
+        _checkServiceWork: async(context, componentContext) => {
+            if ("serviceWorker" in navigator) {
+
+                function listenForWaitingServiceWorker(reg, callback) {
+                    function awaitStateChange() {
+                        reg.installing.addEventListener('statechange', function() {
+                            if (this.state === 'installed') callback(reg.waiting);
+                        });
+                    }
+                    if (!reg) return;
+                    if (reg.waiting) return callback(reg.waiting);
+                    if (reg.installing) awaitStateChange();
+                    reg.addEventListener('updatefound', awaitStateChange);
+                }
+
+                //navigator.serviceWorker.addEventListener('controllerchange', function() {
+                //	alert("有新版本!!  請重新整理");
+                //	location.reload();
+                //});
+                if (navigator.serviceWorker.controller) {
+                    console.log("[PWA] active service worker found, no need to register");
+                    navigator.serviceWorker.getRegistration().then(function(reg) {
+                        console.log("[PWA] try update service worker");
+                        //reg.update();
+                        function promptUserToRefresh(sw) {
+                            componentContext.$confirm("有新版本，是否重新整理", { type: 'success' }).then(() => {
+                                sw.postMessage('skipWaiting');
+                                location.reload();
+                            })
+                        }
+                        listenForWaitingServiceWorker(reg, promptUserToRefresh);
+                    });
+                } else {
+                    // Register the service worker
+                    navigator.serviceWorker.register("sw.js", {
+                            scope: "./"
+                        })
+                        .then(function(reg) {
+                            console.log("[PWA] Service worker has been registered for scope: " + reg.scope);
+                        });
+                }
+            }
+        },
         initBeforeMapMounted: async(context, componentContext) => {
             console.log("[common/common/initBeforeMapMounted]")
+            await context.dispatch("_checkServiceWork", componentContext)
             window.addEventListener('resize', () => {
                 context.commit("UPDATE_WINDOW_SIZE", { width: window.innerWidth, height: window.innerHeight })
             })

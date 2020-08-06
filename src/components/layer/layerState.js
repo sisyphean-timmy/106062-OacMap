@@ -107,21 +107,21 @@ export default {
         sortableLayer: (state, getters) => {
             return state.layer.filter(l => {
                 const { value } = getters._currentTag
-                return /filelayer|geojson/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
+                return /filelayer|geojson/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
             })
         },
         /** 預報 */
         weatherLayer: (state, getters) => {
             return state.layer.filter(l => {
                 const { value } = getters._currentTag
-                return /heatmap|velocity|gradient/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
+                return /heatmap|velocity|gradient/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
             })
         },
         /** 點狀 */
         pointerLayer: (state, getters) => {
             return state.layer.filter(l => {
                 const { value } = getters._currentTag
-                return /cluster|mark/ig.test(l.type) && (value ? l.tag.indexOf(value) > -1 : true)
+                return /cluster|mark/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
             })
         }
     }

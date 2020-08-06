@@ -28,17 +28,18 @@ npm run build
 * 基於 workbox [workbox cli](https://letswrite.tw/pwa-workbox-cli/)
 * 基於 workbox [workbox api](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin)
 
+#### ./public/layerDef
+#### ./public/layerDef
+#### ./public/layerTag
+
 #### ./typescript
 * `typescript/init` leaflet map 初始化 
 * `typescript/layer` leaflet layer 圖層及擴展
 
 #### ./src
-* `src/layerDef` 要載入的圖層設定
-* `src/layerTag` 圖層標籤設定
-* `src/layerCatelog` 圖層分類設定
-
 * `src/main.js` 配置 Vue 引用模塊等
 * `src/store.js` Vuex 狀態配置 : 自動匹配 `./components` 中任意資料夾的 `*.js` 作為狀態，並以路徑的資料夾名稱做為狀態的命名空間
+* `src/sw.js` service worker主程式, 匯入workbox打包後的檔案列表`sw-manifest.js`, 並存入快取, (目前)其他資源直接bypass
 * `src/custom.scss` 主題顏色變數、全局樣式
 * `src/element-variables.scss` ELEMENT UI 樣式
 * `./src/assets/legend.json`
@@ -55,6 +56,12 @@ npm run build
 * `components/layer` 圖層組件 及 快照狀態(只記錄地圖實例中圖層的部分屬性)
 * `components/result` 查詢結果組件及狀態
 
+#### ./public
+* 這邊的東西會直接複製到`dist/`
+* `public/layerDef.json` 要載入的圖層設定
+* `public/layerTag.json` 圖層標籤設定
+* `public/layerCatelog.json` 圖層分類設定
+
 #### 其他
 * [leaflet TS、ES MODULE](https://cli.vuejs.org/config/)
 * [leaflet UML](https://leafletjs.com/examples/extending/class-diagram.html)
@@ -62,13 +69,14 @@ npm run build
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
-#### TODO
-- [X] [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
+#### MEMO
+
+- [X] top-right buttons is strange 
+- [X] isoheStation.vue : make chart in each item
 - [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
-- [X] test windy look weather layers' functionality
 - [X] scss in typescript : `declare module.*scss`
 - [X] top area for alert messages ( typhoon alert、 offline msg ...etc ? )
-- [X] check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
+- [X] top notify bar : typhoon and check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
 ``` js
 const loader = L.FileLayer.fileLoader(...)
 loader.loadData(file ,"filename.kmz") // file in leaflet-filelayer wasn't converted string
