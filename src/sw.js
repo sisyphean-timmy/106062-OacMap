@@ -11,7 +11,7 @@ self.addEventListener('install', function(evt) {
 		console.log('[Service Worker]pre-fetch', self.__precacheManifest);
 
 		evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-			var urls = ['/'];
+			var urls = ['./', './manifest.json'];
 			self.__precacheManifest.forEach(function (val, idx, arr){
 				urls.push(val.url);
 			});
@@ -34,7 +34,7 @@ async function assetsFromCache(req) {
 	var cache = await caches.open(ACACHE);
 	if(!assets) {
 		var listJson = await cache.match('.assets');
-		assets = JSON.parse(listJson);
+		assets = listJson.json();
 	}
 
 	if (req.url.match(/\/\?.*$/)) {  // remove '/?xxxxx...'
