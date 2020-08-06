@@ -59,6 +59,8 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 
 #### TODO
+- [X] fix weather layer actived id -> loading 
+- [X] [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 - [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
 - [X] test windy look weather layers' functionality
 - [X] `timeslider.vue` check real 50% of value to control dir of current tooltip label
