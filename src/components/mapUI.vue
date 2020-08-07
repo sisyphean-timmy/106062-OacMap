@@ -19,27 +19,11 @@
 
 		//- CUSTOM CONER UI
 		.tr
-			//- 海域遊憩活動一站式資訊平臺
-			div(style="margin-bottom:1rem;")
-				el-button(
-					@click="$emit('openDrawer')" 
-					title="海域遊憩活動一站式資訊平臺"
-					size="mini"
-					circle
-					type="warning"
-					style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
-				)
-					strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
-					div
-						font-awesome-icon(icon="bell" fixed-width)
-			//- 海情
-			layerWeather
+			navbar
 		.tl
 			tools
-
 		.br
 			layerWeatherTool
-
 			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:0.5rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
 				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
@@ -57,6 +41,7 @@ import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import layerWeather from "@/components/layer/layerWeather"
 import tools from "@/components/tools"
+import navbar from "@/components/navbar"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
@@ -82,6 +67,7 @@ export default {
 		layerWeather,
 		pageHeader,
 		tools,
+		navbar,
 		layerWeatherTool
 	},
 	computed:{
@@ -101,7 +87,7 @@ export default {
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-		})		
+		})
 	},
 	mounted(){
 		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)

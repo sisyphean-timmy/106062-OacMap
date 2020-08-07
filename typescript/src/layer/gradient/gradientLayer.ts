@@ -49,7 +49,7 @@ export class GradientLayer extends L.Layer implements ILayer{
     }
 
     async fetchData(idx:number = 0):Promise<Array<{data:any,header:any}>>{
-        const url = this.lyrOpts.url.replace("index.json",this.dataIndexDef[idx].name)
+        const url = this.lyrOpts.url.replace(/index.json$/ig,this.dataIndexDef[idx].name)
         return await (await fetch(url)).json()
     }
 
@@ -100,7 +100,7 @@ export class GradientLayer extends L.Layer implements ILayer{
             // get index file and times
             this.dataIndexDef = await (await fetch(this.lyrOpts.url)).json()
             this.times = this.dataIndexDef.map(i=>i.time08)
-
+            
             await this.setTimeData()
             this.fireEvent("loaded")
 

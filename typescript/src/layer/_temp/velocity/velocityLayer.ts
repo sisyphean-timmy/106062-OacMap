@@ -66,7 +66,7 @@ export class VelocityLayer extends L.Layer implements ILayer{
     }
 
     async fetchData(idx:number = 0):Promise<any>{
-        const url = this.lyrOpts.url.replace("index.json",this.dataIndexDef[idx].name)
+        const url = this.lyrOpts.url.replace(/index.json$/ig,this.dataIndexDef[idx].name)
         return await (await fetch(url)).json()
     }
 

@@ -9,7 +9,6 @@ const ZIP = require("node-zip")
 const Togeojson = require('togeojson')
 
 const bodyParser = require('body-parser');
-const { count } = require('console');
 
 app.use('/demo', express.static('demo'))
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -40,15 +39,12 @@ app.get("/typhoon", async(req, res) => {
 const handleCWBTyphoonData = async() => {
     try {
 
-        // TEST
-        // const data = fs.readFileSync("typhoon/W-C0034-002.kmz")
-
         const AUTH_KEY = "?Authorization=CWB-E0F06EC3-785A-4058-8B12-7F43A46F4E17"
         const URI = "https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/"
         const DIR = "./typhoon/export/"
 
         const FILE_NAMES = { /** @see https://opendata.cwb.gov.tw/dataset/warning?page=1 */
-            // "W-C0034-001.CAP": "颱風警報",
+            "W-C0034-001.CAP": "颱風警報",
             "W-C0034-002.KMZ": "颱風消息",
             // "W-C0034-003.KMZ": "颱風侵襲機率",
             "W-C0034-004.JSON": "颱風路徑",
@@ -75,20 +71,31 @@ const handleCWBTyphoonData = async() => {
                 result[FILE_NAMES[name]] = json
             } else if (/cap/ig.test(ext)) { // xml
                 const str = XmlParser.xml2json(await stream.text(), {
-                    compact: true,
-                    spaces: 4
-                })
-
-                // fs.writeFileSync(DIR+name.replace(/\.cap$/ig,".json"),str)
+                        compact: true,
+                        spaces: 4
+                    })
+                    // fs.writeFileSync(DIR+name.replace(/\.cap$/ig,".json"),str)
                 result[FILE_NAMES[name]] = JSON.parse(str)
             } else if (/kmz/ig.test(ext)) {
+                const DOMParser = require('xmldom').DOMParser
+
+                /**
+                 * 多個颱風時
+                 */
+                const muti_test_unzip = new ZIP(fs.readFileSync("./typhoon/muti_test.kmz"))
+                const muti_test_f = Object.values(muti_test_unzip['files']).find(f => /\.kml$/.test(f.name))
+                console.log(muti_test_f)
+                    // const muti_test_kml = new DOMParser().parseFromString(muti_test)
+                    // const muti_test_geojson = Togeojson.kml(kml, { styles: true });
+                    // fs.writeFileSync("./typhoon/export/muti_test.json", JSON.stringify(geojson))
+
+
                 const buffer = await (await stream.blob()).arrayBuffer()
                 const unzip = new ZIP(buffer)
                 const f = Object.values(unzip['files']).find(f => /\.kml$/.test(f.name))
                 if (!f) throw ("can't find kml in kmz")
 
                 const str = f.asText()
-                const DOMParser = require('xmldom').DOMParser
                 const kml = new DOMParser().parseFromString(str)
 
                 const geojson = Togeojson.kml(kml, { styles: true });
@@ -106,18 +113,22 @@ const handleCWBTyphoonData = async() => {
         }
 
         /**
-         * 輸出 002 geojson 不夠的屬性從 004 加入到其 feature.properties
-         * 沒有颱風時 ?? 資料格式是如何?
-         * console.log(result["颱風路徑"]["cwbtyphfcst"]["announcement"])
+         * 以 W-C0034-001.CAP (颱風警報) 來確定是否需要給資料
+         * 以 W-C0034-002.KMZ 中  (kml2geojson) 作為 data
+         * 不夠的屬性從 W-C0034-004 加入到 feature.properties
          */
+
+        const features = result["颱風消息"].features
         const PROPS_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["properties"]
         const CURR_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["curr"]["point"]
         const FCST_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["fcst"]["point"]
         const PAST_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["typhdata"]["past"]["point"]
 
-        console.clear()
-
-        const features = result["颱風消息"].features
+        /** test */
+        const { severity, certainty, category } = result["颱風警報"].alert.info
+        console.log("severity", severity)
+        console.log("certainty", certainty)
+        console.log("category", category)
 
         const { typhname, typhno } = PROPS_004
         // const {} = CURR_004

@@ -269,21 +269,21 @@
         },
         {
             "title": "OCM模式預報-海表鹽度",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSALT_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSALT/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
             "title": "OCM模式預報-海表高度",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmWL_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmWL/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
             "title": "OCM模式預報-海表溫度",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSST_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSST/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
@@ -345,7 +345,7 @@
             "type": "markScenicSpot",
             "tag": ["A", "B", "C", "D"],
             "layerOption": {
-                "icon": "fas fa-star",
+                "icon": "star",
                 "featureProperties": {
                     "title": "Name",
                     "photo": ["Picture1", "Picture2", "Picture3"],
@@ -361,7 +361,7 @@
             "type": "clusterMark",
             "tag": [],
             "layerOption": {
-                "icon": "fas fa-ship"
+                "icon": "ship"
             }
         },
         {
@@ -382,7 +382,7 @@
             "type": "markIsoheStation",
             "tag": ["C"],
             "layerOption": {
-                "icon": "fas fa-temperature-high"
+                "icon": "temperature-high"
             }
         },
         {
@@ -393,7 +393,7 @@
             "type": "clusterMark",
             "tag": ["A", "B", "C", "D"],
             "layerOption": {
-                "icon": "fas fa-fish",
+                "icon": "fish",
                 "featureProperties": {
                     "title": "漁港名稱",
                     "description": ["漁港名稱", "類別"]

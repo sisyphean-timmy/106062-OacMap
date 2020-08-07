@@ -22,18 +22,6 @@ import {
     ScenicSpotLayer
 } from "./clusterMarkerLayer"
 
-
-let catelog = null;
-const fetchCatelog = async () =>{
-    catelog = await(await fetch('./layerCatelog.json')).json()
-}
-const getCatelog = async title =>{
-    if(!catelog) await fetchCatelog()
-    let bucket = catelog.filter(i=>i.layer.some(_name=>new RegExp(_name,"g").test(title))).map(i=>i.catelog)
-    if(!bucket.length) console.error(`無法取得${title}的分類`)
-    return bucket
-}
-
 export class Layer {
     
     private _map:L.Map
@@ -163,6 +151,14 @@ export class Layer {
     
     async addLayer(lyrDefs:any|Array<any>){
         if(!Array.isArray(lyrDefs)) lyrDefs = [lyrDefs]
+
+        let catelog = await(await fetch('./layerCatelog.json')).json()
+        const getCatelog = title =>{
+            let bucket = catelog.filter(i=>i.layer.some(_name=>new RegExp(_name,"g").test(title))).map(i=>i.catelog)
+            if(!bucket.length) console.error(`無法取得${title}的分類`)
+            return bucket
+        }
+
         try{
             for (const lyrOpts of lyrDefs) {
                 const mapFn = {

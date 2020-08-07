@@ -16,20 +16,18 @@
 		template(v-else-if="dialogTitle === '搜尋'")
 			searchAndFilterLayer
 
-	//- DRAWER
+	//- DRAWER :withHeader="false"
 	el-drawer(
 		v-if="drawerVisibility"
-		:title="drawerTitle"
-		:size="isMobile?'100%':'30%'"
+		:title='drawerTitle'
+		:size="isMobile?'100%':'400px'"
 		:visible="true"
 		direction="rtl"
 		@close="drawerTitle='';drawerVisibility = false"
-		@openAddToHomeScreen="dialogTitle = '加至主畫面說明';dialogVisibility = true"
 	)
-		template(v-if="drawerTitle==='相關資訊'")
-			info
-		template(v-else-if="drawerTitle==='海情/海象資訊'")
+		template(v-if="drawerTitle==='海情/海象資訊'")
 			layerWeatherDeatil
+		info(v-else :value="drawerTitle")
 
 	//- Windy Map
 	template(v-if="windyOption.visible")
@@ -62,7 +60,7 @@
 		component(
 			:is="isMobile ? 'mapUIxs' : 'mapUI'"
 			@openDrawer="drawerVisibility=true;drawerTitle=($event||'相關資訊')"
-			@openSearchDialog="dialogVisibility=true;dialogTitle=($event||'搜尋')"
+			@openDialog="dialogVisibility=true;dialogTitle=($event||'搜尋')"
 		)
 
 	//- Map
@@ -140,7 +138,7 @@ export default {
 		typhoonAlert: []
 	}),
 	components:{
-        markss,
+		markss,
 		mapUI,
 		mapUIxs,
 		addToHome,
@@ -159,18 +157,6 @@ export default {
 		ifh(){ // iframe 高度 減 上方按鈕高度 
 			return window.innerHeight - 32
 		},
-	},
-	watch:{
-		"windyOption.visible":{
-			handler(bool){
-				if(!bool) return 
-				this.windyLoading = true
-				this.$nextTick(()=>{
-					const Iframe = this.$el.querySelector("#windy")
-					Iframe.onload = ()=> this.windyLoading = false
-				})
-			}
-		}
 	},
 	watch:{
 		"windyOption.visible":{
@@ -323,8 +309,8 @@ export default {
 		},
 		async layerHandler(){
 
-            /** get layerDef (index) */
-            const layerDef = await(await fetch('./layerDef.json')).json()
+			/** get layerDef (index) */
+			const layerDef = await(await fetch('./layerDef.json')).json()
 
 			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map)
 			
@@ -399,13 +385,13 @@ export default {
 	animation-iteration-count: infinite;
 	animation-timing-function: ease-in-out;
 	//
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 	justify-content: center;
 	width: 100%;
 	//
 	font-size: 0.8rem;
-	padding: 0.5rem 0;
+	padding: 0.3rem 0;
 	position: fixed;
 	z-index: 2;
 	background-color: lighten($danger,20);

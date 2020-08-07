@@ -69,7 +69,7 @@ export class Init {
             margin-left: 0.5rem;
         ` 
 
-        let updateCoord = (lng=0,lat=0) => {
+        let updateCoord = ({lat,lng}) => {
             textLabel.innerHTML = `
                 <small>
                     <span>經度</span> ${lng.toFixed(3)}
@@ -77,11 +77,11 @@ export class Init {
                 </small>
             `
         }
-        updateCoord(this.map.getCenter().lng,this.map.getCenter().lat) // init
-        this.map.on("mousemove",(evt:L.LeafletMouseEvent)=>updateCoord(
-            evt.latlng.lat,
-            evt.latlng.lng
-        ))
+        updateCoord(this.map.getCenter()) // init
+        this.map.on("mousemove",(evt:L.LeafletMouseEvent)=>updateCoord({
+            lat:evt.latlng.lat,
+            lng:evt.latlng.lng
+        }))
 
         container.appendChild(textLabel)
     }
