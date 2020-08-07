@@ -147,7 +147,7 @@ export class IsoheStationLayer extends BaseCluster {
                             result.title = Name+"波浪及海流"
                             result.type = "wave"
                         }else if(/wind/ig.test(k)){
-                            result.title = Name+"風向"
+                            result.title = Name+"風力"
                             result.type = "wind"
                         }
                         this._map.fireEvent("markerClick",{
