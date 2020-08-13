@@ -1,94 +1,155 @@
 <template lang="pug">
 transition(name="slide-fade-up" mode="out-in")
-	div(style="display:flex;flex-direction:column;")
-		.timeSlider--mobile(
-			v-if="isMobile && DATES.length > 1"
-			:class="valueModel<50 ? 'timeSlider--mobile__start' : 'timeSlider--mobile__end'"
-		)
-			//- .timeSlider--mobile__label(v-loading="loading")
-			//- 	span(:style="loading?'opacity:0.2;':'opacity:1;'") {{currentDateTimeString}}
-			small(style="color: #fff;position: absolute;left: 0;right: 0;text-align: center;") 拖動/點擊 調整時間
-			VueSlider(
-				v-model="valueModel"
-				v-bind="options"
-				key="timeSilderMobile"
-			)
+	div
+		//- Mobile style - time wheel
+		template(v-if="isMobile && DATES.length > 1")
+			div(v-loading="loading" )
+				.scroll-label(:style="loading?'opacity:0.7;':'opacity:1;'") 
+					strong {{currentDateTimeString}}
+					.scroll-label__pointer
+			.scroll
+				.scroll__wrapper(ref="bsScroll")
+					.scroll__content
+						.scroll__item(
+							v-for="o in DATES_MOBILE_MODEL" 
+							:key="o.label"
+						)
+							strong(style="display:block;margin:0.5rem 0;") {{o.label}}
+							span(v-for="h in o.hours" ref="timeScale" style="padding-right:0.5rem;") {{h}}
 
-		//- TODO : valueModel is not real percentage of slider
+		//- Default style - time slider
 		.timeSilder(
 			v-else-if="DATES.length > 1" 
-			:class="valueModel<50 ? 'timeSilder__start' : 'timeSilder__end'"
+			key="timeSilder"
 		)
-			VueSlider(
-				v-model="valueModel"
-				v-bind="options"
-			)
+			div(style="display:flex;align-items:center;position: absolute;right: 0;bottom: 1rem;")
+				.custom-tooltip( v-loading="loading" style="display:flex;") 
+					el-button(icon="el-icon-caret-left" type="text" style="padding:0;" :disabled="loading || valueModel===0" @click="valueModel-=1")
+					span(:style="loading?'opacity:0.3;':'opacity:1;'") {{ currentDateTimeString }}
+					el-button(icon="el-icon-caret-right" type="text" style="padding:0;" :disabled="loading || valueModel===DATES.length-1" @click="valueModel+=1")
+			
+				div
+					VueSlider(
+						ref="VueSlider"
+						class="VueSlider"
+						style="width: 60vw;max-width: 650px;"
+						v-model="valueModel"
+						v-bind="options"
+						@mouseenter.native="mouseEnter"
+						@mousemove.native="mouseMove"
+						@mouseleave.native="mouseLeave"
+						@drag-start="hoverTooltipVisibility= false"
+						@drag-end="hoverTooltipVisibility= true"
+						@click.native="value=hoverDateIndex?hoverDateIndex:0"
+					)
+						small(
+							v-if="hoverTooltipVisibility"
+							:style="customTooltipStyle" 
+							ref="hoverCaption"
+						) {{hoverTimeString}}
 
 		//- 圖例
-		.legend(v-if="legendVisible") 
+		.legend(
+			v-if="legendVisible"
+			:style="isMobile?'border-radius:0;':''"
+			key="legend"
+		) 
 			small.legend__title(v-if="legend.label") {{legend.label}}
-			.legend__row(
-				v-for="scale in legendColor" 
-				:key="scale.label"
-			)
-				.legend__row__color(:style="`background-color:${scale.value};`")
-				.legend__row__text {{isNaN(scale.label)?scale.label:Number(scale.label)}}
+			.legend__row(:style="legendGradient")
+				small.legend__row__text(v-for="label in legend.colorScaleLabel") {{isNaN(label)?label:Number(label)}}
 
 </template>
 
 <script>
 
-/** TEST MAP DATES */
-// const DATES = ["2020-07-25T23:00:00+08:00", "2020-07-26T02:00:00+08:00", "2020-07-26T05:00:00+08:00", "2020-07-26T08:00:00+08:00", "2020-07-26T11:00:00+08:00", "2020-07-26T14:00:00+08:00", "2020-07-26T17:00:00+08:00", "2020-07-26T20:00:00+08:00", "2020-07-26T23:00:00+08:00", "2020-07-27T02:00:00+08:00", "2020-07-27T05:00:00+08:00", "2020-07-27T08:00:00+08:00", "2020-07-27T11:00:00+08:00", "2020-07-27T14:00:00+08:00", "2020-07-27T17:00:00+08:00", "2020-07-27T20:00:00+08:00", "2020-07-27T23:00:00+08:00", "2020-07-28T02:00:00+08:00", "2020-07-28T05:00:00+08:00", "2020-07-28T08:00:00+08:00", "2020-07-28T11:00:00+08:00", "2020-07-28T14:00:00+08:00", "2020-07-28T17:00:00+08:00", "2020-07-28T20:00:00+08:00", "2020-07-28T23:00:00+08:00", "2020-07-29T02:00:00+08:00", "2020-07-29T05:00:00+08:00", "2020-07-29T08:00:00+08:00", "2020-07-29T11:00:00+08:00", "2020-07-29T14:00:00+08:00", "2020-07-29T17:00:00+08:00", "2020-07-29T20:00:00+08:00", "2020-07-29T23:00:00+08:00", "2020-07-30T02:00:00+08:00", "2020-07-30T05:00:00+08:00", "2020-07-30T08:00:00+08:00", "2020-07-30T11:00:00+08:00", "2020-07-30T14:00:00+08:00", "2020-07-30T17:00:00+08:00", "2020-07-30T20:00:00+08:00", "2020-07-30T23:00:00+08:00", "2020-07-31T02:00:00+08:00", "2020-07-31T05:00:00+08:00", "2020-07-31T08:00:00+08:00", "2020-07-31T11:00:00+08:00", "2020-07-31T14:00:00+08:00", "2020-07-31T17:00:00+08:00", "2020-07-31T20:00:00+08:00", "2020-07-31T23:00:00+08:00", "2020-08-01T02:00:00+08:00", "2020-08-01T05:00:00+08:00", "2020-08-01T08:00:00+08:00", "2020-08-01T11:00:00+08:00", "2020-08-01T14:00:00+08:00", "2020-08-01T17:00:00+08:00", "2020-08-01T20:00:00+08:00", "2020-08-01T23:00:00+08:00", "2020-08-02T02:00:00+08:00", "2020-08-02T05:00:00+08:00", "2020-08-02T08:00:00+08:00", "2020-08-02T11:00:00+08:00", "2020-08-02T14:00:00+08:00"]
-// console.time("[Map mark of timeline]")
-// let lastAddedDate = null
-// let test = {}
-// const DDS = DATES.forEach((dStr,index)=>{
-//     const D = new Date(dStr)
-//     const yy = D.getFullYear()
-//     const mm = D.getMonth()+1
-//     const dd = D.getDate()
-//     if(!lastAddedDate){
-//         lastAddedDate = D
-//     }else if(D-lastAddedDate>24*60*60*1000 || dd>new Date(lastAddedDate).getDate()){
-//         lastAddedDate = D
-//         test[index] = {
-//             label:`${mm}/${dd}`
-//         }
-//     }
-// })
-// console.timeEnd("[Map mark of timeline]")
-
 import { mapGetters, mapMutations } from 'vuex'
-
 /** @see https://nightcatsama.github.io/vue-slider-component/#/zh-CN/advanced/components-slots */
 import VueSlider from 'vue-slider-component'
 import 'vue-slider-component/theme/antd.css'
+import BScroll from 'better-scroll'
 
 export default {
-	name:"timeSilder",
+	name:"layerWeatherTool",
 	components:{
 		VueSlider
 	},
+	props:{},
 	data:()=>({
 		value: 0,
 		timer:null,
 		loading:false,
-		errDateCollection:[]
+		// 
+		hoverTooltipVisibility:false,
+		hoverTimeString:"",
+		hoverDateIndex: 0,
+		hoverTooltipOffsetX: 0,
+		//
+		BScrollInstance:null
 	}),
-	props:{},
-	mounted(){},
+	watch:{
+		DATES:{
+			async handler(dates){
+
+                /** init to start */
+                this.valueModel = 0
+                this.BScrollInstance && this.BScrollInstance.scrollTo(0,0)
+
+				if(dates.length<=1){
+					this.BScrollInstance&&this.BScrollInstance.destroy()
+					return
+				}
+				
+				const dom = await new Promise(res=>this.$nextTick(()=>res(this.$refs.bsScroll)))
+				
+				if(!dom){ // !isMobile
+					return
+				} 
+				
+				this.BScrollInstance = new BScroll(dom,{
+					scrollX: true,
+					probeType: 3, // listening scroll hook
+					stopPropagation:true,
+					tap:'tap'
+				})
+				const px = this.BScrollInstance.wrapper.clientWidth/2
+				this.BScrollInstance.scroller.style.padding = `0 ${px}px`
+				this.BScrollInstance.refresh()
+				this.BScrollInstance.on("scrollEnd",e=>{
+					const CENTER = this.$refs.timeScale[0].offsetLeft + Math.abs(e.x)
+					console.log("[CENTER]",CENTER)
+					// find min diff from all hours elms
+					let d = 0
+					let i = 0
+					this.$refs.timeScale.forEach((el,idx)=>{
+						let diffToCenter = Math.abs(CENTER-el.offsetLeft)
+						if(d===0 || diffToCenter<d ){
+							d = diffToCenter
+							i = idx-1
+						}
+					})
+					this.valueModel = i
+				})
+			},
+			immediate:true
+		}
+	},
 	computed:{
 		...mapGetters({
 			layerState:"layer/layer/state",
 			isMobile:"common/common/isMobile"
 		}),
 		//** legend */
-		legendColor(){
-			return this.legend.colorScaleValue.map((c,i)=>({
-				label:this.legend.colorScaleLabel[i],
-				value:c
-			}))
+		legendGradient(){
+			let gArr = []
+			const avg = 100/(this.legend.colorScaleValue.length-1)
+			let cnt = 0
+			this.legend.colorScaleValue.forEach(color => {
+				gArr.push(`${color} ${cnt}%`)
+				cnt += avg
+			})
+			return {
+				background:`linear-gradient(90deg,${gArr.join(',')})`
+			}
 		},
 		legend(){
 			return this.layerState('legend')
@@ -97,13 +158,22 @@ export default {
 			return this.legend.colorScaleLabel.length && this.legend.colorScaleValue.length
 		},
 		currentDateTimeString(){
-			const now = new Date(this.DATES[this.value])
-			const mm = now.getMonth()+1
-			const dd = now.getDate()
-			const hh = now.getHours()
-			return `${mm}月${dd}日 ${hh}時`
+			return this.getUnionDateString(this.value)
 		},
 		//** timeSlider */
+		customTooltipStyle(){
+			let defaultStyle = {
+				position:'absolute',
+				background:'rgba(0,0,0,0.7)',
+				color:'#fff',
+				top:'100%',
+				bottom:'auto',
+				padding: '0.2rem 1rem',
+				borderRadius:'1rem'
+			}
+			defaultStyle['transform'] = `translateX(${this.hoverTooltipOffsetX}px)`
+			return defaultStyle
+		},
 		valueModel:{
 			get(){
 				return this.value
@@ -114,11 +184,10 @@ export default {
 				this.timer = setTimeout(async () => {
 					const TIME_STR = this.DATES[index]
 					const activedLyr = this.$LayerIns.normalLayerCollection.find(l=>l.id === this.activedWeatherLyr.id)
-					console.log("%s[set layer time]","background:red;",this.DATES[index])
 					try{
 						await activedLyr.setTimeData(TIME_STR)
-					}catch(e){// 蒐集發生錯誤的日期紀錄，在 tootip 中顯示
-						this.errDateCollection.push(this.DATES[index])
+					}catch(e){
+						console.error(e)
 					}finally{
 						this.loading = false
 					}
@@ -134,9 +203,6 @@ export default {
 		},
 		MARKS(){
 			let bucket = {}
-			if(new Date().getHours()<21){
-				bucket = {"0":"今天"}
-			}
 			this.DATES.forEach((dStr,index)=>{
 				const D = new Date(dStr)
 				const yy = D.getFullYear()
@@ -147,8 +213,8 @@ export default {
 				const lyy = lD.getFullYear()
 				const lmm = lD.getMonth()+1
 				const ldd = lD.getDate()
-				
-				if(dd>ldd || mm>lmm ||yy>lyy){
+
+				if(index===0 || dd>ldd || mm>lmm ||yy>lyy){
 					bucket[index] = {
 						label:`${mm}/${dd}`
 					}
@@ -158,9 +224,9 @@ export default {
 		},
 		options(){
 			return {
-				// dotSize: 5,
-				width:  this.isMobile ? '100%' : 'auto',
-				height: this.isMobile ? '1.5rem' : 10,
+				dotSize: 18,
+				width: 'auto',
+				height: '0.8rem',
 				// contained: true,
 				direction: 'ltr',
 				// data: DATES,
@@ -170,21 +236,14 @@ export default {
 				// disabled: false,
 				// clickable: true,
 				// duration: 0.5,
-				// adsorb: false,
 				// lazy: true,
-				tooltip: 'always',
-				tooltipPlacement: 'top',
-				tooltipFormatter: i=>{
-					const dStr = this.DATES[i]
-					if(this.errDateCollection.indexOf()>-1){
-						return "發生錯誤"
-					}else if(this.loading){
-						return "資料載入中"
-					}else{
-						return this.currentDateTimeString
-					}
-				},
-				// tooltipStyle: void 0,
+				tooltip: 'none',
+				// tooltip: 'always',
+				// // tooltipPlacement: 'top',
+				// tooltipFormatter: i=>this.getUnionDateString(new Date(this.DATES[i])),
+				// tooltipStyle: {
+				// 	pointerEvents: 'auto'
+				// },
 				// useKeyboard: false,
 				// keydownHook: null,
 				// dragOnClick: false,
@@ -194,26 +253,93 @@ export default {
 				// maxRange: void 0,
 				// order: true,
 				included:false,
-				marks: this.isMobile?false:this.MARKS,
-				// dotOptions: void 0,
+				marks: this.MARKS,
+				dotOptions: {
+					style:{
+						pointerEvents:'auto'
+					}
+				},
 				// process: true,
-				// dotStyle: void 0,
-				// railStyle: void 0,
+				// dotStyle: {},
+				railStyle: {
+					pointerEvents:'none'
+				},
 				// processStyle: void 0,
-				// stepStyle: void 0,
+				stepStyle: {
+					boxShadow: 'none',
+					backgroundColor: '#ffffff',
+					width: '2px',
+					borderRadius: 0
+				},
 				// stepActiveStyle: void 0,
 				// labelStyle: void 0
 				// labelActiveStyle: void 0,
 			}
+		},
+		//- scroll bar
+		DATES_MOBILE_MODEL(){
+			console.log("[DATES_MOBILE_MODEL RAW]",this.MARKS)
+
+			const result =  Object.values(this.MARKS).map(v=>({
+				label:v.label,
+				hours:this.DATES.filter(dstr =>{
+					const d = new Date(dstr)
+					const mm = d.getMonth()+1
+					const dd = d.getDate()
+					return `${mm}/${dd}` === v.label
+				}).map(dstr=>new Date(dstr).getHours())
+			}))
+			console.log("[DATES_MOBILE_MODEL RESULT]",result)
+			return result
+		}
+	},
+	methods:{
+		mouseEnter(e){
+			this.hoverTimeString = this.getDateBymouseEvt(e)
+		},
+		mouseMove(e){
+			if(e.target.classList.contains("vue-slider")){
+				this.hoverTooltipVisibility=true
+				this.hoverTimeString = this.getDateBymouseEvt(e)
+			}else{
+				this.hoverTooltipVisibility=false
+			}
+		},
+		mouseLeave(){
+			this.hoverTooltipVisibility=false
+		},
+		getDateBymouseEvt({offsetX}){
+			this.hoverTooltipOffsetX = offsetX
+			const width = this.$refs.VueSlider.$el.clientWidth
+			let idx = Math.floor(this.DATES.length*offsetX/width)
+			idx = idx <0 ? 0 :idx
+			this.hoverDateIndex = idx
+
+			const hoverCaption = this.$refs.hoverCaption
+			if(idx>=50 && hoverCaption){ // 靠右邊位移至左
+				this.hoverTooltipOffsetX-=hoverCaption.clientWidth
+			}
+
+			return this.getUnionDateString(idx)
+		},
+		getUnionDateString(idxOrDate){
+			let now = null
+			if(idxOrDate instanceof Date){
+				now = idxOrDate
+			}else if(typeof idxOrDate === 'number'){
+				now = new Date(this.DATES[idxOrDate])
+			}
+			const mm = now.getMonth()+1
+			const dd = now.getDate()
+			const hh = now.getHours()
+			return `${mm}月${dd}日 ${hh}時`
 		}
 	}
 }
-
 </script>
 
 <style lang="scss" scoped>
 
-/** legend */
 .legend{
 	width: 100%;
 	background-color: rgba(0,0,0,0.45);
@@ -221,6 +347,8 @@ export default {
 	display: flex;
 	align-items:center;
 	position: relative;
+	overflow: hidden;
+	border-radius: 1rem;
 	&__title{
 		white-space: nowrap;
 		padding: 0 1rem;
@@ -228,168 +356,118 @@ export default {
 	}
 	&__row {
 		display: flex;
-		align-items:center;
+		width: 100%;
+		align-items: center;
+		justify-content: space-evenly;
 		&__text{
 			position: relative;
 			padding: 0.25rem 0.5rem;
 			text-shadow: 1px 1px 0px rgba(0,0,0,1);
 		}
-		&__color{
-			position: absolute;
-			width: 100vw;
-			height: 100%;
-		}
 	}
 }
+</style>
 
-/** timeSlider */
-.timeSlider--mobile{
-	display: flex;
-	align-items: center;
-	width:100%;
-    background: rgba(0,0,0,0.3);
-	&__label{
-		width: 170px;
-		padding: 1rem;
-		margin-right: 1rem;
-		color: #fff;
-		font-weight: bolder;
-		font-size: 1.1rem;
-	}
-	/** x and left */
-	&__start /deep/{
-		.vue-slider-dot-tooltip-top{
-			transform: translate(-10%,-100%);
-		}
-		.vue-slider-dot-tooltip-inner-top::after{
-			left: 10%;
-		}
-	}
-	&__end /deep/{
-		.vue-slider-dot-tooltip-top{
-			transform: translate(-90%,-100%);
-		}
-		.vue-slider-dot-tooltip-inner-top::after{
-			left: 90%;
-		}
-	}
-	/deep/ {
-		.el-loading-spinner{
-			.circular{
-				width: 15px !important;
-				height: 15px !important;
-			}
-		} 
-		.vue-slider{
-			padding: 0 !important
-		}
-		.vue-slider-rail{
-			background: transparent;
-		}
-		.vue-slider-dot-handle{
-			visibility: hidden;
-		}
-	}
-}
+<style lang="scss" scoped>
 
 .timeSilder{
-	position: absolute;
-	width: 70vw;
-	max-width: 700px;
-	right: 0;
-	left: auto;
-	top: auto;
-	z-index: 2;
-	bottom: 0;
-
-	/** x and left */
-	&__start /deep/{
-		.vue-slider-dot-tooltip-top{
-			transform: translate(-10%,-100%);
-		}
-		.vue-slider-dot-tooltip-inner-top::after{
-			left: 10%;
-		}
-	}
-	&__end /deep/{
-		.vue-slider-dot-tooltip-top{
-			transform: translate(-90%,-100%);
-		}
-		.vue-slider-dot-tooltip-inner-top::after{
-			left: 90%;
-		}
-	}
-	
+	position: relative;
 	/deep/ {
-		.el-loading-spinner {
-			.circular{
-				width: 15px !important;
-				height: 15px !important;
-			}
-		}
-		
 		.vue-slider-rail {
-			border-radius: 0;
-			background-color: $info !important; // rgba(0, 0, 0, 0.3) 
-			&::after{
-				content:"";
-				position: absolute;
-				// background-color: $info !important; // rgba(0, 0, 0, 0.3) 
-				width: 100vw;
-				height: 100%;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				left: 0;
-			}
+			background-color: rgba(0, 0, 0, 0.5) !important;
 		}
-		
+		.vue-slider-mark{
+			width: 0 !important;
+			position: absolute;
+		}
+		.vue-slider-mark-label{
+			color:#fff;
+			left: 50%;
+			transform: translateX(0);
+			bottom: 100%;
+			top: auto;
+			margin: 0.25rem 0;
+			text-shadow: 1px 1px 1px rgba(0,0,0,1);
+		}
+		.vue-slider-process {
+			background-color: $primary !important;
+		}
 	}
-	
+
+	.custom-tooltip{
+		background: rgba(0,0,0,0.8);
+		color:#fff;
+		white-space: nowrap;
+		border-radius: 1rem;
+		padding: 0.2rem 0.5rem;
+		margin:0 1rem;
+		pointer-events: auto;
+	}
 }
 
+</style>
+
+<style lang="scss" scoped>
+.scroll{
+	width: 100%;
+	overflow: hidden;
+	background:rgba(0,0,0,0.5);
+	&__wrapper{
+		white-space: nowrap;
+	}
+	&__content{
+		display: inline-block;
+	}
+	&__item{
+		display: inline-block;
+		color:#fff;
+		padding:0 0.5rem 0.5rem 0.5rem;
+		&:nth-of-type(odd){
+			background-color: rgba(0,0,0,0.5);
+		}
+	}
+}
+.scroll-label{
+	width:100%;text-align:center;position:relative;color:#fff;
+	background: $primary;
+	padding: 0.25rem 0;
+	&__pointer{
+		width: 0;
+		height: 0;
+		border-style: solid;
+		border-width: 0.8rem 0.8rem 0 0.8rem;
+		border-color: $primary transparent transparent transparent;
+		//-
+		position: absolute;
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+		z-index: 2;
+	}
+}
+</style>
+
+<style lang="scss" scoped>
 /deep/ {
-	
 	.el-loading-mask{
 		background-color: transparent;
 	}
 	.el-loading-spinner {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		top: 0;
+		position: relative;
+		margin: 0;
+		height: 100%;
 		.path{
 			stroke: #fff !important;
 			stroke-width: 5px !important;
 		}
-	}
-
-	.vue-slider{
-		padding: 0 1rem 2rem 1rem !important;
-	}
-
-	.vue-slider-process {
-		background-color: $primary !important;
-		border-radius: 0 !important;
-	}
-	.vue-slider-mark{
-		width: 0 !important;
-	}
-	.vue-slider-mark-label {
-		padding: 0.15rem 0.25rem;
-		background-color: rgba(0,0,0,0.3);
-		margin-top: 0 !important;
-		transform:translateX(0) !important;
-		color: #ffffff;
-		width: 100vw;
-	}
-	
-	.vue-slider-mark:nth-last-of-type(1) .vue-slider-mark-label{
-		background-color:transparent;
-	}
-
-	.vue-slider-mark-step {
-		box-shadow: none !important;
-		background-color: #ffffff !important;
-		width: 3px;
-		border-radius: 0;
+		.circular{
+			width: 18px !important;
+			height: 18px !important;
+		}
 	}
 }
-
 </style>

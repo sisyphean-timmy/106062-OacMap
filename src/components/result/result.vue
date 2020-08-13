@@ -7,7 +7,7 @@ div
                 style="color:red;padding-right:0;"
                 icon="el-icon-delete"
                 type="text" round size="mini" slot="prepend"
-                @click="back();DELETE_RESULT(null)"
+                @click="DELETE_RESULT(null)"
             ) 全部清空
 
     div(v-if="newAdd.length")
@@ -39,7 +39,7 @@ div
                 v-if="isMobile"
                 style="color:red;padding-right:0;"
                 type="text" round size="mini" slot="prepend"
-                @click="back();DELETE_RESULT(null)"
+                @click="DELETE_RESULT(null)"
                 icon="el-icon-delete"
             ) 全部清空
             resultTabbar(
@@ -54,7 +54,7 @@ div
                     resultScrollListItem(
                         :data="scope.singleCaseData.data"
                         @fetchDetail="openDetail(scope.singleCaseData.dataId)"
-                        @delete="deleteResult(scope.singleCaseData.dataId)"
+                        @delete="DELETE_RESULT(scope.singleCaseData.dataId)"
                         @locate="locate(scope.singleCaseData)"
                     )
                         template(slot="title") 
@@ -122,6 +122,16 @@ export default {
         activeName:"全部",
         dataId:''
     }),
+    watch:{
+        "allResultLength":{
+            handler(count){
+                if(count===0){
+                    this.SET_CARD_VISIBLE({key:'result',bool:false})
+                    this.dataId = ''
+                }
+            }
+        }
+    },
     computed:{
         ...mapGetters({
             commonState: "common/common/state",
@@ -142,11 +152,11 @@ export default {
                         }
                     })
                 })
-                console.log("allData",data)
+                console.log("[result dataModel all]",data)
             }else{
-                let k = this.tabsNames.find(t=>t.title === this.activeName).id
-                console.log("data of",k)
-                data = this.history(k)
+                const obj = this.tabsNames.find(t=>t.title === this.activeName)
+                console.log("[result dataModel of ]",obj)
+                if(obj) data = this.history(obj.id)
             }
             
             if(this.dataId){
@@ -180,9 +190,6 @@ export default {
                 duration:0.25,
                 paddingTopLeft: [LOffset, 0] /** [left,top] */
             })
-        },
-        deleteResult(dataId){
-            this.DELETE_RESULT(dataId)
         },
         openDetail(dataId){
             this.dataId = dataId

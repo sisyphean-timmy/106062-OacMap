@@ -4,7 +4,7 @@
 	el-button(
 		circle
 		type="primary" 
-		@click="$parent.$emit('openDialog','搜尋')"
+		@click="$openDialog('搜尋')"
 	)
 		.tools__button
 			font-awesome-icon(icon="search" fixed-width size="lg")
@@ -20,7 +20,7 @@
 	el-button(
 		circle 
 		:disabled="!allR2"
-		@click="isMobile ? $emit('resultClick') : SET_CARD_VISIBLE({key:'result',bool:!resultVisibility})"
+		@click="SET_CARD_VISIBLE({key:'result',bool:true})"
 	)
 		.tools__button
 			.tools__resultNum(

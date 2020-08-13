@@ -58,15 +58,22 @@ export class GradientLayer extends L.Layer implements ILayer{
             const idx = this.times.indexOf(time)
             const data = await this.fetchData(idx)
             
-            this.lyrOpts.data = {
-                d: {'v': data[0].data},
-                la1: data[0].header.la1,
-                la2: data[0].header.la2,
-                lo1: data[0].header.lo1,
-                lo2: data[0].header.lo2,
-                nx: data[0].header.nx,
-                ny: data[0].header.ny,
+            if(Array.isArray(data)){ // format A
+                console.log("[data typeof format A]",data)
+                this.lyrOpts.data = {
+                    d: {'v': data[0].data},
+                    la1: data[0].header.la1,
+                    la2: data[0].header.la2,
+                    lo1: data[0].header.lo1,
+                    lo2: data[0].header.lo2,
+                    nx: data[0].header.nx,
+                    ny: data[0].header.ny,
+                }
+            }else{ // format B
+                console.log("[data typeof format B]",data)
+                this.lyrOpts.data = data
             }
+
             !this._builder && this._init()
             this._builder.setData(this.lyrOpts.data)
             this.needRedraw()

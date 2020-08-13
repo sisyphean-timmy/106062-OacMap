@@ -68,29 +68,20 @@ const handleCWBTyphoonData = async() => {
             if (/json/ig.test(ext)) {
                 const json = await stream.json()
                     // fs.writeFileSync(DIR + name, JSON.stringify(json))
-                result[FILE_NAMES[name]] = json
+                result["颱風路徑"] = json
             } else if (/cap/ig.test(ext)) { // xml
                 const str = XmlParser.xml2json(await stream.text(), {
                         compact: true,
                         spaces: 4
                     })
                     // fs.writeFileSync(DIR+name.replace(/\.cap$/ig,".json"),str)
-                result[FILE_NAMES[name]] = JSON.parse(str)
+                result["颱風警報"] = JSON.parse(str)
             } else if (/kmz/ig.test(ext)) {
                 const DOMParser = require('xmldom').DOMParser
 
-                /**
-                 * 多個颱風時
-                 */
-                const muti_test_unzip = new ZIP(fs.readFileSync("./typhoon/muti_test.kmz"))
-                const muti_test_f = Object.values(muti_test_unzip['files']).find(f => /\.kml$/.test(f.name))
-                console.log(muti_test_f)
-                    // const muti_test_kml = new DOMParser().parseFromString(muti_test)
-                    // const muti_test_geojson = Togeojson.kml(kml, { styles: true });
-                    // fs.writeFileSync("./typhoon/export/muti_test.json", JSON.stringify(geojson))
+                const buffer = fs.readFileSync("./typhoon/muti_test.kmz") // muti test
+                    // const buffer = await (await stream.blob()).arrayBuffer()
 
-
-                const buffer = await (await stream.blob()).arrayBuffer()
                 const unzip = new ZIP(buffer)
                 const f = Object.values(unzip['files']).find(f => /\.kml$/.test(f.name))
                 if (!f) throw ("can't find kml in kmz")
@@ -99,8 +90,7 @@ const handleCWBTyphoonData = async() => {
                 const kml = new DOMParser().parseFromString(str)
 
                 const geojson = Togeojson.kml(kml, { styles: true });
-                // fs.writeFileSync(DIR+f.name.replace(/\.kml$/,".json"),JSON.stringify(geojson))
-                result[FILE_NAMES[name]] = geojson
+                result["颱風消息"] = geojson
 
                 /** export kml to json/geojson */
                 // const jsonStr = XmlParser.xml2json(str, {
@@ -111,12 +101,12 @@ const handleCWBTyphoonData = async() => {
                 // fs.writeFileSync(DIR + f.name.replace(/\.kml$/, "_geo.json"), JSON.stringify(geojson))
             }
         }
-
-        /**
-         * 以 W-C0034-001.CAP (颱風警報) 來確定是否需要給資料
-         * 以 W-C0034-002.KMZ 中  (kml2geojson) 作為 data
-         * 不夠的屬性從 W-C0034-004 加入到 feature.properties
-         */
+        return result
+            /**
+             * 以 W-C0034-001.CAP (颱風警報) 來確定是否需要給資料
+             * 以 W-C0034-002.KMZ 中  (kml2geojson) 作為 data
+             * 不夠的屬性從 W-C0034-004 加入到 feature.properties
+             */
 
         const features = result["颱風消息"].features
         const PROPS_004 = result["颱風路徑"]["cwbtyphfcst"]["typhinfo"]["typhoon"]["properties"]

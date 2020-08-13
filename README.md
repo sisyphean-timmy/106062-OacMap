@@ -32,6 +32,10 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * `vue.config.js`[配置參考](https://stackoverflow.com/questions/51214220/vue-cli-3-how-to-use-the-official-pwa-plugin-service-worker)* 基於 workbox [workbox cli](https://letswrite.tw/pwa-workbox-cli/)
 * 基於 workbox [workbox api](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin)
 
+#### ./public/layerDef
+#### ./public/layerDef
+#### ./public/layerTag
+
 #### ./typescript
 * `typescript/init` leaflet map 初始化 
 * `typescript/layer` leaflet layer 圖層及擴展
@@ -57,15 +61,15 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * [leaflet UML](https://leafletjs.com/examples/extending/class-diagram.html)
 * 緩存圖磚[地圖相關PWA專案範例](https://github.com/reyemtm/pwa-maps)
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
+* [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
-#### TODO
-- [X] [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
+#### MEMO
+
+- [X] top-right buttons is strange 
+- [X] isoheStation.vue : make chart in each item
 - [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
-- [X] test windy look weather layers' functionality
-- [X] `timeslider.vue` check real 50% of value to control dir of current tooltip label
-- [X] scss in typescript : `declare module.*scss`
-- [X] top area for alert messages ( typhoon alert、 offline msg ...etc ? )
-- [X] check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
+
+- [X] top notify bar : typhoon and check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
 ``` js
 const loader = L.FileLayer.fileLoader(...)
 loader.loadData(file ,"filename.kmz") // file in leaflet-filelayer wasn't converted string
@@ -81,3 +85,4 @@ _convertToGeoJSON: function _convertToGeoJSON(content, format) {
     })
 }
 ```
+- [X] scss in typescript : `declare module.*scss`

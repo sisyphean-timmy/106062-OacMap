@@ -8,15 +8,13 @@ export class Init {
 
     constructor(container:string|HTMLElement,mapOption:L.MapOptions = {}){
         
-        console.log("[L.CRS]",Object.getOwnPropertyDescriptor(L.CRS, "scale"));
-        console.log("[L.CRS]",Object.getOwnPropertyDescriptor(L.CRS, "Simple"));
-
-        (<any>L.CRS).scale = (<any>L.CRS).EPSG3857.scale = (<any>L.CRS).EPSG3395.scale = (<any>L.CRS).EPSG4326.scale = (<any>L.CRS).EPSG900913.scale = (<any>L.CRS).Earth.scale = function (zoom) {
-            return 1 << (zoom+8)
-        };
-        (<any>L.CRS).Simple = function(zoom) {
-            return 1 << zoom
-        };
+        // cause mobile safari zoom strange
+        // (<any>L.CRS).scale = (<any>L.CRS).EPSG3857.scale = (<any>L.CRS).EPSG3395.scale = (<any>L.CRS).EPSG4326.scale = (<any>L.CRS).EPSG900913.scale = (<any>L.CRS).Earth.scale = function (zoom) {
+        //     return 1 << (zoom+8)
+        // };
+        // (<any>L.CRS).Simple = function(zoom) {
+        //     return 1 << zoom
+        // };
 
         this.map = L.map(container,{
             ...mapOption,

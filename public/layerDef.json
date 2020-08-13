@@ -259,7 +259,7 @@
         },
         {
             "title": "異常波浪潛勢",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeOFW_risk_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/PDSOFW/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -268,28 +268,28 @@
             }
         },
         {
-            "title": "OCM模式預報-海表鹽度",
+            "title": "海表鹽度_OCM模式",
             "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSALT/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "OCM模式預報-海表高度",
+            "title": "海表高度_OCM模式",
             "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmWL/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "OCM模式預報-海表溫度",
+            "title": "海表溫度_OCM模式",
             "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSST/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "WIFI_10米風資料",
+            "title": "10米風資料_WIFI",
             "url": "https://ocean.taiwan.gov.tw/OpenData/PDSWind/index.json",
             "visible": false,
             "type": "velocity",
@@ -301,21 +301,21 @@
             }
         },
         {
-            "title": "臺灣海域預報-波浪週期",
+            "title": "波浪週期_臺灣海域預報",
             "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
             "visible": false,
             "type": "wavePeriodGradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "臺灣海域預報-波浪浪高",
+            "title": "波浪浪高_臺灣海域預報",
             "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
             "visible": false,
             "type": "waveHeightGradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
-            "title": "OCM模式預報-表面海流",
+            "title": "表面海流_OCM模式",
             "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmUV/json/index.json",
             "visible": false,
             "type": "velocity",
