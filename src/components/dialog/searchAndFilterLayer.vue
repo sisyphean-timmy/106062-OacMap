@@ -65,13 +65,13 @@ export default {
                 
                 this.$parent.$emit("close")
 			}
-		},
-		tags(){
-            if(!this.layerTag) return
-            let qSearchs = []
-            const {tourism} = this.layerTag
-			Object.keys(tourism).forEach(k => {
-				tourism[k].forEach(v=>{
+        },
+        tags(){
+			if(!this.layerTag) return
+			const layerTag = this.layerTag
+			let qSearchs = []
+			Object.keys(layerTag).forEach(k => {
+				layerTag[k].forEach(v=>{
 					qSearchs.push({label: v,value: {
 						label: v,
 						value: k
@@ -79,7 +79,7 @@ export default {
 				})
 			})
 			return qSearchs
-		}
+        }
     },
     async created(){
         /** get layerTag (index) */

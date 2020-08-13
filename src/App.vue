@@ -352,8 +352,11 @@ export default {
 	position: relative;
 	font-size: 0.8rem;
 	z-index: 2;
-	background-color: lighten($danger,20);
+	background-color: rgba(lighten($danger,20),0.9);
 	color: darken($danger,10);
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> dev-v6
 </style>

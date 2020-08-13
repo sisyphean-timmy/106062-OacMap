@@ -89,11 +89,14 @@ export default {
 	watch:{
 		DATES:{
 			async handler(dates){
+<<<<<<< HEAD
+=======
 
                 /** init to start */
                 this.valueModel = 0
                 this.BScrollInstance && this.BScrollInstance.scrollTo(0,0)
 
+>>>>>>> dev-v6
 				if(dates.length<=1){
 					this.BScrollInstance&&this.BScrollInstance.destroy()
 					return

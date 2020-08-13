@@ -297,7 +297,9 @@
             "layerOption": {
                 "maxVelocity": 35,
                 "lineWidth": 2,
-                "colorScale": ["#fff"]
+                "colorScale": ["#fff"],
+                "velocityScale": 0.01,
+                "frameRate": 12
             }
         },
         {
@@ -326,7 +328,7 @@
                 "colorScale": ["#4a4a4a"],
                 "particleMultiplier": 0.002,
                 "opacity": 0.97,
-                "frameRate": 60
+                "frameRate": 12
             }
         },
         {
