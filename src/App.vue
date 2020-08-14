@@ -355,8 +355,4 @@ export default {
 	background-color: rgba(lighten($danger,20),0.9);
 	color: darken($danger,10);
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> dev-v6
 </style>
