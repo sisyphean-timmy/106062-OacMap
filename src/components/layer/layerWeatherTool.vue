@@ -129,8 +129,7 @@ export default {
 					})
 					this.valueModel = i
 				})
-			},
-			immediate:true
+			}
 		}
 	},
 	computed:{

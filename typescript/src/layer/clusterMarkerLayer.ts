@@ -73,7 +73,7 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         return await(await fetch(this.lyrOpts.url)).json()
     }
     onRemove(map){
-        this.markerClusterGroup.removeFrom(map)
+        this.markerClusterGroup.clearLayers().removeFrom(map)
         return this
     }    
     
