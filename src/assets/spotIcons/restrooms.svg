@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1.3754,0,0,1.37656,-3.94823,-5.59424)">
+        <rect x="2.89" y="4.063" width="15.955" height="15.964" style="fill:rgb(36,107,157);stroke:rgb(36,107,157);stroke-width:0.11px;"/>
+    </g>
+    <g transform="matrix(0.796265,0,0,0.796265,2.15,1.78539)">
+        <g>
+            <rect x="11" y="2" width="2" height="18" style="fill:rgb(249,249,249);"/>
+            <path d="M21,7L21,6L16,6L16,7L15,7L15,13L16,13L16,8L17,8L17,20L18,20L18,14L19,14L19,20L20,20L20,8L21,8L21,13L22,13L22,7L21,7Z" style="fill:rgb(249,249,249);fill-rule:nonzero;"/>
+            <path d="M8,7L6,6L3,6L1,7L1,8L0,12L1,12L2,8L3,8L3,9L1,15L3,15L3,20L4,20L4,15L5,15L5,20L6,20L6,15L8,15L6,9L6,8L7,8L8,12L9,12L8,8L8,7Z" style="fill:rgb(249,249,249);fill-rule:nonzero;"/>
+            <circle cx="4.5" cy="3.5" r="1.5" style="fill:rgb(249,249,249);"/>
+            <circle cx="18.5" cy="3.5" r="1.5" style="fill:rgb(249,249,249);"/>
+        </g>
+    </g>
+</svg>

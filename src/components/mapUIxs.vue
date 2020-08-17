@@ -20,7 +20,7 @@ div
 		v-model="pullupStatus"
 		@move="toggleUIFade(1-$event)"
 		style="z-index:10;position:absolute;bottom: 0;"
-        @click.native="$refs.pullup.caculatePullupHeight()"
+		@click.native="$refs.pullup.caculatePullupHeight()"
 	) 
 		result
 		template(slot="fixedFooter")
@@ -28,7 +28,8 @@ div
 				img(style="width:120px;" src="@/assets/logo.png")
 				.footer__r
 					.scaleCoordInfo(ref="scaleCoordInfo")
-					small(style="margin-left:0.5rem;") 人次 {{pageviews}}
+					small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 人次 {{pageviews}}
+					
 				.mask(style="z-index: -1;position: absolute;width: 100%;")
 			layerWeatherTool
 
@@ -73,7 +74,7 @@ export default {
 		layer,
 		layerWeatherTool,
 		toolTopRight
-    },
+	},
 	computed:{
 		...mapGetters({
 			commonState:"common/common/state"
@@ -84,7 +85,7 @@ export default {
 		pageviews(){
 			return this.commonState("GACount").pageviews
 		}
-    },
+	},
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
@@ -128,22 +129,22 @@ export default {
 	},
 	mounted(){
 		this.uiDoms = document.querySelectorAll(".tr,.tl")
-        this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
-        /** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
-        this.$store.subscribe(async (mutation, state) => {
-            if(mutation.type === "common/common/SET_CARD_VISIBLE"){
-                const {key,bool}= mutation.payload
-                if(key!=="result") return
-                const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))
-                if(bool){
-                    pullup.toggleUp()
-                    pullup.caculatePullupHeight()
-                }else{
-                    pullup.toggleDown()
-                    this.pullupStatus = "close"
-                }
-            }
-        })
+		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
+		/** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
+		this.$store.subscribe(async (mutation, state) => {
+			if(mutation.type === "common/common/SET_CARD_VISIBLE"){
+				const {key,bool}= mutation.payload
+				if(key!=="result") return
+				const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))
+				if(bool){
+					pullup.toggleUp()
+					pullup.caculatePullupHeight()
+				}else{
+					pullup.toggleDown()
+					this.pullupStatus = "close"
+				}
+			}
+		})
 	}
 }
 </script>

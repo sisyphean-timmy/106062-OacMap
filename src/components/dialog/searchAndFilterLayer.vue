@@ -23,7 +23,7 @@
                 type="primary" 
             )
                 .tools__button
-                    font-awesome-icon(icon="swimmer" fixed-width size="lg")
+                    font-awesome-icon(icon="search" fixed-width)
 </template>
 
 <script>
@@ -105,7 +105,6 @@ export default {
 <style lang="scss" scoped>
     
 	.search{
-		margin:0.5rem 0 !important;
 		/deep/ {
 			.el-input{
 				&__prefix{

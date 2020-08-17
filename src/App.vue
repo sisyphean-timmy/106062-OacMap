@@ -90,6 +90,7 @@ import info from "@/components/drawer/info"
 import layerWeatherDetail from "@/components/drawer/layerWeatherDetail"
 
 import isoheStation from "@/components/mark/isoheStation"
+import oac from "@/components/mark/oac"
 
 import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
@@ -121,7 +122,6 @@ export default {
 		mapUIxs,
 		addToHome,
 		info,
-		isoheStation,
 		searchAndFilterLayer,
 		layerWeatherDetail
 	},
@@ -270,7 +270,7 @@ export default {
 				}
 			})
 
-		},
+        },
 		async layerHandler(){
 
 			/** get layerDef (index) */
@@ -313,9 +313,33 @@ export default {
 					catelog:l.catelog,
 					tag:l.tag
 				})).reverse()
-			})
-			
-		}
+            })
+            
+            // 海委會點
+			this.addOacMark()
+        },
+        addOacMark(){
+            const icon = L.icon({
+                iconUrl: require('@/assets/spotIcons/default.png'),
+                iconSize: [40, 40],
+                // iconAnchor: [20, 20]
+            });
+            
+            const oacMark = L.marker(L.latLng(22.605521, 120.300307), { icon })
+            oacMark.addEventListener("click", async ()=>{
+                this.drawerDir = "ltr"
+                this.drawerVisibility = true
+                const component = await new Promise(res=>this.$nextTick(()=>res(this.$refs.drawer)))
+                new Vue({
+                    render: h => h(oac 
+                    // ,{
+                    //     props: ,
+                    // }
+                    )
+                }).$mount(component.$slots.default[0])
+            })
+            oacMark.addTo(this.$InitIns.map)
+        },
 	}
 }
 

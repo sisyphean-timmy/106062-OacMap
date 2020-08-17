@@ -1,6 +1,7 @@
 <template lang="pug">
 div
-    strong(style="margin-bottom:1rem;display:block;font-size:1.2rem;white-space:nowrap;color:rgb(255 255 255);text-shadow:rgb(0 0 0) 1px 1px 1px;") 海域遊憩活動一站式資訊平臺
+    searchAndFilterLayer
+    //- strong(style="margin-bottom:1rem;display:block;font-size:1.2rem;white-space:nowrap;color:rgb(255 255 255);text-shadow:rgb(0 0 0) 1px 1px 1px;") 海域遊憩活動一站式資訊平臺
 
     transition-group(name="slide-fade-up" tag="div" class="tool")
         el-button(
@@ -15,71 +16,72 @@ div
                 strong.tool__label(v-else) 海情海象資訊
                 font-awesome-icon(:icon="activedLyr?activedLyr.icon:'bars'" fixed-width)
         
-        template(v-if="!isMobile||collapse")
-            el-button(
-                @click="$openDrawer('相關連結')" 
-                key="相關連結"
-                title="相關連結"
-                circle
-            )
-                .tool__btn
-                    strong.tool__label 相關連結
-                    font-awesome-icon(icon="link" fixed-width)
+    //-     template(v-if="!isMobile||collapse")
+    //-         el-button(
+    //-             @click="$openDrawer('相關連結')" 
+    //-             key="相關連結"
+    //-             title="相關連結"
+    //-             circle
+    //-         )
+    //-             .tool__btn
+    //-                 strong.tool__label 相關連結
+    //-                 font-awesome-icon(icon="link" fixed-width)
 
-            el-button(
-                @click="$openDrawer('活動申請')" 
-                key="活動申請"
-                title="活動申請"
-                circle
-            )
-                .tool__btn
-                    strong.tool__label 活動申請
-                    font-awesome-icon(icon="concierge-bell" fixed-width)
+    //-         el-button(
+    //-             @click="$openDrawer('活動申請')" 
+    //-             key="活動申請"
+    //-             title="活動申請"
+    //-             circle
+    //-         )
+    //-             .tool__btn
+    //-                 strong.tool__label 活動申請
+    //-                 font-awesome-icon(icon="concierge-bell" fixed-width)
 
-            el-button(
-                @click="$openDrawer('使用條約')" 
-                key="使用條約"
-                title="使用條約"
-                circle
-            )
-                .tool__btn
-                    strong.tool__label 使用條約
-                    font-awesome-icon(icon="info" fixed-width)
+    //-         el-button(
+    //-             @click="$openDrawer('使用條約')" 
+    //-             key="使用條約"
+    //-             title="使用條約"
+    //-             circle
+    //-         )
+    //-             .tool__btn
+    //-                 strong.tool__label 使用條約
+    //-                 font-awesome-icon(icon="info" fixed-width)
 
-            el-button(
-                v-if="isAndroid||isIOS"
-                @click="openAddToHomeScreen" 
-                key="安裝說明"
-                title="安裝說明"
-                circle
-            )
-                .tool__btn
-                    strong.tool__label 安裝說明
-                    font-awesome-icon(icon="mobile-alt" fixed-width)
+    //-         el-button(
+    //-             v-if="isAndroid||isIOS"
+    //-             @click="openAddToHomeScreen" 
+    //-             key="安裝說明"
+    //-             title="安裝說明"
+    //-             circle
+    //-         )
+    //-             .tool__btn
+    //-                 strong.tool__label 安裝說明
+    //-                 font-awesome-icon(icon="mobile-alt" fixed-width)
 
-            el-button(
-                @click="$openLink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" 
-                key="意見回饋"
-                title="意見回饋"
-                circle
-            )
-                .tool__btn
-                    strong.tool__label 意見回饋
-                    font-awesome-icon(icon="envelope" fixed-width)
-        el-button(
-            v-if="isMobile"
-            @click="collapse=!collapse" 
-            style="color:#fff;"
-            key="collapse"
-            type="text"
-        )
-            font-awesome-icon(:icon="collapse?'chevron-up':'chevron-down'" fixed-width)
+    //-         el-button(
+    //-             @click="$openLink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" 
+    //-             key="意見回饋"
+    //-             title="意見回饋"
+    //-             circle
+    //-         )
+    //-             .tool__btn
+    //-                 strong.tool__label 意見回饋
+    //-                 font-awesome-icon(icon="envelope" fixed-width)
+    //-     el-button(
+    //-         v-if="isMobile"
+    //-         @click="collapse=!collapse" 
+    //-         style="color:#fff;"
+    //-         key="collapse"
+    //-         type="text"
+    //-     )
+    //-         font-awesome-icon(:icon="collapse?'chevron-up':'chevron-down'" fixed-width)
 
 </template>
 
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import searchAndFilterLayer from '@/components/dialog/searchAndFilterLayer'
 
 const ICON_ENUM = {
     "風":"wind",
@@ -100,6 +102,7 @@ export default {
 	props:{
 	},
 	components:{
+        searchAndFilterLayer
     },
 	computed:{
 		...mapGetters({

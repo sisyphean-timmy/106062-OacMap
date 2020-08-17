@@ -24,9 +24,9 @@
 			tools
 		.br
 			layerWeatherTool
-			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:1rem;")
+			div(style="display:flex;align-items:flex-end;flex-direction:column;justify-content:flex-end;margin-top:1rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
-				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
+				small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 人次 {{pageviews}}
 		.bl
 			img(style="max-width:180px;" src="@/assets/logo.png")
 		.mask

@@ -1,13 +1,13 @@
 <template lang="pug">
 .tools
-	//- 搜尋
-	el-button(
-		circle
-		type="primary" 
-		@click="$openDialog('搜尋')"
-	)
-		.tools__button
-			font-awesome-icon(icon="search" fixed-width size="lg")
+	//- //- 搜尋
+	//- el-button(
+	//- 	circle
+	//- 	type="primary" 
+	//- 	@click="$openDialog('搜尋')"
+	//- )
+	//- 	.tools__button
+	//- 		font-awesome-icon(icon="search" fixed-width size="lg")
 
 	//- 圖層
 	el-button(
