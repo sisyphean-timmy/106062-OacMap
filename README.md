@@ -37,6 +37,14 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 #### ./public/layerDef
 #### ./public/layerDef
 #### ./public/layerTag
+#### ./src/assets/legend.json
+* `layerName:string` 圖層名稱正規字串
+* `label:string` 標籤名稱+單位
+* `type:"color"|"text"`
+    * `colorScaleLabel` 顏色尺度-數值(降冪)
+    * `colorScaleValue` 顏色尺度-顏色(降冪)
+* `type:"text"`
+    * `colorScaleName` 顏色尺度 對應文字(不限排序)
 
 #### ./typescript
 * `typescript/init` leaflet map 初始化 
