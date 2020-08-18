@@ -33,7 +33,12 @@ app.get("/PROXY", async(req, res) => {
 })
 
 app.get("/typhoon", async(req, res) => {
-    res.send(await handleCWBTyphoonData())
+    const buffer = await fs.readFileSync("./typhoon/test.json")
+    const str = await buffer.toString();
+    console.log(str)
+    res.send(str)
+
+    // res.send(await handleCWBTyphoonData())
 })
 
 const handleCWBTyphoonData = async() => {

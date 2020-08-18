@@ -7,6 +7,7 @@
         filterable
         placeholder="選擇遊憩活動"
         placement="bottom"
+        size="small"
         popper-class="selectItems"
         clearable
     )
@@ -17,13 +18,30 @@
             :value="i.value"
         )
         template(slot="prefix")
-            el-button(
-                style="position:absolute;"
-                circle
-                type="primary" 
+            font-awesome-icon.search__icon(
+                :class="{'search__icon--actived':selectedTagModel}"
+                :icon="selectedTagModel ? 'swimmer' : 'search'" 
+                fixed-width
+                size="lg"
             )
-                .tools__button
-                    font-awesome-icon(icon="search" fixed-width)
+
+    el-popover(
+        placement='top-start'
+        width='200'
+        trigger='hover'
+        content='意見回饋、安裝說明、申請連結、相關連結、使用條約'
+    )
+        el-button(
+            slot='reference'
+            size="small"
+            round
+            type="primary"
+            @click="$openDrawer({title:'相關資訊', dir:'rtl'})"
+        )
+            .tools__button
+                font-awesome-icon(icon="plus" fixed-width)
+                span  更多資訊
+
 </template>
 
 <script>
@@ -59,11 +77,8 @@ export default {
 						console.error("error {value}",value)
 						console.error("error tag in layer",l)
 					}
-					console.log(l.title,visible)
 					this.$LayerIns.setVisible(l.id,visible)
                 })
-                
-                this.$parent.$emit("close")
 			}
         },
         tags(){
@@ -104,29 +119,47 @@ export default {
 
 <style lang="scss" scoped>
     
+    
+
 	.search{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
 		/deep/ {
-			.el-input{
-				&__prefix{
-					left:0;
-				}
-				&__inner{
-					padding-left: 55px;
-					border-radius: 999px !important;
-					box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-				}
-			}
+            .el-input{
+                border-radius: 999px !important;
+                overflow: hidden;
+                box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
+                &__prefix{
+                    left:0;
+                    background: $primary;
+                    border-top-right-radius: 1rem !important;
+                    border-bottom-right-radius: 1rem !important;
+                }
+                &__inner{
+                    padding-left: 55px !important;
+                    border-radius: 999px !important;
+                }
+            }
+            .el-button {
+                box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
+            }
+        }
+
+        &>*{
+            margin:0 0.5rem 0 0; 
 		}
-		.el-button{
-			box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-		}
-		&>*{
-			margin:0.5rem 0.5rem 0 0;
-		}
+
+        &__icon{
+            width:3rem;
+            color:#fff;
+            font-weight: bolder;
+        }
 	}
 
 	.selectItems * {
-		color: $primary !important;
+		color: darken($info,30) !important;
 		font-weight: normal !important;
     }
     

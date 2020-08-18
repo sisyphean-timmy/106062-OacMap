@@ -13,8 +13,6 @@
 	)
 		template(v-if="dialogTitle === '加至主畫面說明'")
 			addToHome
-		template(v-else-if="dialogTitle === '搜尋'")
-			searchAndFilterLayer
 
 	//- DRAWER
 	el-drawer(
@@ -84,13 +82,12 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 import mapUI from "@/components/mapUI"
 import mapUIxs from "@/components/mapUIxs"
 
-import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
 import addToHome from "@/components/dialog/addToHome"
 import info from "@/components/drawer/info"
 import layerWeatherDetail from "@/components/drawer/layerWeatherDetail"
 
 import isoheStation from "@/components/mark/isoheStation"
-import oac from "@/components/mark/oac"
+import spotDetail from "@/components/mark/spotDetail"
 
 import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
@@ -112,7 +109,7 @@ export default {
 		// 
 		drawerVisibility:false,
 		drawerTitle:"",
-		drawerDir:'rtl',
+		drawerDir:'ltr',
 		drawerSize:"",
 		//
 		alertData:[]
@@ -122,7 +119,6 @@ export default {
 		mapUIxs,
 		addToHome,
 		info,
-		searchAndFilterLayer,
 		layerWeatherDetail
 	},
 	computed:{
@@ -160,13 +156,14 @@ export default {
 			await this.initBeforeMapMounted(this) // Action before mount
 	
 			Vue.prototype.$openLink = link=>window.open(link,"_blank")
-			Vue.prototype.$openDrawer = evt=>{
+			Vue.prototype.$openDrawer = ({title="相關資訊",dir="ltr"})=>{
+                this.drawerDir = dir
 				this.drawerVisibility=true
-				this.drawerTitle=(evt||'相關資訊')
+				this.drawerTitle=title
 			}
-			Vue.prototype.$openDialog=evt=>{
+			Vue.prototype.$openDialog=({title="搜尋"})=>{
 				this.dialogVisibility=true
-				this.dialogTitle=(evt||'搜尋')
+				this.dialogTitle=title
 			}
 			Vue.prototype.$InitIns = new Init("viewDiv",{
 				center:["23.830576","121.20172"],
@@ -322,7 +319,6 @@ export default {
             const icon = L.icon({
                 iconUrl: require('@/assets/spotIcons/default.png'),
                 iconSize: [40, 40],
-                // iconAnchor: [20, 20]
             });
             
             const oacMark = L.marker(L.latLng(22.605521, 120.300307), { icon })
@@ -331,7 +327,7 @@ export default {
                 this.drawerVisibility = true
                 const component = await new Promise(res=>this.$nextTick(()=>res(this.$refs.drawer)))
                 new Vue({
-                    render: h => h(oac 
+                    render: h => h(spotDetail 
                     // ,{
                     //     props: ,
                     // }

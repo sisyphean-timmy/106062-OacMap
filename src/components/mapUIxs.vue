@@ -28,14 +28,14 @@ div
 				img(style="width:120px;" src="@/assets/logo.png")
 				.footer__r
 					.scaleCoordInfo(ref="scaleCoordInfo")
-					small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 人次 {{pageviews}}
+					small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 累計瀏覽人次 {{pageviews}}
 					
 				.mask(style="z-index: -1;position: absolute;width: 100%;")
 			layerWeatherTool
 
 	//- CUSTOM CONER UI
 	.tr
-		toolTopRight
+		searchAndFilterLayer
 	.tl
 		tools
 
@@ -43,7 +43,7 @@ div
 
 <script>
 
-import toolTopRight from "@/components/toolTopRight"
+import searchAndFilterLayer from "@/components/searchAndFilterLayer"
 import tools from "@/components/tools"
 import pullup from "@/components/pullup"
 
@@ -73,7 +73,7 @@ export default {
 		tools,
 		layer,
 		layerWeatherTool,
-		toolTopRight
+        searchAndFilterLayer
 	},
 	computed:{
 		...mapGetters({
@@ -160,7 +160,8 @@ export default {
 		justify-content: space-between;
 		&__r{
 			display: flex;
-			align-items: center;
+			align-items: flex-end;
+            flex-direction: column;
 			justify-content: space-between;
 			color:#fff;
 		}

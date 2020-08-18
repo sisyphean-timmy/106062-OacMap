@@ -1,13 +1,20 @@
 <template lang="pug">
 .tools
-	//- //- 搜尋
-	//- el-button(
-	//- 	circle
-	//- 	type="primary" 
-	//- 	@click="$openDialog('搜尋')"
-	//- )
-	//- 	.tools__button
-	//- 		font-awesome-icon(icon="search" fixed-width size="lg")
+	//- 海情
+	el-button(
+		:title="activedLyr?activedLyr.title:'海情海象資訊'"
+		:type="activedLyr?'primary':''"
+		type="primary" 
+		@click="$openDrawer({title:'海情/海象資訊'})"
+		key="海情/海象資訊"
+		circle
+	)
+		.tools__button
+			strong.tools__button__label.tools__button__label--actived(v-if="activedLyr") {{activedLyr.title}}
+			strong.tools__button__label(v-else) 海情海象資訊
+			font-awesome-icon(:icon="activedLyr?activedLyr.icon:'cloud'" fixed-width size="lg")
+		//- .tools__button
+		//- 	font-awesome-icon(icon="search" fixed-width size="lg")
 
 	//- 圖層
 	el-button(
@@ -41,6 +48,17 @@
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 
+const ICON_ENUM = {
+	"風":"wind",
+	"海":"water",
+	"船":"ship",
+	"波浪":"wave-square",
+	"溫度":"thermometer-quarter",
+	"高度":"ruler-vertical",
+	"風險|潛勢":"exclamation-triangle",
+	"鹽度":"tachometer-alt"
+}
+
 export default {
 	name:"tools",
 	props:{},
@@ -51,7 +69,8 @@ export default {
 			allResultLength:"result/result/allResultLength",
 			allR2:"result/result/allR2",
 			commonState:"common/common/state",
-			layerState:"layer/layer/state"
+			layerState:"layer/layer/state",
+			weatherLayer:"layer/layer/weatherLayer",
 		}),
 		currentTag(){
 			return this.commonState("currentTag")["label"]
@@ -61,7 +80,23 @@ export default {
 		},
 		resultVisibility(){
 			return  this.commonState("resultCardVisible")
-		}
+		},
+		normalWLyr(){
+			// 增加圖示
+			return this.weatherLayer.map(l=>{
+				let icon = "cloud-sun-rain"
+				Object.keys(ICON_ENUM).forEach(k=>{
+					if(new RegExp(k,"g").test(l.title)){
+						icon = ICON_ENUM[k]
+					}
+				})
+				return {...l,...{icon}}
+			})
+		},
+		activedLyr(){
+			const {id} = this.layerState('activedWeatherLyr')
+			return this.normalWLyr.find(l=>l.id === id)
+		},
 	},
 	methods:{
 		...mapMutations({
@@ -80,6 +115,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+
+	@mixin activeStyle{
+		color:#fff;
+		background: $primary;
+		text-shadow: none;
+		transition: 0.2s ease all;
+		max-width: 200px;
+	}
 
 	.tools{
 		position: absolute;
@@ -100,18 +144,31 @@ export default {
 			width:1rem;
 			height:1rem;
 			position: relative;
+			&__label{
+				color: darken($info, 30);
+				background: lighten($info,20);
+				position: absolute;
+				left: 250%;
+				padding: 0.5rem 0.8rem;
+				border-radius: 1rem;
+				box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
+				font-size: 0.8rem;
+				&--actived {
+					@include activeStyle;
+				}
+			}
 		}
 		&__resultNum{
 			position:absolute;
-			top: -100%;
-			right: -100%;
+			top: -120%;
+			right: -120%;
 			left: auto;
 			bottom: auto;
 
 			background-color:darken($info,10);
 			color: #fff;
-			width:1rem;
-			height:1rem;
+			width:1.15rem;
+			height:1.15rem;
 
 			border-radius: 100%;
 			padding: 0.1rem;

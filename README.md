@@ -74,16 +74,10 @@ pwa-asset-generator [icon-src-path] [icon-output-path]
 * 緩存圖磚[地圖相關PWA專案範例](https://github.com/reyemtm/pwa-maps)
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
-<<<<<<< HEAD
 
 #### MEMO
 
-=======
-
-#### MEMO
-
->>>>>>> dev-v6
-- [X] top-right buttons is strange 
+- [X] activity apply
 - [X] isoheStation.vue : make chart in each item
 - [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
 

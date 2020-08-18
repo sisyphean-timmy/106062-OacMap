@@ -11,7 +11,7 @@
         "ComputerName": "https://WSR2016-VM-WEB1:8172/msdeploy.axd",
         "UserName": "WSR2016-VM-WEB1\\WDeployAdmin",
         "Password": "iis@4622450",
-        "dest": "D:\\Web\\Oac\\test4",
+        "dest": "D:\\Web\\Oac\\preview",
         "dist": "dist"
     },
     "dependencies": {

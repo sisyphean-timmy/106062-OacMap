@@ -11,28 +11,30 @@
     h4 開放時間
     .spot__time(v-for="t in time") 
         strong {{t.slice(0,3)}}
-        sapn {{t.slice(3,t.length)}}
+        span {{t.slice(3,t.length)}}
     el-divider
     div(style="display:flex;justify-content:space-between:")
         div
-            font-awesome-icon(icon="address" fixed-width)
+            font-awesome-icon(icon="map-pin" fixed-width style="margin-right:1rem;")
             strong 地址
         span {{address}}
     div(style="display:flex;justify-content:space-between:")
         div
-            font-awesome-icon(icon="tel" fixed-width)
+            font-awesome-icon(icon="phone" fixed-width style="margin-right:1rem;")
             strong 電話
         span {{tel}}
 
     .spot__link
-        el-link.spot__link__item(
-            v-for="l in links"
-            :href="l.value"
-            :key="l.value"
-            target="_blank"
+        .spot__link__item(
+            v-for="l in links" 
+            :key="l.label"
         )
-            font-awesome-icon(:icon="l.icon" fixed-width)
-            strong {{l.label}}
+            font-awesome-icon(:icon="l.icon" fixed-width style="margin-right:1rem;")
+            el-link(
+                :href="l.value"
+                target="_blank"
+            )
+                strong {{l.label}}
 
 </template>
 
@@ -76,27 +78,27 @@ export default {
         links:{
             type:Array,
             default: ()=>[{
-                    icon:"facebook",
+                    icon: ["fab","facebook"],
                     label:"臉書粉專",
                     value:"https://www.facebook.com/oactw"
                 },
                 {
-                    icon:"globe",
+                    icon:["fas","globe"],
                     label:"Website",
                     value:"https://www.oac.gov.tw"
                 },
                 {
-                    icon:"map",
+                    icon:"map-pin",
                     label:"設施地圖",
                     value:""
                 },
                 {
-                    icon:"youtube",
+                    icon: ["fab","youtube"],
                     label:"介紹影片",
                     value:"https://youtu.be/GPcyzhAUye8"
                 },
                 {
-                    icon:"external",
+                    icon:"paperclip",
                     label:"相關連結",
                     value:""
             }]
@@ -127,8 +129,14 @@ export default {
     }
     .spot {
         color: $info;
+        h4 {
+            color: darken($info,30);
+        }
         &__logo{
             width:100%;
+            max-width: 200px;
+            display: block;
+            margin:0 auto;
         }
         &__facilities{
             display: flex;
@@ -145,13 +153,15 @@ export default {
         &__time{
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
         &__link{
             display: flex;
             flex-direction: column;
             &__item{
                 display: flex;
-                justify-content: space-between;
+                align-items: center;
+                justify-content: flex-start;
             }
         }
     }
