@@ -7,7 +7,6 @@
         filterable
         placeholder="選擇遊憩活動"
         placement="bottom"
-        size="small"
         popper-class="selectItems"
         clearable
     )
@@ -25,22 +24,14 @@
                 size="lg"
             )
 
-    el-popover(
-        placement='top-start'
-        width='200'
-        trigger='hover'
-        content='意見回饋、安裝說明、申請連結、相關連結、使用條約'
+    el-button(
+        slot='reference'
+        size="small"
+        circle
+        type="warning"
+        @click="$openDrawer({title:'相關資訊', dir:'rtl'})"
     )
-        el-button(
-            slot='reference'
-            size="small"
-            round
-            type="primary"
-            @click="$openDrawer({title:'相關資訊', dir:'rtl'})"
-        )
-            .tools__button
-                font-awesome-icon(icon="plus" fixed-width)
-                span  更多資訊
+        font-awesome-icon(icon="plus" fixed-width size="lg")
 
 </template>
 
@@ -134,8 +125,7 @@ export default {
                 &__prefix{
                     left:0;
                     background: $primary;
-                    border-top-right-radius: 1rem !important;
-                    border-bottom-right-radius: 1rem !important;
+                    border-radius: 100% !important;
                 }
                 &__inner{
                     padding-left: 55px !important;
@@ -152,7 +142,7 @@ export default {
 		}
 
         &__icon{
-            width:3rem;
+            width:40px;
             color:#fff;
             font-weight: bolder;
         }

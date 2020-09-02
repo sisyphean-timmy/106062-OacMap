@@ -7,11 +7,11 @@ self.addEventListener('install', function(evt) {
 
     try {
         importScripts("sw-manifest.js");
-        console.log('[Service Worker]pre-fetch', self.__precacheManifest);
+        console.log('[Service Worker]pre-fetch', PRECACHE);
 
         evt.waitUntil(caches.open(ACACHE).then(function(cache) {
             var urls = ['./'];
-            self.__precacheManifest.forEach(function(val, idx, arr) {
+            PRECACHE.forEach(function(val, idx, arr) {
                 urls.push(val.url);
             });
             cache.put('.assets', new Response(JSON.stringify(urls)));

@@ -25,17 +25,17 @@ div
 		result
 		template(slot="fixedFooter")
 			.footer
-				img(style="width:120px;" src="@/assets/logo.png")
-				.footer__r
+				div(style="display:flex;justify-content: space-between;")
+					img(style="width:140px;" src="@/assets/logo.png")
 					.scaleCoordInfo(ref="scaleCoordInfo")
-					small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 累計瀏覽人次 {{pageviews}}
-					
+				div(style="margin:0.5rem 0 -0.5rem 0;color:#fff;")
+					small 海域遊憩活動一站式資訊平臺 累計瀏覽 {{pageviews}}
 				.mask(style="z-index: -1;position: absolute;width: 100%;")
 			layerWeatherTool
 
+	searchAndFilterLayer
 	//- CUSTOM CONER UI
 	.tr
-		searchAndFilterLayer
 	.tl
 		tools
 
@@ -73,7 +73,7 @@ export default {
 		tools,
 		layer,
 		layerWeatherTool,
-        searchAndFilterLayer
+		searchAndFilterLayer
 	},
 	computed:{
 		...mapGetters({
@@ -158,12 +158,9 @@ export default {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		&__r{
-			display: flex;
-			align-items: flex-end;
-            flex-direction: column;
-			justify-content: space-between;
-			color:#fff;
+		flex-direction: column;
+		&>*{
+			width: 100%;
 		}
 	}
 

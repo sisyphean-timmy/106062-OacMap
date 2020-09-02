@@ -26,7 +26,7 @@
 			layerWeatherTool
 			div(style="display:flex;align-items:flex-end;flex-direction:column;justify-content:flex-end;margin-top:1rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
-				small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 累計瀏覽人次 {{pageviews}}
+				small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 累計瀏覽 {{pageviews}}
 		.bl
 			img(style="max-width:180px;" src="@/assets/logo.png")
 		.mask
