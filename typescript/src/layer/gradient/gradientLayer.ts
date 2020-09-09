@@ -87,6 +87,7 @@ export class GradientLayer extends L.Layer implements ILayer{
         maxIntensity:number
         colorScale?:Array<string>
     }){
+        console.log("[GradientLayer setOption]",opts)
         !this._builder && this._init()
         this._builder.setOptions(opts)
     }
@@ -234,30 +235,6 @@ export class WavePeriodGradientLayer extends GradientLayer{
             const data = await this.fetchData(idx) as any
             console.log("[WavePeriod]",data)
 
-            // TODO:不確定資料單位等 無法在 src/assets/legend.json 中定義圖例
-            this.setOption({
-                minIntensity:data["drange"]["週期"][0],
-                maxIntensity:data["drange"]["週期"][1],
-                colorScale: [
-                    "rgb(211, 5, 0)",
-                    "rgb(255, 0, 0)",
-                    "rgb(255, 51, 0)",
-                    "rgb(255, 97, 0)",
-                    "rgb(255, 148, 0)",
-                    "rgb(255, 191, 0)",
-                    "rgb(255, 238, 0)",
-                    "rgb(221, 255, 0)",
-                    "rgb(178, 255, 0)",
-                    "rgb(123, 255, 0)",
-                    "rgb(72, 255, 0)",
-                    "rgb(25, 255, 0)",
-                    "rgb(0, 255, 20)",
-                    "rgb(0, 255, 76)",
-                    "rgb(0, 255, 123)",
-                    "rgb(0, 255, 174)"
-                ]
-            })
-
             this.lyrOpts.data = {
                 d: {'v': data.d["週期"]},
                 la1: data.la1,
@@ -274,6 +251,18 @@ export class WavePeriodGradientLayer extends GradientLayer{
             console.error(e)
         }
     }
+    /**@override */
+    setOption(opts:{
+        minIntensity:number,
+        maxIntensity:number
+        colorScale?:Array<string>
+    }){
+        opts.maxIntensity*= 100
+        opts.minIntensity*= 100
+        console.log("[ WavePeriodGradientLayer @override setOpts ]",opts)
+        !this._builder && this._init()
+        this._builder.setOptions(opts)
+    }
 }
 
 export class WaveHeightGradientLayer extends GradientLayer{
@@ -286,22 +275,6 @@ export class WaveHeightGradientLayer extends GradientLayer{
             const idx = this.times.indexOf(time)
             const data = await this.fetchData(idx) as any
             console.log("[WaveHeight]",data)
-            
-            // TODO:不確定資料單位等 無法在 src/assets/legend.json 中定義圖例            
-            this.setOption({
-                minIntensity:data["drange"]["浪高"][0],
-                maxIntensity:data["drange"]["浪高"][1],
-                colorScale: [
-                    "rgb(64, 0, 68)",
-                    "rgb(0, 0, 255)",
-                    "rgb(0, 84, 255)",
-                    "rgb(82, 139, 254)",
-                    "rgb(102, 170, 255)",
-                    "rgb(134, 220, 255)",
-                    "rgb(157, 255, 255)",
-                    "rgb(215, 215, 215)"
-                ]
-            })
             
             this.lyrOpts.data = {
                 d: {'v': data.d["浪高"]},
@@ -318,5 +291,17 @@ export class WaveHeightGradientLayer extends GradientLayer{
         }catch(e){
             console.error(e)
         }
+    }
+    /** @override cm to m */
+    setOption(opts:{
+        minIntensity:number,
+        maxIntensity:number
+        colorScale?:Array<string>
+    }){
+        opts.minIntensity*=100
+        opts.maxIntensity*=100
+        console.log("[ WaveHeightGradientLayer @override setOpts ]",opts)
+        !this._builder && this._init()
+        this._builder.setOptions(opts)
     }
 }

@@ -179,7 +179,7 @@
         },
         {
             "title": "交通船、遊艇40呎以下",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_5_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_5_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -189,7 +189,7 @@
         },
         {
             "title": "交通船、遊艇40至80呎",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_6_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_6_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -199,7 +199,7 @@
         },
         {
             "title": "交通船、遊艇80至120呎",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_7_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_7_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -209,7 +209,7 @@
         },
         {
             "title": "巡防艇20噸以下、漁船CT2以下",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_1_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_1_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -219,7 +219,7 @@
         },
         {
             "title": "巡防艇20至60 噸、漁船CT3",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_2_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_2_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -229,7 +229,7 @@
         },
         {
             "title": "巡防艇60噸以上、漁船CT4至CT6",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_3_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_3_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -239,7 +239,7 @@
         },
         {
             "title": "巡防艦、巡護船、漁船CT7至CT8",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeMEANWH_4_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_4_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -249,7 +249,7 @@
         },
         {
             "title": "動力小船",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/SafeSeeWRF_8_CONF_Now/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeWRF_8_CONF_Now/json/index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"],
@@ -269,21 +269,21 @@
         },
         {
             "title": "海表鹽度_OCM模式",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSALT/json/Index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/OcmSALT/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
             "title": "海表高度_OCM模式",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmWL/json/Index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/OcmWL/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
         },
         {
             "title": "海表溫度_OCM模式",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmSST/json/Index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/OcmSST/json/Index.json",
             "visible": false,
             "type": "gradient",
             "tag": ["A", "B", "C", "D"]
@@ -318,7 +318,7 @@
         },
         {
             "title": "表面海流_OCM模式",
-            "url": "https://ocean.taiwan.gov.tw/OpenDataTmp/OcmUV/json/index.json",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/OcmUV/json/index.json",
             "visible": false,
             "type": "velocity",
             "tag": ["A", "B", "C", "D"],

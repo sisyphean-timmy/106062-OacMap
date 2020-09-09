@@ -147,9 +147,9 @@
         ]
     },
     {
-        "layerName": "waveHeightOrPeriod",
-        "type": "text",
-        "label": "浪高 m",
+        "layerName": "波浪浪高_臺灣海域預報",
+        "type": "color",
+        "label": "浪高/公尺",
         "colorScaleLabel": [
             "10",
             "6",
@@ -171,9 +171,9 @@
         ]
     },
     {
-        "layerName": "_wavePeriod",
-        "type": "text",
-        "label": "週期",
+        "layerName": "波浪週期_臺灣海域預報",
+        "type": "color",
+        "label": "週期/秒",
         "colorScaleLabel": [
             "18",
             "17",
