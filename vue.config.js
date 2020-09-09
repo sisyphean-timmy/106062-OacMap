@@ -43,8 +43,8 @@ module.exports = {
                     developerName: "詮華",
                     display: "fullscreen",
                     manifestRelativePaths: "./",
-                    start_url: "./?homescreen=1",
-                    scope: "./"
+                    start_url: "../../",
+                    scope: "../../"
                 }
             }])
         if (process.env.NODE_ENV === 'production') {

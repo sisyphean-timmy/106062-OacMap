@@ -22,15 +22,25 @@ npm run build
 
 ### PWA & Vu.config.js(webpack) Settings
 * 使用 workbox (injectManifest) [workbox api](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin) 取得預緩存清單
-* 圖標素材 及 `manifest.json` 使用 `FaviconsWebpackPlugin`，`publicPath`影響會注入到`html <head>`的路徑
+* 圖標素材 及 `manifest.json` 使用 `FaviconsWebpackPlugin`
+    * `publicPath`影響會注入到`html <head>`的路徑
+    * `start_url`、`scope` 路徑是相對於`manifest.json`所在位置
+    
 * `./src/sw-manifest.js` workbox-webpack-plugin 會替換內容中 `self.__WB_MANIFEST` 為預緩存清單
 * `./src/sw.js` 工作線程，使用`copy-webpack-plugin`複製、注入以 `git-describe` 產生的 cahce Name (含版本號)
-* 基於 workbox [workbox cli](https://letswrite.tw/pwa-workbox-cli/)
 * 基於 workbox [workbox api](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin)
 
 #### ./public/layerDef
 #### ./public/layerDef
 #### ./public/layerTag
+#### ./src/assets/legend.json
+* `layerName:string` 圖層名稱正規字串
+* `label:string` 標籤名稱+單位
+* `type:"color"|"text"`
+    * `colorScaleLabel` 顏色尺度-數值(降冪)
+    * `colorScaleValue` 顏色尺度-顏色(降冪)
+* `type:"text"`
+    * `colorScaleName` 顏色尺度 對應文字(不限排序)
 
 #### ./typescript
 * `typescript/init` leaflet map 初始化 
@@ -69,14 +79,16 @@ npm run build
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
-#### MEMO
-
-- [X] top-right buttons is strange 
-- [X] isoheStation.vue : make chart in each item
-- [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
-- [X] scss in typescript : `declare module.*scss`
-- [X] top area for alert messages ( typhoon alert、 offline msg ...etc ? )
-- [X] top notify bar : typhoon and check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
+#### Todo
+- [X] encapsulate dialog 、 drawer on vue prototype with render function
+- [X] strange ui : 
+    * top-right buttons how to integerate all relative links?
+    * top-message ? show typhoon data ?
+    * isoheStation.vue : show charts each item
+- [X] use another better velocity from cs8425
+- [X] check all event listener unbind
+- [X] try use scss in typescript : `declare module.*scss`
+- [X] `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string (use in `typescript/layer/fileLayer.ts`)
 ``` js
 const loader = L.FileLayer.fileLoader(...)
 loader.loadData(file ,"filename.kmz") // file in leaflet-filelayer wasn't converted string

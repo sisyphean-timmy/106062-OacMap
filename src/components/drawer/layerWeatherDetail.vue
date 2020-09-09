@@ -26,7 +26,7 @@
             h3(v-if="group.name" :key="group.name") {{group.name}}
             el-button(
                 v-for="lyr in group.data"
-                @click="openNormalLyr(lyr.id,group.name)"
+                @click="openNormalLyr(lyr.id)"
                 :key="lyr.title"
                 :title="lyr.title"
                 :type="activedLayer && activedLayer.id === lyr.id?'primary':''"
@@ -147,7 +147,7 @@ export default {
 				}) 
             })
 		},
-		async openNormalLyr(id,groupName){
+		async openNormalLyr(id){
 			if(this.loading) return
             try{
                 this.loading = true
@@ -175,25 +175,25 @@ export default {
                 const legend = DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(lyrAwaitToActive.title))
                 console.log("[activedWLyr legend]",legend)
                 if(legend){
-                    const new_legend = {
-                        label:legend.label,
-                        colorScaleLabel:legend.colorScaleLabel,
-                        colorScaleValue:legend.colorScaleValue
-                    }
+                    
+                    const { colorScaleLabel,colorScaleValue } = legend
 
                     // 重新設定 顏色尺度
                     lyrAwaitToActive.setOption({
-                        minIntensity:Number(legend.colorScaleLabel[0]),
-                        maxIntensity:Number(legend.colorScaleLabel[legend.colorScaleLabel.length-1]),
-                        colorScale:legend.colorScaleValue
+                        maxIntensity:Number(colorScaleLabel[0]),
+                        minIntensity:Number(colorScaleLabel[colorScaleLabel.length-1]),
+                        colorScale:Object.assign([],colorScaleValue).reverse()
                     })
 
-                    // legend.colorScaleLabel -> 轉成文字
+                    // get text lable from colorScaleLabelName
                     if(legend.type==="text"){ 
-                        new_legend.colorScaleLabel = legend.colorScaleLabel.map(i => legend.colorScaleLabelName[i])
+                        const {colorScaleLabelName} = legend
+                        colorScaleLabel = colorScaleLabel.map(i => colorScaleLabelName[i])
                     }
 
-                    payload.legend = new_legend
+                    // mix original propers
+                    payload.legend = legend
+
                 }
 
                 // 等待完全建構、提交到狀態保存
