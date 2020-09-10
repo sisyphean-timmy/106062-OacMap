@@ -1,8 +1,38 @@
 <template lang="pug">
 //- 天氣
-.layerWeather
-    transition-group(name='slide-fade-up' class="col" mode="out-in")
-        //- grouped parent
+div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
+    //- mobile only show actived
+    div(v-if="isMobile")
+        //- Exsist actived layer condition
+        el-button(
+            v-if="activedLayer"
+            :title="activedLayer.title"
+            type="primary"
+            :class="getGroupBtnClassName()"
+            @click="$parent.$emit('openDrawer','海情/海象資訊')"
+            size="mini"
+            circle
+        )
+            div(style="display: flex;align-items: center;")
+                strong.layerWeather__label.layerWeather__label--actived {{activedLayer.title}}
+                font-awesome-icon(:icon="activedLayer.icon" fixed-width)
+        el-button(
+            v-else
+            plain
+            title="選擇海情/海象資訊"
+            type="primary"
+            :class="getGroupBtnClassName()"
+            @click="$parent.$emit('openDrawer','海情/海象資訊')"
+            size="mini"
+            circle
+        )   
+            div(style="display: flex;align-items: center;")
+                strong.layerWeather__label 選擇海情/海象資訊
+                font-awesome-icon(icon="cloud" fixed-width)
+
+    //- dektop show all
+    transition-group(v-else name='slide-fade-up' class="col" mode="out-in")
+        //- grouped parent 
         template(v-for="group in normalWLyrGroupModel")
             el-button(
                 v-if="group.name"
@@ -25,7 +55,7 @@
                     @click="openNormalLyr(lyr.id,group.name)"
                     :key="lyr.title"
                     :title="lyr.title"
-                    :type="activedLayerId === lyr.id?'primary':''"
+                    :type="activedLayer && activedLayer.id === lyr.id?'primary':''"
                     size="mini"
                     circle
                 )
@@ -33,16 +63,16 @@
                         transition(name="fade")
                             strong.layerWeather__label(
                                 v-if="textLabelVisible"
-                                :class="{'layerWeather__label--actived': activedLayerId === lyr.id}"
+                                :class="{'layerWeather__label--actived': activedLayer && activedLayer.id === lyr.id}"
                             )
-                                template(v-if="activedLayerId === lyr.id && loading")
+                                template(v-if="activedLayer && activedLayer.id === lyr.id && loading")
                                     i.el-icon-loading
                                     |   載入中
                                 template(v-else)
                                     | {{lyr.title}}
                         font-awesome-icon(:icon="lyr.icon" fixed-width)
-    .col
-        //- fixed : windy
+    //- others
+    .col(v-if="!isMobile")
         el-button(
             style="margin: 0 0 0.5rem 0;"
             @click="SET_WINDY_OPTION({visible:true})"
@@ -75,9 +105,10 @@
             size="mini"
             circle
             type="text"
+            @click="$parent.$emit('openDrawer','海情/海象資訊')"
         )
             div
-                font-awesome-icon(icon="plus" fixed-width )
+                font-awesome-icon(icon="bars" fixed-width )
 
 </template>
 
@@ -99,16 +130,15 @@ const ICON_ENUM = {
 export default {
     name:"layerWeather",
 	data:()=>({
-        activedLayerId:"",
         activedGroupName:"",
         textLabelVisible:true,
 		loading:false
 	}),
 	props:{
-		isMobile:{
-			type:Boolean,
-			default:false		
-		}
+		// isMobile:{
+		// 	type:Boolean,
+		// 	default:true		
+		// }
 	},
 	components:{
     },
@@ -117,10 +147,21 @@ export default {
             handler(v){
                 !v && this.closeAllNormalLyr()
             }
+        },
+        activedLayer:{
+            handler(lyr){
+                if(!lyr) return
+                const activedLayerInGroup = this.normalWLyrGroupModel.find(g=>g.data.indexOf(lyr)>-1)
+                if(activedLayerInGroup){
+                    this.activedGroupName = activedLayerInGroup.name
+                }
+            }
         }
     },
 	computed:{
 		...mapGetters({
+			isMobile:"common/common/isMobile",
+			layerState:"layer/layer/state",
 			weatherLayer:"layer/layer/weatherLayer"
         }),
         normalWLyr(){
@@ -135,8 +176,10 @@ export default {
                 return {...l,...{icon}}
             })
         },
-        // this.weatherLayer.filter(l=>this.baseWLyr.indexOf(l)===-1)
-        // this.weatherLayer.filter(l=>/gradient/ig.test(l.type))
+        activedLayer(){
+            const {id} = this.layerState('activedWeatherLyr')
+            return this.normalWLyr.find(l=>l.id === id)
+        },
         normalWLyrGroupModel(){
             const lyrs = this.normalWLyr
             return [
@@ -174,7 +217,7 @@ export default {
 			SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
         }),
         getGroupBtnClassName(groupMame){
-			let name = this.isMobile?'layerWeather__btn--mobile':'layerWeather__btn'
+			let name = this.isMobile?'layerWeather--mobile__btn':'layerWeather__btn'
             if(this.activedGroupName && this.activedGroupName !== groupMame){
 				name+=` ${name}--unfocus`
 			}
@@ -188,11 +231,10 @@ export default {
 					payload:{visible:false}
 				})
 				this.SET_ACTIVED_WEATHER_DATA({
-					id:l.id,
+					id:'',
 					times:[]
 				}) 
             })
-            this.activedLayerId = ""
 		},
 		async openNormalLyr(id,groupName){
 			if(this.loading) return
@@ -201,17 +243,11 @@ export default {
 
                 const activedLyr = this.$LayerIns.normalLayerCollection.find(l=>l.id === id)
                 console.log("[activedWLyr Ins]",activedLyr)
-
-                if(!activedLyr){
-                    this.activedLayerId = ""
-                    return
-                }else if(this.activedLayerId === activedLyr.id){// self then close all
+                
+                if(this.activedLayer && this.activedLayer.id === activedLyr.id){// self then close all
                     this.closeAllNormalLyr()
                     return
-                }else{
-                    this.activedLayerId = id
                 }
-                
                 if(!groupName) this.activedGroupName = ''
 
                 // 更新狀態及實例
@@ -224,13 +260,10 @@ export default {
                     })
                 })
 
-                // 取得 legend 
+                let payload = {id}
+                // 取得 legend 、保存到狀態、重設圖層實例
                 const legend = DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(activedLyr.title))
                 console.log("[activedWLyr legend]",legend)
-
-                let payload = {id}
-                
-                // 若要啟用的圖層包含圖例，取得圖例保存到狀態、重設圖層實例
                 if(legend){
                     const new_legend = {
                         label:legend.label,
@@ -253,7 +286,7 @@ export default {
                     payload.legend = new_legend
                 }
 
-                // 等待實例完全建構、若有時間資訊提交到狀態保存
+                // 完全建構後提交到狀態保存
                 await new Promise(res=>activedLyr.once("loaded",()=>res()))
                 payload.times = activedLyr.times
                 this.SET_ACTIVED_WEATHER_DATA(payload)
@@ -286,14 +319,15 @@ export default {
         flex-direction:column;
         overflow: hidden;
     }
+    
+	.layerWeather--mobile{
+        &__btn,&__label{
+            @include boxShadow;
+        }
+    }
+
 	.layerWeather{
         
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-        &::-webkit-scrollbar {/* Hide scrollbar for Chrome, Safari and Opera */
-            display: none;
-        }
-
         background:rgba(0,0,0,0.5);
         border-radius:2rem;
 

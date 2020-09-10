@@ -21,11 +21,11 @@ div
 		@move="toggleUIFade(1-$event)"
 		style="z-index:10;position:absolute;bottom: 0;"
 	) 
-		result(v-if="resultVisibility")
+		result
 
 		template(slot="fixedFooter")
 			template(v-if="isTimeInActivedWeatherLayer")
-				timeSlider
+				layerWeatherTool
 			template(v-else)
 				.mask
 				.footer
@@ -67,7 +67,7 @@ import pageHeader from '@/components/common/pageHeader'
 import isoheStation from "@/components/mark/isoheStation"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
-import timeSlider from "@/components/common/timeSlider"
+import layerWeatherTool from "@/components/layer/layerWeatherTool"
 import layerWeather from "@/components/layer/layerWeather"
 
 export default {
@@ -91,7 +91,7 @@ export default {
 		pullup,
 		tools,
 		layer,
-		timeSlider,
+		layerWeatherTool,
 		layerWeather
 	},
 	watch:{
