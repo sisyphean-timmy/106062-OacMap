@@ -116,8 +116,6 @@ import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
 import { marquee } from '@/directives/directives';
 
-const layerDef = require("@/layerDef.json")
-
 Vue.prototype.$openLink = link=>window.open(link,"_blank")
 
 
@@ -324,7 +322,10 @@ export default {
 
 		},
 		async layerHandler(){
-			
+
+            /** get layerDef (index) */
+            const layerDef = await(await fetch('./layerDef.json')).json()
+
 			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map)
 			
 			await this.$LayerIns.addLayer(layerDef.layers)

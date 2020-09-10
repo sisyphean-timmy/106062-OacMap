@@ -7,7 +7,6 @@
 		)
 			el-link(
 				:href="data.opendataLinkUrl" 
-				:title="data.opendataLinkUrl"
 				target="_blank" 
 				icon="el-icon-question"
 				style="float:right;margin:0.5rem 0;"
