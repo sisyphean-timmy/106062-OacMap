@@ -7,11 +7,11 @@ self.addEventListener('install', function(evt) {
 
     try {
         importScripts("sw-manifest.js");
-        console.log('[Service Worker]pre-fetch', PCACHE);
+        console.log('[Service Worker]pre-fetch', PRECACHE);
 
         evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-            var urls = ['./', './manifest.json'];
-            PCACHE.forEach(function(val, idx, arr) {
+            var urls = ['./'];
+            PRECACHE.forEach(function(val, idx, arr) {
                 urls.push(val.url);
             });
             cache.put('.assets', new Response(JSON.stringify(urls)));
@@ -19,7 +19,7 @@ self.addEventListener('install', function(evt) {
             return cache.addAll(urls);
         }));
     } catch (e) {
-        // nop
+        // nop why ?
     }
 });
 
@@ -37,7 +37,7 @@ async function assetsFromCache(req) {
     }
 
     if (req.url.match(/\/\?.*$/)) { // remove '/?xxxxx...'
-        req = '/';
+        req = './';
     }
     var resp = await cache.match(req) || fetch(req);
     return resp;
