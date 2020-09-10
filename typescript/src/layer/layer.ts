@@ -14,7 +14,7 @@ import {
 } from "./gradient/gradientLayer"
 
 import { VelocityLayer } from "./velocity/L.VelocityLayer"
-import { FileLayer} from "./fileLayer"
+// import { FileLayer} from "./fileLayer"
 import { TyphoonLayer } from "./typhoonLayer"
 import { 
     clusterMarkerLayer,
@@ -23,9 +23,12 @@ import {
 } from "./clusterMarkerLayer"
 
 
-const catelog = require("../../../src/layerCatelog.json")
-
-const getCatelog = title =>{
+let catelog = null;
+const fetchCatelog = async () =>{
+    catelog = await(await fetch('./layerCatelog.json')).json()
+}
+const getCatelog = async title =>{
+    if(!catelog) await fetchCatelog()
     let bucket = catelog.filter(i=>i.layer.some(_name=>new RegExp(_name,"g").test(title))).map(i=>i.catelog)
     if(!bucket.length) console.error(`無法取得${title}的分類`)
     return bucket
@@ -171,7 +174,7 @@ export class Layer {
                     "markIsoheStation":IsoheStationLayer,
                     "wavePeriodGradient":WavePeriodGradientLayer,
                     "waveHeightGradient":WaveHeightGradientLayer,
-                    "fileLayer":FileLayer,
+                    // "fileLayer":FileLayer,
                     "typhoonLayer":TyphoonLayer
                 }
                 const lyrIns = new mapFn[lyrOpts.type]({

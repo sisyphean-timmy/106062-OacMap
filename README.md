@@ -63,6 +63,7 @@ npm run build
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
 #### TODO
+- [X] [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 - [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
 - [X] test windy look weather layers' functionality
 - [X] clsuter Mark DOMs performance ?
