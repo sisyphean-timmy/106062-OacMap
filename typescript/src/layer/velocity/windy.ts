@@ -46,10 +46,10 @@ export default class Windy {
       this.autoColorRange = true;
     }
     this.colorScale = new ColorScale(options.minVelocity || 0, options.maxVelocity || 10, options.colorScale);
-    this.velocityScale = 0.1||options.velocityScale || 0.01;
+    this.velocityScale = options.velocityScale || 0.01;
     this.particleAge = options.particleAge || 64;
     this.setData(options.data);
-    this.particuleMultiplier = 0.002||options.particleMultiplier || 1 / 300;
+    this.particuleMultiplier = options.particleMultiplier || 1 / 300;
     this.particuleLineWidth = options.lineWidth || 1;
     const frameRate = options.frameRate || 60;
     this.frameTime = 1000 / frameRate;

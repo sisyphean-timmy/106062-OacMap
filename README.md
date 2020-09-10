@@ -63,9 +63,12 @@ npm run build
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
 #### TODO
+- [X] custom mark's popup dom from `markClick` event in `app.vue` ( check unbind event )
+- [X] test windy look weather layers' functionality
 - [X] clsuter Mark DOMs performance ?
 - [X] scss in typescript : `declare module.*scss`
-- [X] top notify bar : typhoon and check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
+- [X] top area for alert messages ( typhoon alert、 offline msg ...etc ? )
+- [X] check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
 ``` js
 const loader = L.FileLayer.fileLoader(...)
 loader.loadData(file ,"filename.kmz") // file in leaflet-filelayer wasn't converted string

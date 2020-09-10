@@ -1,21 +1,29 @@
 <template lang="pug">
 div(style="display:flex;")
-	transition(name="fade")
+	transition(name="slide-fade-up" mode="out-in")
+		.timeSlider--mobile(v-if="isMobile && DATES.length > 1")
+			.timeSlider--mobile__label(v-loading="loading")
+				span(:style="loading?'opacity:0.2;':'opacity:1;'") {{currentDateTimeString}}
+
+			VueSlider(
+				v-model="valueModel"
+				v-bind="options"
+				key="timeSilderMobile"
+			)
+
 		//- TODO : valueModel is not real percentage of slider
 		.timeSilder(
-			v-if="DATES.length > 1" ref="timeSilder" key="timeSilder"
+			v-else-if="DATES.length > 1" 
+			key="timeSilder"
 			:class="valueModel<50 ? 'timeSilder__start' : 'timeSilder__end'"
 		)
 			VueSlider(
-				ref="slider"
 				v-model="valueModel"
 				v-bind="options"
 			)
-				template(v-slot:dot)
-					div(v-if="loading" v-loading="true" style="width:1rem;height:1rem;")
+
 		.legend(
-			v-if="legendVisible"
-			ref="legend"
+			v-else-if="legendVisible"
 			key="legend"
 		) 
 			small.legend__title(v-if="legend.label") {{legend.label}}
@@ -68,13 +76,12 @@ export default {
 		loading:false,
 		errDateCollection:[]
 	}),
-	props:{
-	},
-	mounted(){
-	},
+	props:{},
+	mounted(){},
 	computed:{
 		...mapGetters({
-			layerState:"layer/layer/state"
+			layerState:"layer/layer/state",
+			isMobile:"common/common/isMobile"
 		}),
 		//** legend */
 		legendColor(){
@@ -88,6 +95,12 @@ export default {
 		},
 		legendVisible(){
 			return this.legend.colorScaleLabel.length && this.legend.colorScaleValue.length
+		},
+		currentDateTimeString(){
+			const now = new Date(this.DATES[this.value])
+			const mm = now.getMonth()+1
+			const dd = now.getDate()
+			return `${mm}/${dd} ${now.toLocaleTimeString()}`
 		},
 		//** timeSlider */
 		valueModel:{
@@ -143,7 +156,14 @@ export default {
 			return bucket
 		},
 		options(){
-			return {
+			return this.isMobile?{
+				dotSize: 18,
+				height: 6,
+				width: '100%',
+				tooltip: 'none',
+				max: this.DATES.length ? (this.DATES.length-1) : 0,
+				included:false,
+			}:{
 				// dotSize: 5,
 				width: 'auto',
 				height: 10,
@@ -226,6 +246,32 @@ export default {
 }
 
 /** timeSlider */
+.timeSlider--mobile{
+	display: flex;
+	align-items: center;
+	width:100%;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.3);
+	&__label{
+		width: 170px;
+		margin-right: 1rem;
+		color: #fff;
+		font-weight: bolder;
+		font-size: 1.1rem;
+	}
+	/deep/ {
+		.el-loading-spinner{
+			top: 100%!important;
+			.circular{
+				width: 15px !important;
+				height: 15px !important;
+			}
+		} 
+		.vue-slider{
+			padding: 0 !important
+		}
+	}
+}
 
 .timeSilder{
 	position: absolute;
@@ -236,14 +282,6 @@ export default {
 	top: auto;
 	z-index: 2;
 	bottom: 0;
-	
-	@media screen and (max-width:768px){
-		width: 100vw;
-		bottom: 0;
-		/deep/ .vue-slider{
-			padding: 0 0 1.5rem 0 !important
-		}
-	}
 
 	/** x and left */
 	&__start /deep/{
@@ -262,64 +300,71 @@ export default {
 			left: 90%;
 		}
 	}
+	
+	/deep/ {
+		.el-loading-spinner {
+			.circular{
+				width: 15px !important;
+				height: 15px !important;
+			}
+		}
+		
+		.vue-slider-rail {
+			border-radius: 0;
+			background-color: $info !important; // rgba(0, 0, 0, 0.3) 
+			&::after{
+				content:"";
+				position: absolute;
+				background-color: $info !important; // rgba(0, 0, 0, 0.3) 
+				width: 100vw;
+				height: 100%;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+			}
+		}
+		.vue-slider-mark{
+			width: 0 !important;
+		}
+		.vue-slider-mark-label {
+			padding: 0.15rem 0.25rem;
+			background-color: rgba(0,0,0,0.3);
+			margin-top: 0 !important;
+			transform:translateX(0) !important;
+			color: #ffffff;
+			width: 100vw;
+		}
+		.vue-slider-mark-step {
+			box-shadow: none !important;
+			background-color: #ffffff !important;
+			width: 3px;
+			border-radius: 0;
+		}
+	}
+	
 }
 
 /deep/ {
-
-	//- ----
-	.el-loading-spinner .circular{
-		width: 15px !important;
-		height: 15px !important;
+	
+	.el-loading-mask{
+		background-color: transparent;
+	}
+	.el-loading-spinner {
 		.path{
 			stroke: #fff !important;
 			stroke-width: 5px !important;
 		}
 	}
-	.el-loading-mask{
-		background-color: transparent;
-	}
-	
-	//- ----
+
 	.vue-slider{
 		padding: 0 1rem 2rem 1rem !important;
 	}
+
 	.vue-slider-process {
 		background-color: $primary !important;
 		border-radius: 0 !important;
 	}
-	.vue-slider-rail {
-		border-radius: 0;
-		background-color: $info !important; // rgba(0, 0, 0, 0.3) 
-		&::after{
-			content:"";
-			position: absolute;
-			background-color: $info !important; // rgba(0, 0, 0, 0.3) 
-			width: 100vw;
-			height: 100%;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-		}
-	}
-	.vue-slider-mark{
-		width: 0 !important;
-	}
-	.vue-slider-mark-label {
-		padding: 0.15rem 0.25rem;
-		background-color: rgba(0,0,0,0.3);
-		margin-top: 0 !important;
-		transform:translateX(0) !important;
-		color: #ffffff;
-		width: 100vw;
-	}
-	.vue-slider-mark-step {
-		box-shadow: none !important;
-		background-color: #ffffff !important;
-		width: 3px;
-		border-radius: 0;
-	}
-
 }
 
 </style>

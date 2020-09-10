@@ -5,7 +5,7 @@ div
             slot="title" 
             style="color:#fff;" 
             v-model="neverShowAddToScreenModel"
-        ) 點我關閉，且不再顯示
+        ) 不再顯示
     el-carousel(trigger="click" type="card" indicator-position="outside" arrow="never" :autoplay="false")
         el-carousel-item(v-for="src,key in guideStepModel" :key="key")
             img(:src="src" style="width:100%;")
@@ -52,7 +52,7 @@ export default {
 				}
 				console.log("[ neverShowAddToScreenModel get ]",this.neverShowAddToScreen)
 				if(this.neverShowAddToScreen){
-                    this.$emit("close")
+                    this.$parent.$emit("close")
 				}
 				return this.neverShowAddToScreen
 			},

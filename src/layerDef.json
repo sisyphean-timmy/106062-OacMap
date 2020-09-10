@@ -293,7 +293,12 @@
             "url": "https://ocean.taiwan.gov.tw/OpenData/PDSWind/index.json",
             "visible": false,
             "type": "velocity",
-            "tag": ["A", "B", "C", "D"]
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "maxVelocity": 35,
+                "lineWidth": 2,
+                "colorScale": ["#fff"]
+            }
         },
         {
             "title": "臺灣海域預報-波浪週期",
