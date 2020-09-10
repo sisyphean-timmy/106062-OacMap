@@ -27,6 +27,7 @@
         "echarts": "^4.8.0",
         "element-ui": "^2.12.0",
         "epsg": "^0.5.0",
+        "git-describe": "^4.0.4",
         "leaflet": "^1.6.0",
         "leaflet-filelayer": "^1.2.0",
         "leaflet-geometryutil": "^0.9.3",
