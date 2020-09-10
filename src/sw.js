@@ -2,16 +2,21 @@ self.addEventListener('install', function(evt) {
     console.log('[Service Worker] is being installed.');
     //	self.skipWaiting();
 
-    importScripts("sw-manifest.js");
-    console.log('[Service Worker]pre-fetch', PRECACHE);
+    try {
+        importScripts("sw-manifest.js");
+        console.log('[Service Worker]pre-fetch', PRECACHE);
 
-    // TODO: pre-fetch PRECACHE
-    //	var offlinePage = new Request('offlinePage.html');
-    //	event.waitUntil(fetch(offlinePage).then(function(response) {
-    //		return caches.open('offline-note').then(function(cache) {
-    //			return cache.put(offlinePage, response);
-    //		});
-    //	}));
+        // TODO: split ACACHE/DCACHE
+        evt.waitUntil(caches.open(ACACHE).then(function(cache) {
+            var urls = ['/'];
+            PRECACHE.forEach(function(val, idx, arr) {
+                urls.push(val.url)
+            });
+            return cache.addAll(urls);
+        }));
+    } catch (e) {
+        // nop
+    }
 });
 
 var HOST = [
