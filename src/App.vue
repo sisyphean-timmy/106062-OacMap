@@ -1,6 +1,32 @@
 <template lang="pug">
-
 #app
+	//- DIALOG - 主畫面說明
+	el-dialog(
+		:title="dialogTitle"
+		v-if="dialogVisibility"
+		@close="dialogTitle = '';dialogVisibility = false"
+		visible
+		show-close
+		append-to-body	
+		center
+		:top="'10vh'"
+	)
+		template(v-if="dialogTitle === '加至主畫面說明'")
+			addToHome(@close="dialogTitle = '';dialogVisibility = false")
+		template(v-else-if="dialogTitle === '搜尋'")
+			searchAndFilterLayer(@close="dialogTitle = '';dialogVisibility = false")
+
+	//- DRAWER
+	el-drawer(
+		v-if="drawerVisibility"
+		:title="drawerTitle"
+		:size="isMobile?'100%':'30%'"
+		:visible="true"
+		direction="rtl"
+		@close="drawerTitle='';drawerVisibility = false"
+	)
+		info(v-if="drawerTitle==='相關資訊'")
+
 	//- Windy Map
 	template(v-if="windyOption.visible")
 		el-button(
@@ -18,16 +44,49 @@
 				:style="`height:${ifh}px`"
 				:src="`https://embed.windy.com/?${windyOption.location}`"
 			)
-	//- UI
+
+	//- UI and alerts
 	template(v-else-if="mapConstructed")
+		.topAlert(v-if="typhoonAlert.length" @click="typhoonAlert.splice(0,typhoonAlert.legnth)")
+			div(style="display:flex;")
+				strong
+					font-awesome-icon(icon="exclamation-triangle" fixed-width size="1x")
+					| 颱風警報 
+				div(v-marquee="{width:'70vw',play:true}") 
+					| {{Object.values(typhoonAlert[0]).join()}}
+
 		component(
-			:is="isMobile ? 'mapUIxs' : 'mapUI'" 
-			:popupData="popupData"
-			@close="popupData=null"
+			:is="isMobile ? 'mapUIxs' : 'mapUI'"
+			@openDrawer="drawerVisibility=true;drawerTitle='相關資訊'"
+			@openSearchDialog="dialogVisibility=true;dialogTitle='搜尋'"
 		)
 
 	//- Map
 	#viewDiv(:style="windyOption.visible ? 'z-index:-10;' : ''")
+
+	//- Mark Template - mounted by render function by "markClick" event
+	div(ref="mark")
+
+	pullup(
+		ref='pullup'
+		v-if="popupData"
+		:reservedHeight='0'
+		height=""
+		style="z-index:10;position:absolute;bottom: 0;"
+	)
+		el-button.close(
+			style="position: absolute;left: auto;top: -2rem;bottom:auto;right: 1rem;"
+			@click="popupData = null" 
+			circle 
+			type="danger" 
+			size="mini"
+		)
+			font-awesome-icon(icon="times" fixed-width)
+
+		isoheStation(
+			:data="popupData"
+			@caculateHeight="$refs.pullup.caculatePullupHeight()"
+		)
 
 </template>
 
@@ -41,23 +100,51 @@ import mapUI from "@/components/mapUI"
 import mapUIxs from "@/components/mapUIxs"
 import markss from "@/components/mark/mark"
 
+import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
+import addToHome from "@/components/dialog/addToHome"
+import info from "@/components/drawer/info"
+
+import pullup from "@/components/pullup"
+import isoheStation from "@/components/mark/isoheStation"
+
 import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
+import { marquee } from '@/directives/directives';
 
 const layerDef = require("@/layerDef.json")
 
+Vue.prototype.$openLink = link=>window.open(link,"_blank")
+
+
 export default {
 	name: 'app',
+	directives:{
+		marquee
+	},
 	data:()=>({
 		loading:null,
-        popupData:null,
 		windyLoading: true,
-		mapConstructed:false
+		mapConstructed:false,
+		//
+		popupData:null,
+		//
+		dialogVisibility:false,
+		dialogTitle:"",
+		// 
+		drawerVisibility:false,
+		drawerTitle:"",
+		//
+		typhoonAlert: []
 	}),
 	components:{
         markss,
 		mapUI,
-		mapUIxs
+		mapUIxs,
+		addToHome,
+		info,
+		pullup,
+		isoheStation,
+		searchAndFilterLayer
 	},
 	computed:{
 		...mapGetters({
@@ -77,6 +164,29 @@ export default {
 				this.$nextTick(()=>{
 					const Iframe = this.$el.querySelector("#windy")
 					Iframe.onload = ()=> this.windyLoading = false
+				})
+			}
+		}
+	},
+	watch:{
+		"windyOption.visible":{
+			handler(bool){
+				if(!bool) return 
+				this.windyLoading = true
+				this.$nextTick(()=>{
+					const Iframe = this.$el.querySelector("#windy")
+					Iframe.onload = ()=> this.windyLoading = false
+				})
+			}
+		},
+		popupData:{
+			handler(){
+				this.$nextTick(()=>{
+					if(!this.$refs.pullup) return
+					this.SET_CARD_VISIBLE({key:"result",bool:false})
+					this.SET_CARD_VISIBLE({key:"layer",bool:false})
+					this.$refs.pullup.toggleUp()
+					this.$refs.pullup.caculatePullupHeight()
 				})
 			}
 		}
@@ -113,6 +223,9 @@ export default {
 			// 初始化相關事件
 			this.eventHandler()
 
+			this.dialogVisibility = true
+			this.dialogTitle = "加至主畫面說明"
+
 			await this.initAfterMapMounted(this) // Action after mount
 
 		}catch(e){
@@ -140,6 +253,9 @@ export default {
 			const map = this.$InitIns.map
 
 			map.on({
+				"typhoonAlert":({data})=>{
+					this.typhoonAlert.push(...data)
+				},
 				"moveend":evt=>{
 					/** 移動後記錄位置 */
 					const lat = map.getCenter().lat
@@ -160,37 +276,41 @@ export default {
 					this.SET_CARD_VISIBLE({key:'layer',bool:false})
 					this.SET_CARD_VISIBLE({key:'result',bool:true})
 				},
-				"markerClick":({type,layer,data})=>{
-					/**
-                     *  layer --> must latency bindPopup( vue componente rendering fn ) --> openPopup()
-                     * 
-                     * layer can't be pass
-                     * 
-                    */
-
-                    const vm = new Vue({
-                        render: h => h(markss, {
-                            // style: {
-                            //     display: context.rootState['tool/tool']['activedId'] === 'googleStreetView' ? 'block' : 'none'
-                            // },
-                            props: {data
-                                // width: 450,
-                                // position: {
-                                //     x: window.innerWidth,
-                                //     y: 0,
-                                //     z: 9999
-                                // }
-                            },
-                            // on: {
-                            //     close: event => context.dispatch("deActiveDispatcher")
-                            // }
-                        })
-                    }).$mount()
-                    setTimeout(()=>{
-                        layer.bindPopup(vm.$el).openPopup()
-                    },100)
-
-					// this.popupData = result
+				"markerClick":({dataType,layer,data,event})=>{
+					console.log("[markerClick]",{dataType,layer,data,event})
+					switch(dataType){
+						case "isoheStation":
+							/** 
+							 * Render fn : 
+							 * layer --> bindPopup( vue component ) ---latency---> openPopup()  
+							 */
+							// const vm = new Vue({
+							//     render: h => h(markss, {
+							//         // style: {
+							//         //     display: context.rootState['tool/tool']['activedId'] === 'googleStreetView' ? 'block' : 'none'
+							//         // },
+							//         props: {data
+							//             // width: 450,
+							//             // position: {
+							//             //     x: window.innerWidth,
+							//             //     y: 0,
+							//             //     z: 9999
+							//             // }
+							//         },
+							//         // on: {
+							//         //     close: event => context.dispatch("deActiveDispatcher")
+							//         // }
+							//     })
+							// }).$mount()
+							// setTimeout(()=>{
+							//     layer.bindPopup(vm.$el).openPopup()
+							// },100)
+							this.popupData = data //TODO: will be replace
+							break
+						case "scenicSpot":
+						default:
+							setTimeout(()=>layer.openPopup(),100)
+					}
 				}
 			})
 
@@ -198,9 +318,9 @@ export default {
 		async layerHandler(){
 			
 			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map)
-            
-            await this.$LayerIns.addLayer(layerDef.layers)
-            this.$LayerIns.addBaseLayer(layerDef.baseLayers)
+			
+			await this.$LayerIns.addLayer(layerDef.layers)
+			this.$LayerIns.addBaseLayer(layerDef.baseLayers)
 
 			console.log("%c $layerIns:","background:red;", this.$LayerIns)
 
@@ -261,6 +381,37 @@ export default {
 	height: 100%;
 	width: 100%;
 	z-index: 0;
+}
+
+
+.topAlert{
+	animation-name: sparkle;
+	animation-duration: 800ms;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+	//
+    display: flex;
+    align-items: center;
+	justify-content: center;
+	width: 100%;
+	//
+	font-size: 0.8rem;
+	padding: 0.5rem 0;
+	position: fixed;
+	z-index: 2;
+	background-color: lighten($warning,20);
+	color: darken($warning,10);
+}
+@keyframes sparkle{
+	0% {
+		background-color: rgba(lighten($warning,20),1);
+	}
+	50% {
+		background-color: rgba(lighten($warning,20),0.5);
+	}
+	100% {
+		background-color: rgba(lighten($warning,20),1);
+	}
 }
 
 </style>

@@ -62,7 +62,9 @@ npm run build
 * [esri-leaflet 可載入 arcgis 圖層](http://esri.github.io/esri-leaflet)
 * [unsafely-treat-insecure-origin-as-secure](https://stackoverflow.com/questions/40696280/unsafely-treat-insecure-origin-as-secure-flag-is-not-working-on-chrome)
 
-#### MEMO
+#### TODO
+- [X] clsuter Mark DOMs performance ?
+- [X] scss in typescript : `declare module.*scss`
 - [X] top notify bar : typhoon and check typhoon data format ; add typhoon alert msg `backend/index.js` has converted `.kml` in `.kmz` to `.geojson` ; `typescript/layer/fileLayer.ts`'s dependency `leaflet-filelayer`line:214 `_convertToGeoJSON()` not convert File to string for dependency which used in the parser
 ``` js
 const loader = L.FileLayer.fileLoader(...)
@@ -79,7 +81,3 @@ _convertToGeoJSON: function _convertToGeoJSON(content, format) {
     })
 }
 ```
-- [X] 海象 UI 移出到畫面右側 with windy look
-- [X] clsuter Mark DOMs performance ?
-- [X] scss in typescript : `declare module.*scss`
-- [X] `timeslider.vue` : test put label of date interval in slider's dot instead of mark、loading icon in current time label

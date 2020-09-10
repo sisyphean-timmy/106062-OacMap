@@ -2,16 +2,16 @@
 var assets = null;
 
 self.addEventListener('install', function(evt) {
-    console.log('[Service Worker] is being installed.');
-    //	self.skipWaiting();
+    console.log('[Service Worker] is being installed.', ACACHE);
+    //self.skipWaiting();
 
     try {
         importScripts("sw-manifest.js");
-        console.log('[Service Worker]pre-fetch', PRECACHE);
+        console.log('[Service Worker]pre-fetch', PCACHE);
 
         evt.waitUntil(caches.open(ACACHE).then(function(cache) {
             var urls = ['./', './manifest.json'];
-            PRECACHE.forEach(function(val, idx, arr) {
+            PCACHE.forEach(function(val, idx, arr) {
                 urls.push(val.url);
             });
             cache.put('.assets', new Response(JSON.stringify(urls)));
@@ -58,4 +58,8 @@ self.addEventListener('activate', function(ev) {
             );
         })
     );
+});
+
+self.addEventListener('message', async function(ev) {
+    if (ev.data === 'skipWaiting') return self.skipWaiting();
 });

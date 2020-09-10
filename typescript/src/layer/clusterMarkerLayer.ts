@@ -20,6 +20,7 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         type,
         title,
         visible,
+        tag,
         catelog,
         opacity,
         dataSet,
@@ -29,6 +30,7 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         this.catelog = catelog
         this.id = id
         this.type = type
+        this.tag = tag
         this.title = title
         this.visible = visible
         this.opacity = 1
@@ -71,12 +73,29 @@ export class clusterMarkerLayer extends BaseCluster{
         const mk = L.marker(latlng, {
             icon:this.iconIns
         })
-        mk.on("click",()=>{
+        mk.on("click",e=>{
             this._map.fireEvent("markerClick", {
+                dataType: "default",
                 layer: mk,
-                result: feature
+                result: feature,
+                data: feature,
+                event: e
             })
         })
+        // test properties
+        const misc = Object.keys(feature.properties).join()
+        if(/遊艇泊區/g.test(misc)){
+            mk.bindPopup(`
+                <h3>${feature.properties["遊艇泊區名"]}，泊位數 ${feature.properties['泊位數']} 位</h3>
+            `)
+        }else if(/漁港名稱/g.test(misc)){
+            mk.bindPopup(`
+                <h3>${feature.properties["漁港名稱"]}</h3>
+            `)
+        }else{
+            mk.bindPopup(JSON.stringify(feature.properties))
+        }
+        
         return mk
     }
     onAdd(map){
@@ -115,7 +134,7 @@ export class IsoheStationLayer extends BaseCluster {
                             icon:this.iconIns
                         }
                     )
-                    mk.on("click",()=>{
+                    mk.on("click",e=>{
                         let result  = {
                             title:"",
                             type:"",
@@ -132,8 +151,10 @@ export class IsoheStationLayer extends BaseCluster {
                             result.type = "wind"
                         }
                         this._map.fireEvent("markerClick",{
+                            dataType: "isoheStation",
                             layer: mk,
-                            result
+                            data: result,
+                            event:e
                         })
                     })
                     this.markerClusterGroup.addLayer(mk)
@@ -170,22 +191,21 @@ export class ScenicSpotLayer extends BaseCluster {
             Picture3,
             Py,Px
         } = feature.properties
-
-        // mk.bindPopup(`
-        //     <h3>${Name}</h3>
-        //     <small>
-        //         經度 ${Px} 緯度 ${Py}
-        //     </small>
-        //     <img src="${Picture1||Picture2||Picture3}" alt="${Name}"/>
-        //     ${Name}
-        //     ${Toldescribe}
-        // `, {
-        //     maxHeight: 300
-        // })
+        const img = Picture1||Picture2||Picture3||''
+        mk.bindPopup(`
+            <h3>${Name}</h3>
+            <small>
+                經度 ${Px} 緯度 ${Py}
+            </small>
+            ${img?`<img style="max-width:200px;" src="${img}" alt="${Name}"/>`:``}
+            <p>${Toldescribe}</p>
+        `, {
+            maxHeight: 300
+        })
         
-        mk.on("click",()=>{
+        mk.on("click",e=>{
             this._map.fireEvent("markerClick",{
-                type: this.type,
+                dataType: "scenicSpot",
                 layer: mk,
                 data:{
                     Name,
@@ -194,7 +214,8 @@ export class ScenicSpotLayer extends BaseCluster {
                     Picture2,
                     Picture3,
                     Py,Px
-                }
+                },
+                event: e
             })
         })
         return mk

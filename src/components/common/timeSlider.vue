@@ -1,7 +1,11 @@
 <template lang="pug">
-
+div(style="display:flex;")
 	transition(name="fade")
-		.timeSilder(v-if="DATES.length > 1" ref="timeSilder" key="timeSilder")
+		//- TODO : valueModel is not real percentage of slider
+		.timeSilder(
+			v-if="DATES.length > 1" ref="timeSilder" key="timeSilder"
+			:class="valueModel<50 ? 'timeSilder__start' : 'timeSilder__end'"
+		)
 			VueSlider(
 				ref="slider"
 				v-model="valueModel"
@@ -9,13 +13,16 @@
 			)
 				template(v-slot:dot)
 					div(v-if="loading" v-loading="true" style="width:1rem;height:1rem;")
-		.legend( 
+		.legend(
 			v-if="legendVisible"
 			ref="legend"
 			key="legend"
 		) 
-			small(style="margin-bottom:0.5rem;" v-if="legend.label") {{legend.label}}
-			.legend__row(v-for="scale in legendColor" :key="scale.label")
+			small.legend__title(v-if="legend.label") {{legend.label}}
+			.legend__row(
+				v-for="scale in legendColor" 
+				:key="scale.label"
+			)
 				.legend__row__color(:style="`background-color:${scale.value};`")
 				.legend__row__text {{isNaN(scale.label)?scale.label:Number(scale.label)}}
 
@@ -112,23 +119,26 @@ export default {
 			return this.activedWeatherLyr.times
 		},
 		MARKS(){
-            let bucket = {}
+			let bucket = {}
+			if(new Date().getHours()<21){
+				bucket = {"0":"今天"}
+			}
 			this.DATES.forEach((dStr,index)=>{
 				const D = new Date(dStr)
 				const yy = D.getFullYear()
 				const mm = D.getMonth()+1
-                const dd = D.getDate()
+				const dd = D.getDate()
 
 				const lD = new Date(this.DATES[index-1])
 				const lyy = lD.getFullYear()
 				const lmm = lD.getMonth()+1
-                const ldd = lD.getDate()
-                
-                if(dd>ldd || mm>lmm ||yy>lyy){
-                    bucket[index] = {
+				const ldd = lD.getDate()
+				
+				if(dd>ldd || mm>lmm ||yy>lyy){
+					bucket[index] = {
 						label:`${mm}/${dd}`
 					}
-                }
+				}
 			})
 			return bucket
 		},
@@ -153,13 +163,12 @@ export default {
 				tooltipFormatter: i=>{
 					const dStr = this.DATES[i]
 					if(this.errDateCollection.indexOf()>-1){
-						return "無法取得該時間點資料，請重試"
+						return "發生錯誤"
 					}else{
-						let resStr = new Date(dStr).toLocaleString()
-						if(this.loading) resStr+="，資料載入中"
-						return resStr
+						return new Date(dStr).toLocaleString()
 					}
 				},
+				// tooltipStyle: void 0,
 				// useKeyboard: false,
 				// keydownHook: null,
 				// dragOnClick: false,
@@ -175,15 +184,9 @@ export default {
 				// dotStyle: void 0,
 				// railStyle: void 0,
 				// processStyle: void 0,
-				// tooltipStyle: void 0,
 				// stepStyle: void 0,
 				// stepActiveStyle: void 0,
-				labelStyle: {
-					padding: "0.15rem 0.25rem",
-					borderRadius: "0.15rem",
-					backgroundColor: "rgba(0,0,0,0.6)",
-					color: "#ffffff"
-				},
+				// labelStyle: void 0
 				// labelActiveStyle: void 0,
 			}
 		}
@@ -196,31 +199,28 @@ export default {
 
 /** legend */
 .legend{
-	position: absolute !important;
-    right: 0;
-    bottom: 3rem;
-    top: auto;
-	left: auto;
-    padding: 0.5rem 0.5rem 1rem 0.5rem;
+	width: 100%;
 	background-color: rgba(0,0,0,0.45);
-	display: flex;
-	flex-direction: column;
 	color:#fff;
+	display: flex;
+	align-items:center;
+	&__title{
+		white-space: nowrap;
+		padding: 0 1rem;
+		z-index: 1;
+	}
 	&__row {
 		display: flex;
-		justify-content: flex-start;
-		margin: 0.1rem 0;
+		align-items:center;
 		&__text{
 			position: relative;
-			top:0.5rem;
-			padding-left: 0.5rem;
-			right: auto;
-			bottom: auto;
-			font-size: 0.7rem;
+			padding: 0.25rem 0.5rem;
+			text-shadow: 1px 1px 0px rgba(0,0,0,1);
 		}
 		&__color{
-			width:1rem;
-			height:1rem;
+			position: absolute;
+			width: 100vw;
+			height: 100%;
 		}
 	}
 }
@@ -234,26 +234,44 @@ export default {
 	right: 0;
 	left: auto;
 	top: auto;
-	margin-bottom: 5vh;
 	z-index: 2;
-}
+	bottom: 0;
+	
+	@media screen and (max-width:768px){
+		width: 100vw;
+		bottom: 0;
+		/deep/ .vue-slider{
+			padding: 0 0 1.5rem 0 !important
+		}
+	}
 
-.timeDot{
-	color: $primary;
-	width: 100%;
-	height: 100%;
+	/** x and left */
+	&__start /deep/{
+		.vue-slider-dot-tooltip-top{
+			transform: translate(-5%,-100%);
+		}
+		.vue-slider-dot-tooltip-inner-top::after{
+			left: 5%;
+		}
+	}
+	&__end /deep/{
+		.vue-slider-dot-tooltip-top{
+			transform: translate(-90%,-100%);
+		}
+		.vue-slider-dot-tooltip-inner-top::after{
+			left: 90%;
+		}
+	}
 }
 
 /deep/ {
-	
-	// .vue-slider-dot{
-	// 	visibility: hidden;
-	// }
+
+	//- ----
 	.el-loading-spinner .circular{
-		width: 1rem !important;
-		height: 1rem !important;
+		width: 15px !important;
+		height: 15px !important;
 		.path{
-			stroke: #000 !important;
+			stroke: #fff !important;
 			stroke-width: 5px !important;
 		}
 	}
@@ -262,30 +280,44 @@ export default {
 	}
 	
 	//- ----
+	.vue-slider{
+		padding: 0 1rem 2rem 1rem !important;
+	}
 	.vue-slider-process {
 		background-color: $primary !important;
 		border-radius: 0 !important;
 	}
+	.vue-slider-rail {
+		border-radius: 0;
+		background-color: $info !important; // rgba(0, 0, 0, 0.3) 
+		&::after{
+			content:"";
+			position: absolute;
+			background-color: $info !important; // rgba(0, 0, 0, 0.3) 
+			width: 100vw;
+			height: 100%;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+	}
 	.vue-slider-mark{
 		width: 0 !important;
 	}
+	.vue-slider-mark-label {
+		padding: 0.15rem 0.25rem;
+		background-color: rgba(0,0,0,0.3);
+		transform:translateX(0);
+		color: #ffffff;
+		margin-top: 0;
+		width: 100vw;
+	}
 	.vue-slider-mark-step {
 		box-shadow: none !important;
-		// background-color: darken($primary,20) !important;
 		background-color: #ffffff !important;
 		width: 3px;
 		border-radius: 0;
-	}
-	.vue-slider-rail {
-		border-radius: 0;
-        background-color: rgba(0, 0, 0, 0.3) !important;
-		// background-color: rgba(lighten($primary,30),0.7) !important;
-	}
-	.vue-slider-dot-tooltip-top{
-		transform: translate(-90%,-100%);
-	}
-	.vue-slider-dot-tooltip-inner-top::after{
-		left: 90%;
 	}
 
 }

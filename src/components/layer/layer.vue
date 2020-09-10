@@ -3,31 +3,6 @@
 		.layer__wrapper
 			.layer__header
 				slot(name="header")
-				//- 	el-alert(type="success" style="margin-bottom:1rem;line-height:150%;" )
-				//- 		h3 
-				//- 			font-awesome-icon(icon="exclamation-circle" size="lg" fixed-width)
-				//- 			| 您想找什麼 ? 
-
-				//- 		p
-				//- 			span 點擊地圖上的色塊，來查詢您想知道的資訊，下方的圖層可以控制地圖色塊開關與透明度 。
-				//- 	el-input(
-				//- 		v-model="layerKeywordModel" 
-				//- 		size="small" 
-				//- 		placeholder="輸入關鍵字搜尋圖資名稱" 
-				//- 		clearable
-				//- 	)
-				//- 		font-awesome-icon(icon="search" fixed-width slot="prefix")
-
-				//- 	p(style="line-height: 200%;")
-				//- 		el-button(
-				//- 			v-for="tag in tourismTags"
-				//- 			:key="tag"
-				//- 			type="info" 
-				//- 			round
-				//- 			size="mini" 
-				//- 			style="padding:0.2rem 0.5rem;margin:0 0.5rem 0 0;"
-				//- 		) {{tag}}
-				
 			//- see : https://github.com/Jexordexan/vue-slicksort
 			SlickList.slickList(
 				ref="slickList"
@@ -40,9 +15,9 @@
 				helperClass="dragging"
 				:transitionDuration="300"
 			)
-				h3 海域與遊憩資訊總覽
-				.col
-					layerWeather
+				//- h3 海域與遊憩資訊總覽
+				//- .col
+				//- 	layerWeather
 				.col
 					small 地圖上帶有對應圖示的圓形，在縮放比例尺後可以得到更多關於點的資訊
 						.fixedTopList(style="position:relative;" )
@@ -112,7 +87,7 @@ import layerItemCard from "./layerItemCard"
 import layerBaseMap from "./layerBaseMap"
 
 import layerItemFixedCard from "./layerItemFixedCard"
-import layerWeather from '@/components/layer/layerWeather';
+// import layerWeather from '@/components/layer/layerWeather';
 
 
 export default {
@@ -123,7 +98,7 @@ export default {
 		layerItemCard,
 		layerBaseMap,
 		layerItemFixedCard,
-		layerWeather
+		// layerWeather
 	},
 	data:()=>({
 		dragging:false,

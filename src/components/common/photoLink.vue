@@ -28,7 +28,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-height: 6rem;
+            min-height: 2rem;
+            text-decoration: none;
         }
         .tag{
             color: #222;
@@ -83,14 +84,15 @@
     }
     a.item:hover{
         h3{
-            transform: scale(1.15);
+            transform: scale(1.05);
             transition: all .4s ease-in-out	;
+            text-shadow: 2px 2px 2px black;
         }
         .img-wrapper{
             transform: scale(1.1);
             transition: all .3s ease-in-out	;
             &:before{
-                background-color: rgba(0,0,0,0);
+                background-color: rgba(0,0,0,0.1);
                 transition: all .3s ease-in;
             }
         }

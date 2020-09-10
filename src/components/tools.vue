@@ -1,76 +1,52 @@
 <template lang="pug">
 div
 
-	//- 整合搜尋
-	.search
-		//- 標籤
-		el-select(
-			style="width:200px;"
-			v-model="selectedTagModel"
-			filterable
-			placeholder="選擇遊憩活動"
-			placement="bottom"
-			popper-class="selectItems"
-			clearable
-		)
-			el-option(
-				v-for="i in tags" 
-				:key="i.label" 
-				:label="i.label" 
-				:value="i.value"
-			)
-			template(slot="prefix")
-				el-button(
-					style="position:absolute;"
-					circle
-					type="primary" 
-				)
-					.tools__button
-						font-awesome-icon(icon="search" fixed-width size="lg")
+.tools
+	//- 搜尋
+	el-button(
+		circle
+		type="primary" 
+		@click="$parent.$emit('openSearchDialog')"
+	)
+		.tools__button
+			font-awesome-icon(icon="search" fixed-width size="lg")
 
-	.tools
-		//- 圖層
-		el-button(
-			circle
-			@click="SET_CARD_VISIBLE({key:'layer',bool:!layerVisibility})"
-		)
-			.tools__button
-				font-awesome-icon(icon="layer-group" fixed-width size="lg")
-		//- 搜尋結果
-		el-button(
-			circle 
-			:disabled="!allR2"
-			@click="isMobile ? $emit('resultClick') : SET_CARD_VISIBLE({key:'result',bool:!resultVisibility})"
-		)
-			.tools__button
-				.tools__resultNum(
-					:class="{'tools__resultNum--active':allR2}" 
-				) {{allR2}}
-				font-awesome-icon(icon="info" fixed-width size="lg")
-		//- 當前位置
-		el-button(
-			circle
-			@click="locateCurrent()"
-		)
-			.tools__button
-				font-awesome-icon(icon="crosshairs" fixed-width  size="lg")
+	//- 圖層
+	el-button(
+		circle
+		@click="SET_CARD_VISIBLE({key:'layer',bool:!layerVisibility})"
+	)
+		.tools__button
+			font-awesome-icon(icon="layer-group" fixed-width size="lg")
+	//- 搜尋結果
+	el-button(
+		circle 
+		:disabled="!allR2"
+		@click="isMobile ? $emit('resultClick') : SET_CARD_VISIBLE({key:'result',bool:!resultVisibility})"
+	)
+		.tools__button
+			.tools__resultNum(
+				:class="{'tools__resultNum--active':allR2}" 
+			) {{allR2}}
+			font-awesome-icon(icon="info" fixed-width size="lg")
+	//- 當前位置
+	el-button(
+		circle
+		@click="locateCurrent()"
+	)
+		.tools__button
+			font-awesome-icon(icon="crosshairs" fixed-width  size="lg")
 
 </template> 
 
 <script>
 
-import Vue from 'vue'
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 
 export default {
 	name:"tools",
-	props:{
-	},
-	data:()=>({
-		keywordLabel:"",
-		// selectedTag:"",
-		tourismTags:require("@/layerTag.json")['tourism'],
-	}),
+	props:{},
+	data:()=>({}),
 	computed:{
 		...mapGetters({
 			isMobile:"common/common/isMobile",
@@ -84,39 +60,6 @@ export default {
 		},
 		resultVisibility(){
 			return  this.commonState("resultCardVisible")
-		},
-		selectedTagModel:{
-			get(){
-				return this.keywordLabel
-			},
-			set(obj){
-                
-                let val = obj.value
-                this.keywordLabel = obj.label
-
-				this.SET_CURRENT_TAG(val)
-				this.SET_CARD_VISIBLE({key:'layer',bool:true})
-				
-				this.layerState("layer").forEach(l => {
-					let visible = l.visible
-					if(l.tag.indexOf(this.commonState("currentTag")) === -1 && val){
-						visible = false
-					}
-					this.$LayerIns.setVisible(l.id,visible)
-				})
-			}
-		},
-		tags(){
-			let qSearchs = []
-			Object.keys(this.tourismTags).forEach(k => {
-				this.tourismTags[k].forEach(v=>{
-					qSearchs.push({label: v,value: {
-                        label: v,
-                        value: k
-                    }})
-				})
-			})
-			return qSearchs
 		}
 	},
 	methods:{
@@ -131,48 +74,11 @@ export default {
 				this.$alert("目前無法定位到當前位置，請檢查GPS狀態",{type:"error"})
 			}
 		},
-		autocompleteSelectQuerySearch(queryString, cb){
-			
-			let val = spots.features.filter(i=>new RegExp(queryString,"g").test(i.properties.Name))
-			let result = val.map(i=>({
-				label:i.properties.Name,
-				value:i
-			}))
-
-			cb(result)
-		},
 	}
 }
 </script>
 
 <style lang="scss" scoped>
-	
-	.selectItems * {
-		color: $primary !important;
-		font-weight: normal !important;
-	}
-
-	.search{
-		margin:0.5rem 0 !important;
-		/deep/ {
-			.el-input{
-				&__prefix{
-					left:0;
-				}
-				&__inner{
-					padding-left: 50px;
-					border-radius: 999px !important;
-					box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-				}
-			}
-		}
-		.el-button{
-			box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-		}
-		&>*{
-			margin:0.5rem 0.5rem 0 0;
-		}
-	}
 
 	.tools{
 		position: absolute;
@@ -182,7 +88,7 @@ export default {
 		align-items: flex-start;
 
 		&>*{
-			margin:0.5rem 0 !important;
+			margin:0 0 1rem 0 !important;
 			box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
 		}
 
