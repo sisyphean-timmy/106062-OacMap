@@ -1,0 +1,1 @@
+const PRECACHE = self.__WB_MANIFEST
