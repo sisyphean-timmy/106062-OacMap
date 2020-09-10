@@ -1,10 +1,34 @@
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+const { InjectManifest } = require('workbox-webpack-plugin')
 
+const { gitDescribe, gitDescribeSync } = require('git-describe')
+process.env.VUE_APP_GIT_HASH = gitDescribeSync().hash
+process.env.VUE_APP_VERSION = require('./package.json').version
+process.env.VUE_APP_BUILDTIME = (new Date()).toISOString()
+process.env.VUE_APP_BUILD = `v${process.env.VUE_APP_VERSION}-${process.env.VUE_APP_GIT_HASH}-${process.env.VUE_APP_BUILDTIME}`
+const injectStr =
+    `const ACACHE = 'acache-${process.env.VUE_APP_BUILD}';\n` +
+    `const DCACHE = 'dcache-${process.env.VUE_APP_BUILD}';\n`;
 
 module.exports = {
     configureWebpack: config => {},
     chainWebpack: config => {
-
+        config.plugin('InjectManifest')
+            .use(InjectManifest, [{
+                swSrc: './src/sw-manifest.js',
+                compileSrc: false,
+                maximumFileSizeToCacheInBytes: 99999999
+            }])
+        config.plugin('sw-copy')
+            .use(require('copy-webpack-plugin'), [
+                [{
+                    from: 'src/sw.js',
+                    to: 'sw.js',
+                    transform(content, path) {
+                        return injectStr + content;
+                    },
+                }]
+            ])
         config.plugin('FaviconsWebpackPlugin')
             .use(FaviconsWebpackPlugin, [{
                 inject: true,
@@ -19,11 +43,10 @@ module.exports = {
                     developerName: "詮華",
                     display: "fullscreen",
                     manifestRelativePaths: "./",
-                    start_url: "../../",
-                    scope: "../../"
+                    start_url: "./?homescreen=1",
+                    scope: "./"
                 }
             }])
-
         if (process.env.NODE_ENV === 'production') {
             config.plugins.delete('preload');
             config.plugins.delete('prefetch');
