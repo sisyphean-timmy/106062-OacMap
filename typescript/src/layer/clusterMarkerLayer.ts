@@ -1,3 +1,12 @@
+
+import Vue from 'vue'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(fas, fab, far)
+
 abstract class BaseCluster extends L.Layer implements ILayer{
 
     id: string
@@ -13,7 +22,6 @@ abstract class BaseCluster extends L.Layer implements ILayer{
     lyrOpts:any
 
     markerClusterGroup:L.MarkerClusterGroup
-    iconIns:L.Icon|L.DivIcon
 
     constructor({
         id,
@@ -37,16 +45,24 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         this.icon = lyrOpts.layerOption.icon
         this.lyrOpts = lyrOpts
         this.dataSet = dataSet 
-        this.iconIns = L.divIcon({
-            html:`
-                <div class="leaflet-mark-icon">
-                    <i class="${this.lyrOpts.layerOption.icon}"></i>
-                </div>
-            `
-        })
 
+        /** Fix XSS by vue's render fn  */
         this.markerClusterGroup = L.markerClusterGroup({
-            iconCreateFunction: cluster=> this.iconIns,
+            iconCreateFunction: cluster=> L.divIcon({
+                html: new Vue({
+                    render: h => h(
+                        "div",
+                        {class:"leaflet-mark-icon"},
+                        [
+                            h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                                props:{
+                                    icon:this.icon
+                                }
+                            })
+                        ]
+                    )
+                }).$mount().$el as HTMLElement
+            }),
             showCoverageOnHover:false,
             spiderLegPolylineOptions: {opacity:0}
         })
@@ -70,8 +86,22 @@ export class clusterMarkerLayer extends BaseCluster{
         super(opts)
     }
     private _pointToLayer(feature, latlng):L.Marker{
-        const mk = L.marker(latlng, {
-            icon:this.iconIns
+            const mk = L.marker(latlng, {
+                icon:L.divIcon({
+                    html:new Vue({
+                        render: h => h(
+                        "div",
+                        {class:"leaflet-mark-icon"},
+                        [
+                            h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                                props:{
+                                    icon:this.icon
+                                }
+                            })
+                        ]
+                    )
+                }).$mount().$el as HTMLElement
+            })
         })
         mk.on("click",e=>{
             this._map.fireEvent("markerClick", {
@@ -131,7 +161,20 @@ export class IsoheStationLayer extends BaseCluster {
                     const {Latitude,Longitude} = location
                     const mk = L.marker(
                         L.latLng(Latitude,Longitude),{
-                            icon:this.iconIns
+                            icon:L.divIcon({
+                                html:new Vue({
+                                render: h => h(
+                                    "div",
+                                    {class:"leaflet-mark-icon"},
+                                    [
+                                        h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                                            props:{
+                                                icon:this.icon
+                                            }
+                                        })
+                                    ]
+                                )
+                            }).$mount().$el as HTMLElement})
                         }
                     )
                     mk.on("click",e=>{
@@ -180,7 +223,20 @@ export class ScenicSpotLayer extends BaseCluster {
     private _pointToLayer(feature, latlng){
 
         const mk = L.marker(latlng, {
-            icon:this.iconIns
+            icon:L.divIcon({
+                html:new Vue({
+                render: h => h(
+                    "div",
+                    {class:"leaflet-mark-icon"},
+                    [
+                        h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                            props:{
+                                icon:this.icon
+                            }
+                        })
+                    ]
+                )
+            }).$mount().$el as HTMLElement})
         })
 
         const {

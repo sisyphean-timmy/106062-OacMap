@@ -3,7 +3,7 @@ const marqueeTimeRamp = 15
 export default {
     bind(el, binding, vnode) {
 
-        console.log("marquee binding", binding)
+        // console.log("[vue marquee directive binding]", binding)
 
         //- force set style 
         el.style.cssText = `

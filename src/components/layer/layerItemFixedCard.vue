@@ -5,7 +5,7 @@
 		:class="isOutScaleStyle ? 'layer-card--outscale' : !layer.visible ? 'layer-card--disabled ' :'layer-card--default'"
 	)
 		.icon
-			i(:class="layer.icon")
+			font-awesome-icon(:icon="layer.icon" fixed-width)
 
 		.layer-card__content
 			.layer-card__content__head
