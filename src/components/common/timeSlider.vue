@@ -308,9 +308,9 @@ export default {
 	.vue-slider-mark-label {
 		padding: 0.15rem 0.25rem;
 		background-color: rgba(0,0,0,0.3);
-		transform:translateX(0);
+		margin-top: 0 !important;
+		transform:translateX(0) !important;
 		color: #ffffff;
-		margin-top: 0;
 		width: 100vw;
 	}
 	.vue-slider-mark-step {
