@@ -1,10 +1,13 @@
 <template lang="pug">
-div(style="display:flex;")
-	transition(name="slide-fade-up" mode="out-in")
-		.timeSlider--mobile(v-if="isMobile && DATES.length > 1")
-			.timeSlider--mobile__label(v-loading="loading")
-				span(:style="loading?'opacity:0.2;':'opacity:1;'") {{currentDateTimeString}}
-
+transition(name="slide-fade-up" mode="out-in")
+	div(style="display:flex;flex-direction:column;")
+		.timeSlider--mobile(
+			v-if="isMobile && DATES.length > 1"
+			:class="valueModel<50 ? 'timeSlider--mobile__start' : 'timeSlider--mobile__end'"
+		)
+			//- .timeSlider--mobile__label(v-loading="loading")
+			//- 	span(:style="loading?'opacity:0.2;':'opacity:1;'") {{currentDateTimeString}}
+			small(style="color: #fff;position: absolute;left: 0;right: 0;text-align: center;") 拖動/點擊 調整時間
 			VueSlider(
 				v-model="valueModel"
 				v-bind="options"
@@ -14,7 +17,6 @@ div(style="display:flex;")
 		//- TODO : valueModel is not real percentage of slider
 		.timeSilder(
 			v-else-if="DATES.length > 1" 
-			key="timeSilder"
 			:class="valueModel<50 ? 'timeSilder__start' : 'timeSilder__end'"
 		)
 			VueSlider(
@@ -22,10 +24,8 @@ div(style="display:flex;")
 				v-bind="options"
 			)
 
-		.legend(
-			v-else-if="legendVisible"
-			key="legend"
-		) 
+		//- 圖例
+		.legend(v-if="legendVisible") 
 			small.legend__title(v-if="legend.label") {{legend.label}}
 			.legend__row(
 				v-for="scale in legendColor" 
@@ -100,7 +100,8 @@ export default {
 			const now = new Date(this.DATES[this.value])
 			const mm = now.getMonth()+1
 			const dd = now.getDate()
-			return `${mm}/${dd} ${now.toLocaleTimeString()}`
+			const hh = now.getHours()
+			return `${mm}月${dd}日 ${hh}時`
 		},
 		//** timeSlider */
 		valueModel:{
@@ -156,17 +157,10 @@ export default {
 			return bucket
 		},
 		options(){
-			return this.isMobile?{
-				dotSize: 18,
-				height: 6,
-				width: '100%',
-				tooltip: 'none',
-				max: this.DATES.length ? (this.DATES.length-1) : 0,
-				included:false,
-			}:{
+			return {
 				// dotSize: 5,
-				width: 'auto',
-				height: 10,
+				width:  this.isMobile ? '100%' : 'auto',
+				height: this.isMobile ? '1.5rem' : 10,
 				// contained: true,
 				direction: 'ltr',
 				// data: DATES,
@@ -184,8 +178,10 @@ export default {
 					const dStr = this.DATES[i]
 					if(this.errDateCollection.indexOf()>-1){
 						return "發生錯誤"
+					}else if(this.loading){
+						return "資料載入中"
 					}else{
-						return new Date(dStr).toLocaleString()
+						return this.currentDateTimeString
 					}
 				},
 				// tooltipStyle: void 0,
@@ -198,7 +194,7 @@ export default {
 				// maxRange: void 0,
 				// order: true,
 				included:false,
-				marks: this.MARKS,
+				marks: this.isMobile?false:this.MARKS,
 				// dotOptions: void 0,
 				// process: true,
 				// dotStyle: void 0,
@@ -224,6 +220,7 @@ export default {
 	color:#fff;
 	display: flex;
 	align-items:center;
+	position: relative;
 	&__title{
 		white-space: nowrap;
 		padding: 0 1rem;
@@ -250,18 +247,34 @@ export default {
 	display: flex;
 	align-items: center;
 	width:100%;
-    padding: 1.5rem;
     background: rgba(0,0,0,0.3);
 	&__label{
 		width: 170px;
+		padding: 1rem;
 		margin-right: 1rem;
 		color: #fff;
 		font-weight: bolder;
 		font-size: 1.1rem;
 	}
+	/** x and left */
+	&__start /deep/{
+		.vue-slider-dot-tooltip-top{
+			transform: translate(-10%,-100%);
+		}
+		.vue-slider-dot-tooltip-inner-top::after{
+			left: 10%;
+		}
+	}
+	&__end /deep/{
+		.vue-slider-dot-tooltip-top{
+			transform: translate(-90%,-100%);
+		}
+		.vue-slider-dot-tooltip-inner-top::after{
+			left: 90%;
+		}
+	}
 	/deep/ {
 		.el-loading-spinner{
-			top: 100%!important;
 			.circular{
 				width: 15px !important;
 				height: 15px !important;
@@ -269,6 +282,12 @@ export default {
 		} 
 		.vue-slider{
 			padding: 0 !important
+		}
+		.vue-slider-rail{
+			background: transparent;
+		}
+		.vue-slider-dot-handle{
+			visibility: hidden;
 		}
 	}
 }
@@ -286,10 +305,10 @@ export default {
 	/** x and left */
 	&__start /deep/{
 		.vue-slider-dot-tooltip-top{
-			transform: translate(-5%,-100%);
+			transform: translate(-10%,-100%);
 		}
 		.vue-slider-dot-tooltip-inner-top::after{
-			left: 5%;
+			left: 10%;
 		}
 	}
 	&__end /deep/{
@@ -315,7 +334,7 @@ export default {
 			&::after{
 				content:"";
 				position: absolute;
-				background-color: $info !important; // rgba(0, 0, 0, 0.3) 
+				// background-color: $info !important; // rgba(0, 0, 0, 0.3) 
 				width: 100vw;
 				height: 100%;
 				top: 0;
@@ -324,23 +343,7 @@ export default {
 				left: 0;
 			}
 		}
-		.vue-slider-mark{
-			width: 0 !important;
-		}
-		.vue-slider-mark-label {
-			padding: 0.15rem 0.25rem;
-			background-color: rgba(0,0,0,0.3);
-			margin-top: 0 !important;
-			transform:translateX(0) !important;
-			color: #ffffff;
-			width: 100vw;
-		}
-		.vue-slider-mark-step {
-			box-shadow: none !important;
-			background-color: #ffffff !important;
-			width: 3px;
-			border-radius: 0;
-		}
+		
 	}
 	
 }
@@ -364,6 +367,28 @@ export default {
 	.vue-slider-process {
 		background-color: $primary !important;
 		border-radius: 0 !important;
+	}
+	.vue-slider-mark{
+		width: 0 !important;
+	}
+	.vue-slider-mark-label {
+		padding: 0.15rem 0.25rem;
+		background-color: rgba(0,0,0,0.3);
+		margin-top: 0 !important;
+		transform:translateX(0) !important;
+		color: #ffffff;
+		width: 100vw;
+	}
+	
+	.vue-slider-mark:nth-last-of-type(1) .vue-slider-mark-label{
+		background-color:transparent;
+	}
+
+	.vue-slider-mark-step {
+		box-shadow: none !important;
+		background-color: #ffffff !important;
+		width: 3px;
+		border-radius: 0;
 	}
 }
 

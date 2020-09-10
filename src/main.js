@@ -1,5 +1,6 @@
-//import { register } from 'register-service-worker'
-
+// import { register } from 'register-service-worker'
+// import './registerServiceWorker'
+//TODO: Move to state to custom notification style ?
 if ("serviceWorker" in navigator) {
 
     function listenForWaitingServiceWorker(reg, callback) {
@@ -22,7 +23,15 @@ if ("serviceWorker" in navigator) {
         console.log("[PWA] active service worker found, no need to register");
         navigator.serviceWorker.getRegistration().then(function(reg) {
             console.log("[PWA] try update service worker");
-            reg.update();
+            //reg.update();
+            function promptUserToRefresh(sw) {
+                var yn = confirm("有新版本!!  是否重新整理?"); // TODO: better way!!
+                if (yn) {
+                    sw.postMessage('skipWaiting');
+                    location.reload();
+                }
+            }
+            listenForWaitingServiceWorker(reg, promptUserToRefresh);
         });
     } else {
         // Register the service worker
@@ -33,8 +42,6 @@ if ("serviceWorker" in navigator) {
                 console.log("[PWA] Service worker has been registered for scope: " + reg.scope);
                 localStorage.setItem('pwa', 'install')
             });
-        // Load controlled and uncontrolled pages once the worker is active.
-        //navigator.serviceWorker.ready.then(reload);
     }
 }
 
@@ -56,10 +63,6 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(fas, fab, far)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
-
-/** @see https://github.com/FortAwesome/vue-fontawesome#processing-i-tags-into-svg-using-font-awesome*/
-import { dom } from '@fortawesome/fontawesome-svg-core'
-dom.watch()
 
 // VUEX
 import store from './store'

@@ -1,6 +1,20 @@
 <template lang="pug">
 //- 天氣
 div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
+    .col(v-if="!isMobile")
+        el-button(
+            style="margin: 0 0 0.5rem 0;color: #fff;"
+            @click="SET_WINDY_OPTION({visible:true})"
+            size="mini"
+            circle
+        )
+            strong.layerWeather__label(
+                v-if="textLabelVisible"
+                style="position:absolute;right:130%;"
+            ) Windy 地圖
+            div
+                img(src="@/assets/windy_icon.png" style="max-width:1rem;")
+
     //- mobile only show actived
     div(v-if="isMobile")
         //- Exsist actived layer condition
@@ -9,7 +23,7 @@ div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
             :title="activedLayer.title"
             type="primary"
             :class="getGroupBtnClassName()"
-            @click="$parent.$emit('openDrawer','海情/海象資訊')"
+            @click="$parent.$parent.$emit('openDrawer','海情/海象資訊')"
             size="mini"
             circle
         )
@@ -22,7 +36,7 @@ div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
             title="選擇海情/海象資訊"
             type="primary"
             :class="getGroupBtnClassName()"
-            @click="$parent.$emit('openDrawer','海情/海象資訊')"
+            @click="$parent.$parent.$emit('openDrawer','海情/海象資訊')"
             size="mini"
             circle
         )   
@@ -73,22 +87,9 @@ div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
                         font-awesome-icon(:icon="lyr.icon" fixed-width)
     //- others
     .col(v-if="!isMobile")
-        el-button(
-            style="margin: 0 0 0.5rem 0;"
-            @click="SET_WINDY_OPTION({visible:true})"
-            size="mini"
-            circle
-        )
-            strong.layerWeather__label(
-                v-if="textLabelVisible"
-                style="position:absolute;right:130%;"
-            ) Windy 地圖
-            div
-                img(src="@/assets/windy_icon.png" style="max-width:1rem;")
-
         //- other
         el-button(
-            style="margin: 0 0 0.5rem 0;"
+            style="margin: 0 0 0.5rem 0;color: #fff;"
             @click="textLabelVisible=!textLabelVisible"
             title="文字顯示與否"
             size="mini"
@@ -97,15 +98,14 @@ div(:class="isMobile?'layerWeather--mobile':'layerWeather'")
         )
             div
                 font-awesome-icon(:icon="textLabelVisible?'chevron-circle-right':'chevron-circle-left'" fixed-width )
-
         //- detail
         el-button(
-            style="margin: 0 0 0.5rem 0;"
+            style="margin: 0 0 0.5rem 0;color: #fff;"
             title="詳細資料"
             size="mini"
             circle
             type="text"
-            @click="$parent.$emit('openDrawer','海情/海象資訊')"
+            @click="$parent.$parent.$emit('openDrawer','海情/海象資訊')"
         )
             div
                 font-awesome-icon(icon="bars" fixed-width )
@@ -184,6 +184,10 @@ export default {
             const lyrs = this.normalWLyr
             return [
                 {
+                    name:"",
+                    data: lyrs.filter(i=>!(/OCM|巡防艇|巡護船|交通船|海域預報|海域預報|異常波浪|動力小船/g.test(i.title)))
+                },
+                {
                     name:"OCM 預報",
                     icon:"tachometer-alt",
                     data: lyrs.filter(i=>/OCM/g.test(i.title))
@@ -202,10 +206,6 @@ export default {
                     name:"波浪",
                     icon:"wave-square",
                     data: lyrs.filter(i=>/海域預報|異常波浪/g.test(i.title))
-                },
-                {
-                    name:"",
-                    data: lyrs.filter(i=>!(/OCM|巡防艇|巡護船|交通船|海域預報|海域預報|異常波浪|動力小船/g.test(i.title)))
                 }
             ]
         }

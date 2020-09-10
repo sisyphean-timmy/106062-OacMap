@@ -36,21 +36,22 @@ div
 
 	//- CUSTOM CONER UI
 	.tr
-		//- 海域遊憩活動一站式資訊平臺
-		div(style="margin-bottom:1rem;")
-			el-button(
-				@click="$emit('openDrawer')" 
-				title="海域遊憩活動一站式資訊平臺"
-				size="mini"
-				circle
-				type="warning"
-				style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
-			)
-				strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
-				div
-					font-awesome-icon(icon="bell" fixed-width)
-		//- 海情
-		layerWeather
+		navbar
+		//- //- 海域遊憩活動一站式資訊平臺
+		//- div(style="margin-bottom:1rem;")
+		//- 	el-button(
+		//- 		@click="$emit('openDrawer')" 
+		//- 		title="海域遊憩活動一站式資訊平臺"
+		//- 		size="mini"
+		//- 		circle
+		//- 		type="warning"
+		//- 		style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
+		//- 	)
+		//- 		strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
+		//- 		div
+		//- 			font-awesome-icon(icon="bell" fixed-width)
+		//- //- 海情
+		//- layerWeather
 	.tl
 		tools(@resultClick="resultClick")
 
@@ -65,6 +66,7 @@ import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import pageHeader from '@/components/common/pageHeader'
 import isoheStation from "@/components/mark/isoheStation"
+import navbar from "@/components/navbar"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import layerWeatherTool from "@/components/layer/layerWeatherTool"
@@ -92,7 +94,8 @@ export default {
 		tools,
 		layer,
 		layerWeatherTool,
-		layerWeather
+		layerWeather,
+		navbar
 	},
 	watch:{
 		allResultLength:{

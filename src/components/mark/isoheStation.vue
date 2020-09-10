@@ -12,7 +12,7 @@
 				style="float:right;margin:0.5rem 0;"
 				title="查看資料來源"
 			)
-
+			
 		//- 圖表 或 水平捲
 		template(v-if="dirScrollBarVisibility")
 			.scroll
@@ -29,7 +29,7 @@
 				key="chart" 
 				v-bind="historyChartOptions"
 			)
-
+		small 在圖表上移動到特定時間，下方表格會呈現對應的資料
 		//- 項目卡片
 		.cardGrid
 			//- tideData

@@ -1,12 +1,10 @@
 <template lang="pug">
-div
-
 .tools
 	//- 搜尋
 	el-button(
 		circle
 		type="primary" 
-		@click="$parent.$emit('openSearchDialog')"
+		@click="$parent.$emit('openDialog','搜尋')"
 	)
 		.tools__button
 			font-awesome-icon(icon="search" fixed-width size="lg")
@@ -35,7 +33,7 @@ div
 		@click="locateCurrent()"
 	)
 		.tools__button
-			font-awesome-icon(icon="crosshairs" fixed-width  size="lg")
+			font-awesome-icon(icon="map-marker-alt" fixed-width  size="lg")
 
 </template> 
 
@@ -55,6 +53,9 @@ export default {
 			commonState:"common/common/state",
 			layerState:"layer/layer/state"
 		}),
+		currentTag(){
+			return this.commonState("currentTag")["label"]
+		},
 		layerVisibility(){
 			return  this.commonState("layerCardVisible")
 		},

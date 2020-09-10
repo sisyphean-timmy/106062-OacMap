@@ -1,6 +1,16 @@
 <template lang="pug">
 //- 天氣
 .layerWeather(v-loading="loading")
+    .col
+        el-button(
+            @click="SET_WINDY_OPTION({visible:true});$parent.$emit('close')"
+            size="mini"
+            round
+        )
+            div(style="display: flex;align-items: center;")
+                img(src="@/assets/windy_icon.png" style="max-width:1rem;margin-right:0.5rem;")
+                strong Windy 地圖
+                
     transition-group(name='slide-fade-up' class="col" mode="out-in")
         //- grouped parent
         template(v-for="group in normalWLyrGroupModel")
@@ -17,15 +27,7 @@
                 div(style="display: flex;align-items: center;")
                     font-awesome-icon(:icon="lyr.icon" fixed-width style="margin-right:0.5rem;")
                     span {{lyr.title}}
-    .col
-        el-button(
-            @click="SET_WINDY_OPTION({visible:true});$parent.$emit('close')"
-            size="mini"
-            round
-        )
-            div(style="display: flex;align-items: center;")
-                img(src="@/assets/windy_icon.png" style="max-width:1rem;margin-right:0.5rem;")
-                strong Windy 地圖
+    
 
 </template>
 

@@ -67,10 +67,11 @@ export default {
 			}
 		},
 		tags(){
-            if(!layerTag) return
-			let qSearchs = []
-			Object.keys(layerTag.tourism).forEach(k => {
-				layerTag.tourism[k].forEach(v=>{
+            if(!this.layerTag) return
+            let qSearchs = []
+            const {tourism} = this.layerTag
+			Object.keys(tourism).forEach(k => {
+				tourism[k].forEach(v=>{
 					qSearchs.push({label: v,value: {
 						label: v,
 						value: k
