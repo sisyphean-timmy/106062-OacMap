@@ -9,7 +9,7 @@ div
 		)
 			pageHeader(
 				slot="header"
-				:title="commonState('activedSubject')"
+				title="海域與遊憩資訊總覽"
 				@back="SET_CARD_VISIBLE({key:'layer',bool:false})"
 			)
 
@@ -22,28 +22,42 @@ div
 		style="z-index:10;position:absolute;bottom: 0;"
 	) 
 		result(v-if="resultVisibility")
-		isoheStation(v-else :data="popupData" @caculateHeight="$refs.pullup.caculatePullupHeight()")
 
 		template(slot="fixedFooter")
-			.mask
-			.footer
-				img(style="width:120px;" src="@/assets/logo.png")
-				.footer__r
-					.scaleCoordInfo(ref="scaleCoordInfo")
-					small(style="margin-left:0.5rem;") 人次 {{pageviews}}
+			template(v-if="isTimeInActivedWeatherLayer")
+				timeSlider
+			template(v-else)
+				.mask
+				.footer
+					img(style="width:120px;" src="@/assets/logo.png")
+					.footer__r
+						.scaleCoordInfo(ref="scaleCoordInfo")
+						small(style="margin-left:0.5rem;") 人次 {{pageviews}}
 
 	//- CUSTOM CONER UI
 	.tr
-		navbar(:isMobile="isMobile")
+		//- 海域遊憩活動一站式資訊平臺
+		div(style="margin-bottom:1rem;")
+			el-button(
+				@click="$emit('openDrawer')" 
+				title="海域遊憩活動一站式資訊平臺"
+				size="mini"
+				circle
+				type="warning"
+				style="box-shadow: 0 0 4px 2px rgba(0, 0, 0, .25);"
+			)
+				strong(style="font-size:1.2rem;color:#fff;position:absolute;right:130%;text-shadow: 2px 2px 9px rgba(0,0,0,1);") 海域遊憩活動一站式資訊平臺
+				div
+					font-awesome-icon(icon="bell" fixed-width)
+		//- 海情
+		layerWeather
 	.tl
 		tools(@resultClick="resultClick")
-	
 
 </template> 
 
 <script>
 
-import navbar from "@/components/navbar"
 import tools from "@/components/tools"
 import pullup from "@/components/pullup"
 
@@ -53,6 +67,8 @@ import pageHeader from '@/components/common/pageHeader'
 import isoheStation from "@/components/mark/isoheStation"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
+import timeSlider from "@/components/common/timeSlider"
+import layerWeather from "@/components/layer/layerWeather"
 
 export default {
 	name:"mapuixs",
@@ -70,39 +86,44 @@ export default {
 		uiDoms: null,
 	}),
 	components:{
-		navbar,
 		result,
 		pageHeader,
 		pullup,
 		tools,
-        layer,
-        isoheStation
+		layer,
+		timeSlider,
+		layerWeather
 	},
 	watch:{
-        resultVisibility:{
-            handler(bool){
-                this.pullupStatus = bool && this.allResultLength || this.popupData ? 'top': 'close'
-            },
-            immediate:true
-        },
-        allResultLength:{
-            handler(cnt){
-                if(cnt && this.$refs.pullup){
-                    this.$refs.pullup.toggleUp()
-                    this.$refs.pullup.caculatePullupHeight()
-                }
-            }
-        },
+		allResultLength:{
+			handler(cnt){
+				if(cnt && this.$refs.pullup){
+					this.$refs.pullup.toggleUp()
+					this.$refs.pullup.caculatePullupHeight()
+				}
+			}
+		},
 		popupData:{
 			handler(){
 				this.$nextTick(()=>{
-                    if(this.$refs.pullup){
-                        this.SET_CARD_VISIBLE({key:"result",bool:false})
-                        this.$refs.pullup.toggleUp()
-                        this.$refs.pullup.caculatePullupHeight()
-                    }
-                })
+					if(this.$refs.pullup){
+						this.SET_CARD_VISIBLE({key:"result",bool:false})
+						this.$refs.pullup.toggleUp()
+						this.$refs.pullup.caculatePullupHeight()
+					}
+				})
 			}
+		},
+		isTimeInActivedWeatherLayer:{
+			handler(bool){
+				this.$nextTick(()=>{
+					const dom = this.$refs.scaleCoordInfo
+					if(!bool && dom){
+						this.$InitIns.mountScaleDom(dom)
+					}
+				})
+			},
+			immediate:true
 		}
 	},
 	computed:{
@@ -110,8 +131,12 @@ export default {
 			isMobile:"common/common/isMobile",
 			allResultLength:"result/result/allResultLength",
 			commonState:"common/common/state",
+			layerState:"layer/layer/state",
 			weatherLayer:"layer/layer/weatherLayer"
 		}),
+		isTimeInActivedWeatherLayer(){
+			return this.layerState("activedWeatherLyr")["times"].length
+		},
 		layerVisibility(){
 			let bool = this.commonState("layerCardVisible")
 			this.toggleUIFade(!bool) 
@@ -128,11 +153,11 @@ export default {
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-        }),
-        resultClick(){
-            this.SET_CARD_VISIBLE({key:'result',bool:true})
-            this.$refs.pullup.toggleUp()
-        },
+		}),
+		resultClick(){
+			this.SET_CARD_VISIBLE({key:'result',bool:true})
+			this.$refs.pullup.toggleUp()
+		},
 		/** UI 隨資訊卡片上下拉動 淡出、入 @overload +1 */
 		toggleUIFade(boolOrNumber){
 			if(!this.uiDoms) return
@@ -172,7 +197,6 @@ export default {
 	},
 	mounted(){
 		this.uiDoms = document.querySelectorAll(".tr,.tl")
-		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
 	}
 }
 </script>
@@ -225,7 +249,8 @@ export default {
 	.tr,.tl{
 		position:  absolute;
 		z-index: 2;
-		top: 1rem;bottom: auto;
+		top: 2rem;
+		bottom: auto;
 		&>*{
 			position: relative;
 		}

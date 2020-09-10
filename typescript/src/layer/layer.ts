@@ -9,8 +9,10 @@ const uuidv4 = require('uuid/v4')
 import { GeojsonLayer } from "./geojsonLayer"
 import { 
     GradientLayer,
-    WaveGradientLayer
+    WavePeriodGradientLayer,
+    WaveHeightGradientLayer
 } from "./gradient/gradientLayer"
+
 import { VelocityLayer } from "./velocity/L.VelocityLayer"
 import { FileLayer} from "./fileLayer"
 import { TyphoonLayer } from "./typhoonLayer"
@@ -167,7 +169,8 @@ export class Layer {
                     "clusterMark":clusterMarkerLayer,
                     "markScenicSpot":ScenicSpotLayer,
                     "markIsoheStation":IsoheStationLayer,
-                    "waveGradientLayer":WaveGradientLayer,
+                    "wavePeriodGradient":WavePeriodGradientLayer,
+                    "waveHeightGradient":WaveHeightGradientLayer,
                     "fileLayer":FileLayer,
                     "typhoonLayer":TyphoonLayer
                 }

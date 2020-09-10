@@ -110,7 +110,7 @@ export default {
         sortableLayer: (state, getters) => {
             return state.layer.filter(l => {
                 let tagMatch = true
-                if (getters._currentTag) {
+                if (getters._currentTag && l.tag) {
                     tagMatch = l.tag.indexOf(getters._currentTag) > -1
                 }
                 return /filelayer|geojson/ig.test(l.type) && tagMatch
@@ -120,7 +120,7 @@ export default {
         weatherLayer: (state, getters) => {
             return state.layer.filter(l => {
                 let tagMatch = true
-                if (getters._currentTag) {
+                if (getters._currentTag && l.tag) {
                     tagMatch = l.tag.indexOf(getters._currentTag) > -1
                 }
                 return /heatmap|velocity|gradient/ig.test(l.type) && tagMatch
@@ -130,7 +130,7 @@ export default {
         pointerLayer: (state, getters) => {
             return state.layer.filter(l => {
                 let tagMatch = true
-                if (getters._currentTag) {
+                if (getters._currentTag && l.tag) {
                     tagMatch = l.tag.indexOf(getters._currentTag) > -1
                 }
                 return /cluster|mark/ig.test(l.type) && tagMatch
