@@ -39,9 +39,11 @@ div
     //-                 p 使用者進入本系統，視同同意上開使用規範。本系統所有資料僅限正常查詢、瀏覽使用，未經本會同意之大量抄錄或複製資料行為，將依違反著作權法及妨礙電腦使用罪辦理
     //-                 el-divider
     //-                 small 本系統版權及管理機關為海洋委員會。
-    template(v-if="value==='相關連結'")
+    template(v-if="value==='相關資訊'||value==='相關連結'")
+        h3(v-if="value==='相關資訊'") 相關連結
         photoLink(:links="links")
-    template(v-else-if="value==='活動申請'")
+    template(v-if="value==='相關資訊'||value==='活動申請'")
+        h3(v-if="value==='相關資訊'") 活動申請
         p
             el-link(type="primary" icon="el-icon-link" @click="$openLink('https://www.icellars.tw/keelungreeffishing/auth/login.html')")
                 strong 基隆市島礁磯釣活動
@@ -63,7 +65,8 @@ div
             br
             small 遊憩活動申請須知及相關附件
 
-    template(v-else-if="value==='使用條約'")
+    template(v-if="value==='相關資訊'||value==='使用條約'")
+        h3(v-if="value==='相關資訊'") 使用條約
         div(style="padding:0 1rem;")
             p 本系統係為便利一般民眾單站視覺化查詢海域遊憩活動相關規定，所呈現之法規、公告資料為各主管機關、各縣市政府所提供資料彙整而得，因各主管機關、各縣市資料建置時間之差異及建檔品質，與實際公告或有不同，實際內容仍依各主管機關、各縣市政府公告為準。
             p 使用者不得將本系統所提供之資料內容或查詢結果作為任何形式之依據或主張，本會對於所有資料內容之正確性及完整性，皆不負擔保之責。使用者如因使用本系統之資料而受損害或損失，或因此導致使用者或第三人遭受損害或損失而遭求償者，本系統管理機關及各資料提供機關不負任何賠償或補償之責。
@@ -71,22 +74,21 @@ div
             p 使用者進入本系統，視同同意上開使用規範。本系統所有資料僅限正常查詢、瀏覽使用，未經本會同意之大量抄錄或複製資料行為，將依違反著作權法及妨礙電腦使用罪辦理
             el-divider
             small 本系統版權及管理機關為海洋委員會。
-    //- .info__footer
-    //-     el-link(
-    //-         @click="$openLink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" 
-    //-         title="用戶意見回饋" 
-    //-         size="mini"
-    //-     )
-    //-         font-awesome-icon(icon="envelope" fixed-width)
-    //-         small  用戶意見回饋
-    //-     el-divider(direction="vertical")
-    //-     el-link(
-    //-         @click="resetLocalStorageThenEmit" 
-    //-         title="加到主畫面說明"
-    //-         size="mini"
-    //-     )
-    //-         font-awesome-icon(icon="mobile-alt" fixed-width)
-    //-         small  加到主畫面說明
+    .info__footer
+        el-link(
+            @click="$openLink('https://docs.google.com/forms/d/e/1FAIpQLScf7at41snW4-ZczKN3p2hR8M9VKj_Af82BWEsZg6uPfwnY3Q/viewform')" 
+            title="用戶意見回饋" 
+            size="mini"
+        )
+            font-awesome-icon(icon="envelope" fixed-width)
+            small  用戶意見回饋
+        el-divider(direction="vertical")
+        el-link(
+            @click="resetLocalStorageThenEmit" 
+            title="加到主畫面說明"
+        )
+            font-awesome-icon(icon="mobile-alt" fixed-width)
+            small  加到主畫面說明
 
 </template>
 
@@ -146,11 +148,10 @@ export default {
         photoLink
     },
     methods:{
-        // resetLocalStorageThenEmit(){
-        //     localStorage.setItem("neverShowAddToScreen", false)
-        //     this.$parent.$emit('close')
-        //     this.$parent.$emit('openAddToHomeScreen')
-        // }
+        resetLocalStorageThenEmit(){
+            localStorage.setItem("neverShowAddToScreen", false)
+            this.$openDialog({title:"加至主畫面說明"})
+        }
     }
 }
 

@@ -19,14 +19,14 @@
 
 		//- CUSTOM CONER UI
 		.tr
-			toolTopRight
+			searchAndFilterLayer
 		.tl
 			tools
 		.br
 			layerWeatherTool
-			div(style="display:flex;align-items:center;justify-content:flex-end;margin-top:1rem;")
+			div(style="display:flex;align-items:flex-end;flex-direction:column;justify-content:flex-end;margin-top:1rem;")
 				.scaleCoordInfo(ref="scaleCoordInfo")
-				small(style="margin-left:1rem;color:#fff;") 人次 {{pageviews}}
+				small(style="margin-top:0.5rem;color:#fff;") 海域遊憩活動一站式資訊平臺 累計瀏覽 {{pageviews}}
 		.bl
 			img(style="max-width:180px;" src="@/assets/logo.png")
 		.mask
@@ -40,7 +40,7 @@ import Vue from 'vue'
 import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import tools from "@/components/tools"
-import toolTopRight from "@/components/toolTopRight"
+import searchAndFilterLayer from "@/components/searchAndFilterLayer"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
@@ -61,7 +61,7 @@ export default {
 		layer,
 		pageHeader,
 		tools,
-		toolTopRight,
+		searchAndFilterLayer,
 		layerWeatherTool
 	},
 	computed:{

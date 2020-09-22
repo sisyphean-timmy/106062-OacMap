@@ -30,17 +30,12 @@ npm run build
 * `./src/sw.js` 工作線程，使用`copy-webpack-plugin`複製、注入以 `git-describe` 產生的 cahce Name (含版本號)
 * 基於 workbox [workbox api](https://developers.google.com/web/tools/workbox/modules/workbox-webpack-plugin)
 
-#### ./public/layerDef
-#### ./public/layerDef
-#### ./public/layerTag
-#### ./src/assets/legend.json
-* `layerName:string` 圖層名稱正規字串
-* `label:string` 標籤名稱+單位
-* `type:"color"|"text"`
-    * `colorScaleLabel` 顏色尺度-數值(降冪)
-    * `colorScaleValue` 顏色尺度-顏色(降冪)
-* `type:"text"`
-    * `colorScaleName` 顏色尺度 對應文字(不限排序)
+
+#### ./public
+* 這邊的東西會直接複製到`dist/`
+#### ./public/layerTag 圖層標籤設定
+#### ./public/layerDef 要載入的圖層設定
+#### ./public/layerCatelog 圖層分類設定
 
 #### ./typescript
 * `typescript/init` leaflet map 初始化 
@@ -49,7 +44,6 @@ npm run build
 #### ./src
 * `src/main.js` 配置 Vue 引用模塊等
 * `src/store.js` Vuex 狀態配置 : 自動匹配 `./components` 中任意資料夾的 `*.js` 作為狀態，並以路徑的資料夾名稱做為狀態的命名空間
-* `src/sw.js` service worker主程式, 匯入workbox打包後的檔案列表`sw-manifest.js`, 並存入快取, (目前)其他資源直接bypass
 * `src/custom.scss` 主題顏色變數、全局樣式
 * `src/element-variables.scss` ELEMENT UI 樣式
 * `./src/assets/legend.json`
@@ -65,12 +59,6 @@ npm run build
 * `components/common` 共用組件及狀態
 * `components/layer` 圖層組件 及 快照狀態(只記錄地圖實例中圖層的部分屬性)
 * `components/result` 查詢結果組件及狀態
-
-#### ./public
-* 這邊的東西會直接複製到`dist/`
-* `public/layerDef.json` 要載入的圖層設定
-* `public/layerTag.json` 圖層標籤設定
-* `public/layerCatelog.json` 圖層分類設定
 
 #### 其他
 * [leaflet TS、ES MODULE](https://cli.vuejs.org/config/)

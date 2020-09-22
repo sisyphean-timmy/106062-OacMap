@@ -307,14 +307,22 @@
             "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
             "visible": false,
             "type": "wavePeriodGradient",
-            "tag": ["A", "B", "C", "D"]
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor",
+                "dpx": 2
+            }
         },
         {
             "title": "波浪浪高_臺灣海域預報",
             "url": "https://ocean.taiwan.gov.tw/OpenData/SeaDirHsT/index.json",
             "visible": false,
             "type": "waveHeightGradient",
-            "tag": ["A", "B", "C", "D"]
+            "tag": ["A", "B", "C", "D"],
+            "layerOption": {
+                "interpolateType": "nearestneighbor",
+                "dpx": 2
+            }
         },
         {
             "title": "表面海流_OCM模式",

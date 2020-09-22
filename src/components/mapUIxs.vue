@@ -20,21 +20,22 @@ div
 		v-model="pullupStatus"
 		@move="toggleUIFade(1-$event)"
 		style="z-index:10;position:absolute;bottom: 0;"
-        @click.native="$refs.pullup.caculatePullupHeight()"
+		@click.native="$refs.pullup.caculatePullupHeight()"
 	) 
 		result
 		template(slot="fixedFooter")
 			.footer
-				img(style="width:120px;" src="@/assets/logo.png")
-				.footer__r
+				div(style="display:flex;justify-content: space-between;")
+					img(style="width:140px;" src="@/assets/logo.png")
 					.scaleCoordInfo(ref="scaleCoordInfo")
-					small(style="margin-left:0.5rem;") 人次 {{pageviews}}
+				div(style="margin:0.5rem 0 -0.5rem 0;color:#fff;")
+					small 海域遊憩活動一站式資訊平臺 累計瀏覽 {{pageviews}}
 				.mask(style="z-index: -1;position: absolute;width: 100%;")
 			layerWeatherTool
 
+	searchAndFilterLayer
 	//- CUSTOM CONER UI
 	.tr
-		toolTopRight
 	.tl
 		tools
 
@@ -42,7 +43,7 @@ div
 
 <script>
 
-import toolTopRight from "@/components/toolTopRight"
+import searchAndFilterLayer from "@/components/searchAndFilterLayer"
 import tools from "@/components/tools"
 import pullup from "@/components/pullup"
 
@@ -72,8 +73,8 @@ export default {
 		tools,
 		layer,
 		layerWeatherTool,
-		toolTopRight
-    },
+		searchAndFilterLayer
+	},
 	computed:{
 		...mapGetters({
 			commonState:"common/common/state"
@@ -84,7 +85,7 @@ export default {
 		pageviews(){
 			return this.commonState("GACount").pageviews
 		}
-    },
+	},
 	methods:{
 		...mapMutations({
 			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
@@ -128,22 +129,22 @@ export default {
 	},
 	mounted(){
 		this.uiDoms = document.querySelectorAll(".tr,.tl")
-        this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
-        /** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
-        this.$store.subscribe(async (mutation, state) => {
-            if(mutation.type === "common/common/SET_CARD_VISIBLE"){
-                const {key,bool}= mutation.payload
-                if(key!=="result") return
-                const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))
-                if(bool){
-                    pullup.toggleUp()
-                    pullup.caculatePullupHeight()
-                }else{
-                    pullup.toggleDown()
-                    this.pullupStatus = "close"
-                }
-            }
-        })
+		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
+		/** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
+		this.$store.subscribe(async (mutation, state) => {
+			if(mutation.type === "common/common/SET_CARD_VISIBLE"){
+				const {key,bool}= mutation.payload
+				if(key!=="result") return
+				const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))
+				if(bool){
+					pullup.toggleUp()
+					pullup.caculatePullupHeight()
+				}else{
+					pullup.toggleDown()
+					this.pullupStatus = "close"
+				}
+			}
+		})
 	}
 }
 </script>
@@ -157,11 +158,9 @@ export default {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		&__r{
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			color:#fff;
+		flex-direction: column;
+		&>*{
+			width: 100%;
 		}
 	}
 

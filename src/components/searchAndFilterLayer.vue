@@ -17,13 +17,22 @@
             :value="i.value"
         )
         template(slot="prefix")
-            el-button(
-                style="position:absolute;"
-                circle
-                type="primary" 
+            font-awesome-icon.search__icon(
+                :class="{'search__icon--actived':selectedTagModel}"
+                :icon="selectedTagModel ? 'swimmer' : 'search'" 
+                fixed-width
+                size="lg"
             )
-                .tools__button
-                    font-awesome-icon(icon="swimmer" fixed-width size="lg")
+
+    el-button(
+        slot='reference'
+        size="small"
+        circle
+        type="warning"
+        @click="$openDrawer({title:'相關資訊', dir:'rtl'})"
+    )
+        font-awesome-icon(icon="plus" fixed-width size="lg")
+
 </template>
 
 <script>
@@ -59,11 +68,8 @@ export default {
 						console.error("error {value}",value)
 						console.error("error tag in layer",l)
 					}
-					console.log(l.title,visible)
 					this.$LayerIns.setVisible(l.id,visible)
                 })
-                
-                this.$parent.$emit("close")
 			}
         },
         tags(){
@@ -104,30 +110,46 @@ export default {
 
 <style lang="scss" scoped>
     
+    
+
 	.search{
-		margin:0.5rem 0 !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
 		/deep/ {
-			.el-input{
-				&__prefix{
-					left:0;
-				}
-				&__inner{
-					padding-left: 55px;
-					border-radius: 999px !important;
-					box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-				}
-			}
+            .el-input{
+                border-radius: 999px !important;
+                overflow: hidden;
+                box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
+                &__prefix{
+                    left:0;
+                    background: $primary;
+                    border-radius: 100% !important;
+                }
+                &__inner{
+                    padding-left: 55px !important;
+                    border-radius: 999px !important;
+                }
+            }
+            .el-button {
+                box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
+            }
+        }
+
+        &>*{
+            margin:0 0.5rem 0 0; 
 		}
-		.el-button{
-			box-shadow:0 0 6px 3px rgba(0,0,0,0.2);
-		}
-		&>*{
-			margin:0.5rem 0.5rem 0 0;
-		}
+
+        &__icon{
+            width:40px;
+            color:#fff;
+            font-weight: bolder;
+        }
 	}
 
 	.selectItems * {
-		color: $primary !important;
+		color: darken($info,30) !important;
 		font-weight: normal !important;
     }
     
