@@ -10,10 +10,11 @@ self.addEventListener('install', function(evt) {
         console.log('[Service Worker]pre-fetch', PRECACHE);
 
         evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-            var urls = ['./'];
+            var urls = ['/'];
             PRECACHE.forEach(function(val, idx, arr) {
                 urls.push(val.url);
             });
+            console.log("[urls]", urls)
             cache.put('.assets', new Response(JSON.stringify(urls)));
             assets = urls;
             return cache.addAll(urls);

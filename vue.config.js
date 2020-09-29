@@ -13,40 +13,7 @@ const injectStr =
 module.exports = {
     configureWebpack: config => {},
     chainWebpack: config => {
-        config.plugin('InjectManifest')
-            .use(InjectManifest, [{
-                swSrc: './src/sw-manifest.js',
-                compileSrc: false,
-                maximumFileSizeToCacheInBytes: 99999999
-            }])
-        config.plugin('sw-copy')
-            .use(require('copy-webpack-plugin'), [
-                [{
-                    from: 'src/sw.js',
-                    to: 'sw.js',
-                    transform(content, path) {
-                        return injectStr + content;
-                    },
-                }]
-            ])
-        config.plugin('FaviconsWebpackPlugin')
-            .use(FaviconsWebpackPlugin, [{
-                inject: true,
-                cache: true,
-                devMode: 'webapp',
-                prefix: "./img/icons",
-                publicPath: "./",
-                logo: "./src/assets/logoOCA.png",
-                favicons: {
-                    appName: "海域整合資訊",
-                    appDescription: "海域遊憩活動一站式資訊平臺",
-                    developerName: "詮華",
-                    display: "fullscreen",
-                    manifestRelativePaths: "./",
-                    start_url: "../../",
-                    scope: "../../"
-                }
-            }])
+
         if (process.env.NODE_ENV === 'production') {
             config.plugins.delete('preload');
             config.plugins.delete('prefetch');
@@ -54,6 +21,43 @@ module.exports = {
             config.optimization.splitChunks({
                 chunks: 'async'
             })
+
+            config.plugin('InjectManifest')
+                .use(InjectManifest, [{
+                    swSrc: './src/sw-manifest.js',
+                    compileSrc: false,
+                    maximumFileSizeToCacheInBytes: 99999999
+                }])
+
+            config.plugin('sw-copy')
+                .use(require('copy-webpack-plugin'), [
+                    [{
+                        from: 'src/sw.js',
+                        to: 'sw.js',
+                        transform(content, path) {
+                            return injectStr + content;
+                        },
+                    }]
+                ])
+
+            config.plugin('FaviconsWebpackPlugin')
+                .use(FaviconsWebpackPlugin, [{
+                    inject: true,
+                    cache: true,
+                    devMode: 'webapp',
+                    prefix: "./img/icons",
+                    publicPath: "./",
+                    logo: "./src/assets/logoOCA.png",
+                    favicons: {
+                        appName: "海域整合資訊",
+                        appDescription: "海域遊憩活動一站式資訊平臺",
+                        developerName: "詮華",
+                        display: "fullscreen",
+                        manifestRelativePaths: "./",
+                        start_url: "../../",
+                        scope: "../../"
+                    }
+                }])
         }
         config.module.rule('pug')
             .test(/\.pug$/)

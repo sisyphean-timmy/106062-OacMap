@@ -84,25 +84,30 @@ export class GeojsonLayer extends L.GeoJSON implements ILayer{
     /** @override */
     onAdd(map){
         (async()=>{
+            try{
+                this.fireEvent("loading")
+                
+                let data = await this.fetchData()
 
-            let data = await this.fetchData()
+                /** 轉投影 data.crs.properties.name = "urn:ogc:def:crs:OGC:1.3:CRS84" */
+                if(/3857/g.test(data.crs.properties.name)){
+                    const reproject = require('reproject')
+                    const epsg = require('epsg')
+                    data = reproject.toWgs84(data, undefined, epsg)
+                }
 
-            /** 轉投影 data.crs.properties.name = "urn:ogc:def:crs:OGC:1.3:CRS84" */
-            if(/3857/g.test(data.crs.properties.name)){
-                const reproject = require('reproject')
-                const epsg = require('epsg')
-                data = reproject.toWgs84(data, undefined, epsg)
+                this._Geojson = L.geoJSON(data) as L.GeoJSON
+
+                this.setStyle(this.lyrOpts.pathOptions)
+                this._Geojson.addTo(map)
+
+                this.handleQueryClick = this.handleQueryClick.bind(this)
+                this._Geojson.on("click",this.handleQueryClick)
+                
+                this.fireEvent("loaded")
+            }catch(e){
+                this.fireEvent("error")
             }
-
-            this._Geojson = L.geoJSON(data) as L.GeoJSON
-
-            this.setStyle(this.lyrOpts.pathOptions)
-            this._Geojson.addTo(map)
-
-            this.handleQueryClick = this.handleQueryClick.bind(this)
-            this._Geojson.on("click",this.handleQueryClick)
-            
-            this.fireEvent("loaded")
         })()
         return this
     }

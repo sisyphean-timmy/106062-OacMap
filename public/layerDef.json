@@ -332,14 +332,6 @@
             }
         },
         {
-            "title": "颱風路徑",
-            "url": "http://localhost:3000/typhoon",
-            "visible": true,
-            "tag": [],
-            "dataSet": [{ "label": "", "value": "" }],
-            "type": "typhoonLayer"
-        },
-        {
             "title": "觀光景點資訊",
             "url": "./layers/scenic_spot_C_f_2km.json",
             "visible": true,
@@ -401,6 +393,22 @@
                     "description": ["漁港名稱", "類別"]
                 }
             }
+        },
+        {
+            "title": "海面天氣預報(近海海象)",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/CWB_NSea/json/geo_F_A0012_001.json",
+            "visible": true,
+            "dataSet": [{ "label": "臺灣鄰近及遠洋漁業海面天氣預報資料-海面天氣預報(中文版)", "value": "https://opendata.cwb.gov.tw/dataset/forecast/F-A0012-001" }],
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"]
+        },
+        {
+            "title": "颱風路徑",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/CWB_Typhoon/json/W-C0034-001_002.json",
+            "visible": true,
+            "tag": [],
+            "dataSet": [{ "label": "", "value": "" }],
+            "type": "typhoonLayer"
         }
     ]
 }
