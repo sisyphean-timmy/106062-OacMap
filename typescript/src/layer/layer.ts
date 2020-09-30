@@ -14,7 +14,6 @@ import {
 } from "./gradient/gradientLayer"
 
 import { VelocityLayer } from "./velocity/L.VelocityLayer"
-// import { FileLayer} from "./fileLayer"
 import { TyphoonLayer } from "./typhoonLayer"
 import { 
     clusterMarkerLayer,
@@ -23,23 +22,22 @@ import {
 } from "./clusterMarkerLayer"
 
 export class Layer {
-    static catelog:any
+
+    catelog:any
     private _map:L.Map
     
     baseLayerColletion:baseLayerColletion = new Array()
     normalLayerCollection:normalLayerCollection = new Array()
     
-    constructor(map:L.Map){
+    constructor(map:L.Map, catelog:any){
         this._map = map
+        this.catelog = catelog
     }
 
-    static async fetchCatelog() {
-        if(!this.catelog) this.catelog = await(await fetch('./layerCatelog.json')).json()
-    }
-    static getCatelog(title) {
-        let bucket = this.catelog.filter(i=>i.layer.some(_name=>new RegExp(_name,"g").test(title))).map(i=>i.catelog)
-        if(!bucket.length) console.error(`無法取得${title}的分類`)
-        return bucket
+    getCatelog(title) {
+        const result = this.catelog.filter(i=>i.layer.some(_name=>new RegExp(_name,"g").test(title))).map(i=>i.catelog)
+        if(!result.length) console.error(`無法取得${title}的分類`)
+        return result
     }
 
     /** 設置圖層屬性 */
@@ -113,7 +111,7 @@ export class Layer {
 
         // 要移動的目標
         let ptr = this.normalLayerCollection[rvOldIndex]
-        // if(!(ptr instanceof L.TileLayer) && !(ptr instanceof L.GeoJSON)) return
+        console.log(ptr)
 
         if(offset>0){
             ptr.bringToFront() // 會使目標移到最前
@@ -159,62 +157,70 @@ export class Layer {
     }
     
     async addLayer(lyrDefs:any|Array<any>){
-        // try fetch if not fetch before
-        await Layer.fetchCatelog();
 
         if(!Array.isArray(lyrDefs)) lyrDefs = [lyrDefs]
 
-        try{
-            for (const lyrOpts of lyrDefs) {
-                const mapFn = {
-                    "geojson":GeojsonLayer,
-                    "gradient":GradientLayer,
-                    "velocity":VelocityLayer,
-                    "clusterMark":clusterMarkerLayer,
-                    "markScenicSpot":ScenicSpotLayer,
-                    "markIsoheStation":IsoheStationLayer,
-                    "wavePeriodGradient":WavePeriodGradientLayer,
-                    "waveHeightGradient":WaveHeightGradientLayer,
-                    // "fileLayer":FileLayer,
-                    "typhoonLayer":TyphoonLayer
-                }
-                const lyrIns = new mapFn[lyrOpts.type]({
-                    ...lyrOpts,
-                    ...{
-                        id:uuidv4(),
-                        catelog:Layer.getCatelog(lyrOpts.title)
-                    }
-                })
-                this.normalLayerCollection.push(lyrIns)
-                lyrIns.visible && lyrIns.addTo(this._map)
+        for (const lyrOpts of lyrDefs) {
+            const mapFn = {
+                "geojson":GeojsonLayer,
+                "gradient":GradientLayer,
+                "velocity":VelocityLayer,
+                "clusterMark":clusterMarkerLayer,
+                "markScenicSpot":ScenicSpotLayer,
+                "markIsoheStation":IsoheStationLayer,
+                "wavePeriodGradient":WavePeriodGradientLayer,
+                "waveHeightGradient":WaveHeightGradientLayer,
+                "typhoonLayer":TyphoonLayer
             }
-        }catch(e){
-            console.error(e)
-        }finally{
-            console.log("%c added layer : ","background:green;",this.normalLayerCollection)
+            const lyrIns = new mapFn[lyrOpts.type]({
+                ...lyrOpts,
+                id:uuidv4(),
+                catelog:this.getCatelog(lyrOpts.title)
+            })
+            this.normalLayerCollection.push(lyrIns)
+            
+            if(!lyrIns.visible) continue
+
+            lyrIns.addTo(this._map)
+            try{
+                await new Promise((res,rej)=>{
+                    lyrIns.once("loaded",e=>res())
+                    lyrIns.once("error",e=>rej(e))
+                })
+            }catch(e){
+                console.error(`${lyrIns.title}`,e)
+            }
         }
+        console.log("%c added layer : ","background:green;",this.normalLayerCollection)
     }
     
     addBaseLayer(lyrDefs:any|Array<any>){
         if(!Array.isArray(lyrDefs)) lyrDefs = [lyrDefs]
         
-        lyrDefs.forEach((lyrOpts,idx) => {
-            if(lyrOpts.type !== "wmts"){
-                console.error(lyrOpts)
+        lyrDefs.forEach(({
+            type,
+            url,
+            title,
+            opacity,
+            maxZoom,
+            imgUrl
+        },idx) => {
+            if(type !== "wmts"){
+                console.error("addBaseLayer invali type",type)
                 return
             }
             
-            const tileLayer = L.tileLayer(lyrOpts.url, {
-                opacity:lyrOpts.opacity,
-                maxZoom: lyrOpts.maxZoom,
+            const tileLayer = L.tileLayer(url, {
+                opacity,
+                maxZoom,
             }) as any
             
             tileLayer.id = uuidv4()
-            tileLayer.type = lyrOpts.type
-            tileLayer.title = lyrOpts.title
-            tileLayer.visible = idx === (lyrDefs.length-1)// 確保最後一個可見
-            tileLayer.opacity = lyrOpts.opacity
-            tileLayer.imgUrl = lyrOpts.imgUrl
+            tileLayer.type = type
+            tileLayer.title = title
+            tileLayer.visible = idx === (lyrDefs.length-1)
+            tileLayer.opacity = opacity
+            tileLayer.imgUrl = imgUrl
 
             this.baseLayerColletion.push(tileLayer)
             tileLayer.visible && tileLayer.addTo(this._map)  

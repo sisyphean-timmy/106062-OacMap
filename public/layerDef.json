@@ -178,6 +178,19 @@
             }
         },
         {
+            "title": "海面天氣預報(近海海象)",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/CWB_NSea/json/geo_F_A0012_001.json",
+            "visible": true,
+            "dataSet": [{ "label": "臺灣鄰近及遠洋漁業海面天氣預報資料-海面天氣預報(中文版)", "value": "https://opendata.cwb.gov.tw/dataset/forecast/F-A0012-001" }],
+            "type": "geojson",
+            "tag": ["A", "B", "C", "D"],
+            "pathOptions": {
+                "opacity": 0.6,
+                "color": "rgb(156, 39, 176)",
+                "weight": 2
+            }
+        },
+        {
             "title": "交通船、遊艇40呎以下",
             "url": "https://ocean.taiwan.gov.tw/OpenData/SafeSeeMEANWH_5_CONF_Now/json/index.json",
             "visible": false,
@@ -393,14 +406,6 @@
                     "description": ["漁港名稱", "類別"]
                 }
             }
-        },
-        {
-            "title": "海面天氣預報(近海海象)",
-            "url": "https://ocean.taiwan.gov.tw/OpenData/CWB_NSea/json/geo_F_A0012_001.json",
-            "visible": true,
-            "dataSet": [{ "label": "臺灣鄰近及遠洋漁業海面天氣預報資料-海面天氣預報(中文版)", "value": "https://opendata.cwb.gov.tw/dataset/forecast/F-A0012-001" }],
-            "type": "geojson",
-            "tag": ["A", "B", "C", "D"]
         },
         {
             "title": "颱風路徑",

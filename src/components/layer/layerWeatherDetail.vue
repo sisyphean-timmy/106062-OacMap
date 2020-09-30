@@ -22,7 +22,7 @@
                 
     transition-group(name='slide-fade-up' class="col" mode="out-in")
         //- grouped parent
-        template(v-for="group in normalWLyrGroupModel")
+        template(v-for="group in weatherLayerGroup")
             h3(v-if="group.name" :key="group.name") {{group.name}}
             el-button(
                 v-for="lyr in group.data"
@@ -44,98 +44,40 @@
 
 import { mapGetters, mapMutations } from 'vuex'
 
-const DUMMY_LEGEND = require("@/assets/legend")
-const ICON_ENUM = {
-    "風":"wind",
-    "海":"water",
-    "船":"ship",
-    "波浪":"wave-square",
-    "溫度":"thermometer-quarter",
-    "高度":"ruler-vertical",
-    "風險|潛勢":"exclamation-triangle",
-    "鹽度":"tachometer-alt"
-}
 export default {
     name:"layerWeatherDetail",
 	data:()=>({
-		loading:false,
-	}),
-	props:{
-	},
-	components:{
+        loading:false,
+        DUMMY_LEGEND:[]
+    }),
+    async created(){
+        this.DUMMY_LEGEND = await(await fetch('./layerLegend.json')).json()
     },
 	computed:{
 		...mapGetters({
-			layerState:"layer/layer/state",
-			weatherLayer:"layer/layer/weatherLayer"
+            weatherLayer:"layer/weatherLayer"
         }),
         activedLayer(){
-            const {id} = this.layerState('activedWeatherLyr')
-            return this.normalWLyr.find(l=>l.id === id)
+            const {id} = this.$store.state.layer.activedWeatherLyr
+            return this.weatherLayer.find(l=>l.id === id)
         },
-        normalWLyr(){
-            // 增加圖示
-            return this.weatherLayer.map(l=>{
-                let icon = "cloud-sun-rain"
-                Object.keys(ICON_ENUM).forEach(k=>{
-                    if(new RegExp(k,"g").test(l.title)){
-                        icon = ICON_ENUM[k]
-                    }
-                })
-                return {...l,...{icon}}
-            })
-        },
-        normalWLyrGroupModel(){
-            const lyrs = this.normalWLyr
+        weatherLayerGroup(){
             return [
                 {
                     name:"海象",
-                    data:lyrs.filter(i=>/OCM模式|臺灣海域預報/g.test(i.title))
+                    data:this.weatherLayer.filter(i=>/OCM模式|臺灣海域預報/g.test(i.title))
                 }
-                // {
-                //     name:"氣象",
-                //     data:lyrs.filter(i=>/10米風資料_WIFI/g.test(i.title))
-                // }
             ]
         }
-        // normalWLyrGroupModel(){
-        //     const lyrs = this.normalWLyr
-        //     return [
-        //         {
-        //             name:"",
-        //             data: lyrs.filter(i=>!(/OCM|巡防艇|巡護船|交通船|海域預報|海域預報|異常波浪|動力小船/g.test(i.title)))
-        //         },
-        //         {
-        //             name:"OCM 預報",
-        //             icon:"tachometer-alt",
-        //             data: lyrs.filter(i=>/OCM/g.test(i.title))
-        //         },
-        //         {
-        //             name:"船級作業風險",
-        //             icon:"ship",
-        //             data: lyrs.filter(i=>/巡防艇|巡護船|動力小船/g.test(i.title))
-        //         },
-        //         {
-        //             name:"船級舒適度",
-        //             icon:"ship",
-        //             data: lyrs.filter(i=>/交通船/g.test(i.title))
-        //         },
-        //         {
-        //             name:"波浪",
-        //             icon:"wave-square",
-        //             data: lyrs.filter(i=>/海域預報|異常波浪/g.test(i.title))
-        //         }
-        //     ]
-        // }
 	},
 	methods:{
 		...mapMutations({
-			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS",
-			SET_ACTIVED_WEATHER_DATA:"layer/layer/SET_ACTIVED_WEATHER_DATA",
-			SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
+			UPDATE_LAYER_OPTIONS:"layer/UPDATE_LAYER_OPTIONS",
+			SET_ACTIVED_WEATHER_DATA:"layer/SET_ACTIVED_WEATHER_DATA",
+			SET_WINDY_OPTION:"SET_WINDY_OPTION",
         }),
 		closeAllNormalLyr(){
-			this.normalWLyr.forEach(l=>{
+			this.weatherLayer.forEach(l=>{
 				this.$LayerIns.setVisible(l.id,false)
 				this.UPDATE_LAYER_OPTIONS({
 					id:l.id,
@@ -161,7 +103,7 @@ export default {
                 }
                 
                 // 更新狀態及實例
-                this.normalWLyr.forEach(l=>{  
+                this.weatherLayer.forEach(l=>{  
                     const visible = l.id === lyrAwaitToActive.id
                     this.$LayerIns.setVisible(l.id,visible)
                     this.UPDATE_LAYER_OPTIONS({
@@ -172,7 +114,7 @@ export default {
 
                 let payload = {id}
                 // 取得 legend 、保存到狀態、重設圖層實例
-                const legend = DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(lyrAwaitToActive.title))
+                const legend = this.DUMMY_LEGEND.find(l=> new RegExp(l.layerName,"g").test(lyrAwaitToActive.title))
                 console.log("[activedWLyr legend]",legend)
                 if(legend){
                     

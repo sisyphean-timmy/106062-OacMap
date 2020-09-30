@@ -17,7 +17,7 @@ abstract class BaseCluster extends L.Layer implements ILayer{
     visible: boolean
     opacity: number
     dataSet: { label: string; value: string }[]
-
+    status:"loading"|"loaded"|"error"
     icon?: string
     lyrOpts:any
 
@@ -46,27 +46,29 @@ abstract class BaseCluster extends L.Layer implements ILayer{
         this.lyrOpts = lyrOpts
         this.dataSet = dataSet 
 
-        /** Fix XSS by vue's render fn  */
         this.markerClusterGroup = L.markerClusterGroup({
             iconCreateFunction: cluster=> L.divIcon({
-                html: new Vue({
-                    render: h => h(
-                        "div",
-                        {class:"leaflet-mark-icon"},
-                        [
-                            h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
-                                props:{
-                                    icon:this.icon
-                                }
-                            })
-                        ]
-                    )
-                }).$mount().$el as HTMLElement
+                html: this.getIconVM()
             }),
             showCoverageOnHover:false,
             spiderLegPolylineOptions: {opacity:0}
         })
-
+    }
+    
+    getIconVM(){
+        return new Vue({
+            render: h => h(
+                "div",
+                {class:"leaflet-mark-icon"},
+                [
+                    h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
+                        props:{
+                            icon:this.icon
+                        }
+                    })
+                ]
+            )
+        }).$mount().$el as HTMLElement
     }
 
     async fetchData(){
@@ -86,21 +88,9 @@ export class clusterMarkerLayer extends BaseCluster{
         super(opts)
     }
     private _pointToLayer(feature, latlng):L.Marker{
-            const mk = L.marker(latlng, {
-                icon:L.divIcon({
-                    html:new Vue({
-                        render: h => h(
-                        "div",
-                        {class:"leaflet-mark-icon"},
-                        [
-                            h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
-                                props:{
-                                    icon:this.icon
-                                }
-                            })
-                        ]
-                    )
-                }).$mount().$el as HTMLElement
+        const mk = L.marker(latlng, {
+            icon:L.divIcon({
+                html: this.getIconVM()
             })
         })
         mk.on("click",e=>{
@@ -132,15 +122,17 @@ export class clusterMarkerLayer extends BaseCluster{
         
         (async ()=>{
             try{
-                this.fireEvent("loading")
+                this.status = "loading"
                 if(!this.data) this.data = await this.fetchData()
                 const geojson = L.geoJSON(this.data,{
                     pointToLayer:this._pointToLayer.bind(this)
                 })
                 this.markerClusterGroup.addLayer(geojson).addTo(map)
                 this.fireEvent("loaded")
+                this.status = "loaded"
             }catch(e){
-                this.fireEvent("error")
+                this.fireEvent("error",e)
+                this.status = "error"
             }
         })()
 
@@ -160,7 +152,7 @@ export class IsoheStationLayer extends BaseCluster {
     onAdd(map){
         (async ()=>{
             try{
-                this.fireEvent("loading")
+                this.status = "loading"
                 if(!this.data) this.data = await this.fetchData()
                 for (const {DataSet,Name} of this.data.Stations) {
                     for (const k of Object.keys(DataSet)) {
@@ -170,19 +162,8 @@ export class IsoheStationLayer extends BaseCluster {
                             const mk = L.marker(
                                 L.latLng(Latitude,Longitude),{
                                     icon:L.divIcon({
-                                        html:new Vue({
-                                        render: h => h(
-                                            "div",
-                                            {class:"leaflet-mark-icon"},
-                                            [
-                                                h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
-                                                    props:{
-                                                        icon:this.icon
-                                                    }
-                                                })
-                                            ]
-                                        )
-                                    }).$mount().$el as HTMLElement})
+                                        html: this.getIconVM()
+                                    })
                                 }
                             )
                             mk.on("click",e=>{
@@ -215,8 +196,10 @@ export class IsoheStationLayer extends BaseCluster {
                 this.markerClusterGroup.addTo(map)
                 
                 this.fireEvent("loaded")
+                this.status = "loaded"
             }catch(e){
-                this.fireEvent("error")
+                this.fireEvent("error",e)
+                this.status = "error"
             }
         })()
         return this
@@ -293,7 +276,7 @@ export class ScenicSpotLayer extends BaseCluster {
     onAdd(map){
         (async ()=>{
             try{
-                this.fireEvent("loading")
+                this.status = "loading"
                 
                 if(!this.data) this.data = await this.fetchData()
 
@@ -304,8 +287,10 @@ export class ScenicSpotLayer extends BaseCluster {
                 this.markerClusterGroup.addLayer(geojson).addTo(map)
 
                 this.fireEvent("loaded")
+                this.status = "loaded"
             }catch(e){
-                this.fireEvent("error")
+                this.fireEvent("error",e)
+                this.status = "error"
             }
         })()
         return this

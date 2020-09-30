@@ -7,7 +7,7 @@ div
             :title="activedLyr?activedLyr.title:'海情海象資訊'"
             :type="activedLyr?'primary':''"
             key="海情/海象資訊"
-            @click="$openDrawer('海情/海象資訊')"
+            @click="openDrawer('海情/海象資訊')"
             circle
         )
             .tool__btn
@@ -17,7 +17,7 @@ div
         
         template(v-if="!isMobile||collapse")
             el-button(
-                @click="$openDrawer('相關連結')" 
+                @click="openDrawer('相關連結')" 
                 key="相關連結"
                 title="相關連結"
                 circle
@@ -27,7 +27,7 @@ div
                     font-awesome-icon(icon="link" fixed-width)
 
             el-button(
-                @click="$openDrawer('活動申請')" 
+                @click="openDrawer('活動申請')" 
                 key="活動申請"
                 title="活動申請"
                 circle
@@ -37,7 +37,7 @@ div
                     font-awesome-icon(icon="concierge-bell" fixed-width)
 
             el-button(
-                @click="$openDrawer('使用條約')" 
+                @click="openDrawer('使用條約')" 
                 key="使用條約"
                 title="使用條約"
                 circle
@@ -80,59 +80,67 @@ div
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import addToHome from "@/components/addToHome"
 
-const ICON_ENUM = {
-    "風":"wind",
-    "海":"water",
-    "船":"ship",
-    "波浪":"wave-square",
-    "溫度":"thermometer-quarter",
-    "高度":"ruler-vertical",
-    "風險|潛勢":"exclamation-triangle",
-    "鹽度":"tachometer-alt"
-}
+import info from "@/components/info"
+import layerWeatherDetail from "@/components/layer/layerWeatherDetail"
 
 export default {
     name:"toolTopRight",
 	data:()=>({
         collapse:false
 	}),
-	props:{
-	},
-	components:{
-    },
+	props:{},
+	components:{},
 	computed:{
-		...mapGetters({
-			layerState:"layer/layer/state",
-            weatherLayer:"layer/layer/weatherLayer",
-			isAndroid:"common/common/isAndroid",
-			isIOS:"common/common/isIOS",
-			isMobile:"common/common/isMobile"
+        ...mapGetters(["isAndroid","isIOS","isMobile"]),
+        ...mapGetters({
+            weatherLayer:"layer/weatherLayer"
         }),
-        normalWLyr(){
-            // 增加圖示
-            return this.weatherLayer.map(l=>{
-                let icon = "cloud-sun-rain"
-                Object.keys(ICON_ENUM).forEach(k=>{
-                    if(new RegExp(k,"g").test(l.title)){
-                        icon = ICON_ENUM[k]
-                    }
-                })
-                return {...l,...{icon}}
-            })
-        },
         activedLyr(){
-            const {id} = this.layerState('activedWeatherLyr')
-            return this.normalWLyr.find(l=>l.id === id)
+            const {id} = this.$store.state.layer.activedWeatherLyr
+            return this.weatherLayer.find(l=>l.id === id)
         },
-	},
+    },
+    mounted(){
+        if(this.isMobile) this.openAddToHomeScreen()
+    },
 	methods:{
-		// ...mapMutations({
-        // }),
         openAddToHomeScreen(){
-			localStorage.setItem("neverShowAddToScreen", false)
-			this.$openDialog('加至主畫面說明')
-		}
+            localStorage.setItem("neverShowAddToScreen", false)
+            const dialog = this.$dialog({
+                style: {maxWidth:'500px'},
+                props:{
+                    ['close-on-click-modal']:false,
+                    title:"加至主畫面說明"
+                }
+            })
+            dialog.open({...addToHome,store: this.$store})
+        },
+        openDrawer(title){
+            const drawerIns = this.$drawer({
+				props:{
+					title,
+                    size: this.isMobile ? "100%" : "400px",
+				},
+				on:{
+					close:()=>{
+						console.log("drawer close")
+					}
+				}
+            }) 
+            if(title === "海情/海象資訊"){
+                drawerIns.open({...layerWeatherDetail,store:this.$store})
+            }else{
+                drawerIns.open(
+                    {...info,store:this.$store},{ 
+                        props:{
+                            value:title
+                        }
+                    }
+                )
+            }
+        }
 	}
 }
 </script>

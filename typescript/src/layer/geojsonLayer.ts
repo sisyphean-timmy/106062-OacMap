@@ -12,7 +12,7 @@ export class GeojsonLayer extends L.GeoJSON implements ILayer{
     opacity: number
     dataSet: { label: string; value: string }[]
     legendColor: string
-
+    status:"loading"|"loaded"|"error"
     lyrOpts:any
 
     private _Geojson:L.GeoJSON
@@ -85,12 +85,11 @@ export class GeojsonLayer extends L.GeoJSON implements ILayer{
     onAdd(map){
         (async()=>{
             try{
-                this.fireEvent("loading")
-                
+                this.status = "loading"
+
                 let data = await this.fetchData()
 
-                /** 轉投影 data.crs.properties.name = "urn:ogc:def:crs:OGC:1.3:CRS84" */
-                if(/3857/g.test(data.crs.properties.name)){
+                if(data.hasOwnProperty("crs") && /3857/g.test(data.crs.properties.name)){
                     const reproject = require('reproject')
                     const epsg = require('epsg')
                     data = reproject.toWgs84(data, undefined, epsg)
@@ -104,9 +103,11 @@ export class GeojsonLayer extends L.GeoJSON implements ILayer{
                 this.handleQueryClick = this.handleQueryClick.bind(this)
                 this._Geojson.on("click",this.handleQueryClick)
                 
+                this.status = "loaded"
                 this.fireEvent("loaded")
             }catch(e){
-                this.fireEvent("error")
+                this.status = "error"
+                this.fireEvent("error",e)
             }
         })()
         return this
@@ -187,36 +188,39 @@ export class GeojsonLayer extends L.GeoJSON implements ILayer{
     
 
     handleQueryClick(evt:L.LeafletMouseEvent){
-        
-        this.deHighLightPath() // 高亮初始化
-
+        this.deHighLightPath()
+        const result = this.query(evt.latlng, this._map)
+        this._map.fireEvent("geojsonClick", {result})
+    }
+    
+    query(latlng:L.LatLng, map:L.Map){
+        this.deHighLightPath()
         let payload:Array<IQueryResult> = new Array()
 
-        this._map.eachLayer((l:any)=>{
+        map.eachLayer((l:any)=>{
             if(l.visible && l instanceof GeojsonLayer){
-                const pathCollection = l.getFeaturePropertiesBylatlng(evt.latlng)
+                const pathCollection = l.getFeaturePropertiesBylatlng(latlng)
+                const {id,title,catelog,tag} = l
                 pathCollection.forEach(path=>{
                     payload.push({
-                        layerId:l["id"],
-                        layerTitle:l["title"],
-                        layerCatelog:l["catelog"],
-                        tag:l["tag"],
+                        layerId:id,
+                        layerTitle:title,
+                        layerCatelog:catelog,
+                        tag,
                         dataId: uuidv4(),
                         data:path.feature.properties,
                         /** @see https://leafletjs.com/reference-1.6.0.html#map-flytobounds */
                         goTo:flyToBoundsOption=>{
                             this.deHighLightPath()
                             this.highLightPath([path])
-                            this._map.flyToBounds(path.getBounds(),flyToBoundsOption)
+                            map.flyToBounds(path.getBounds(),flyToBoundsOption)
                         }
                     })
                 })
                 this.highLightPath(pathCollection) // 高亮
             } 
         })
-        
-        this._map.fireEvent("geojsonClick", {result:payload})
-
+        return payload
     }
 
 }

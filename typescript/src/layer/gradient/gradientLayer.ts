@@ -10,6 +10,7 @@ export class GradientLayer extends L.Layer implements ILayer{
     visible: boolean
     opacity: number
     dataSet: { label: string; value: string }[]
+    status:"loading"|"loaded"|"error"
 
     protected _canvas:HTMLCanvasElement = null
     protected _frame:any = null
@@ -95,23 +96,28 @@ export class GradientLayer extends L.Layer implements ILayer{
     /** @override */
     onAdd(map){
         (async ()=>{
-            this._canvas = L.DomUtil.create("canvas", "gradient-overlay") as HTMLCanvasElement
+            try{
+                this.status = "loading"
+                this._canvas = L.DomUtil.create("canvas", "gradient-overlay") as HTMLCanvasElement
 
-            let size = map.getSize()
-            this._canvas.width = size.x
-            this._canvas.height = size.y
-    
-            map.getPane("overlayPane").appendChild(this._canvas)
-            
-            map.on(this.getEvents(),this)
-            
-            // get index file and times
-            this.dataIndexDef = await (await fetch(this.lyrOpts.url)).json()
-            this.times = this.dataIndexDef.map(i=>i.time08)
-            
-            await this.setTimeData()
-            this.fireEvent("loaded")
-
+                let size = map.getSize()
+                this._canvas.width = size.x
+                this._canvas.height = size.y
+        
+                map.getPane("overlayPane").appendChild(this._canvas)
+                
+                map.on(this.getEvents(),this)
+                
+                // get index file and times
+                this.dataIndexDef = await (await fetch(this.lyrOpts.url)).json()
+                this.times = this.dataIndexDef.map(i=>i.time08)
+                
+                await this.setTimeData()
+                this.fireEvent("loaded")
+            }catch(e){
+                this.status = "error"
+                this.fireEvent("error",e)
+            }
         })()
         return this
     }

@@ -13,7 +13,7 @@ export class FileLayer extends L.Layer implements ILayer{
     imgUrl?: string
     legendColor?: string
     icon?: string
-    
+    status:"loading"|"loaded"|"error"
     lyrOpts:any
 
     constructor({

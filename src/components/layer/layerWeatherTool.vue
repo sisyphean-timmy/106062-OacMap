@@ -133,10 +133,7 @@ export default {
 		}
 	},
 	computed:{
-		...mapGetters({
-			layerState:"layer/layer/state",
-			isMobile:"common/common/isMobile"
-		}),
+		...mapGetters(["isMobile"]),
 		//** legend */
 		legendGradient(){
 			let gArr = []
@@ -151,7 +148,7 @@ export default {
 			}
 		},
 		legend(){
-			return this.layerState('legend')
+			return this.$store.state.layer.legend
 		},
 		legendVisible(){
 			return this.legend.colorScaleLabel.length && this.legend.colorScaleValue.length
@@ -195,7 +192,7 @@ export default {
 			}
 		},
 		activedWeatherLyr(){
-			return this.layerState("activedWeatherLyr")
+			return this.$store.state.layer.activedWeatherLyr
 		},
 		DATES(){
 			return this.activedWeatherLyr.times

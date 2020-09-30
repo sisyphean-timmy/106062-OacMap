@@ -32,7 +32,6 @@ export class Init {
             this.currentLocationMarkLayer.bindPopup(`目前位置 經度 ${latlng.lng.toFixed(2)} 緯度 ${latlng.lat.toFixed(2)}`)
             this.map.addLayer(this.currentLocationMarkLayer)
         }else{
-            this.currentLocationMarkLayer.remove()
             this.currentLocationMarkLayer.setLatLng(latlng)
         }
         return this.currentLocationMarkLayer

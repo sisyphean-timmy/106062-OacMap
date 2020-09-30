@@ -32,10 +32,12 @@ export default {
 		]
     }),
     computed:{
-		...mapGetters({
-			isAndroid:"common/common/isAndroid",
-			isIOS:"common/common/isIOS",
-		}),
+		isAndroid(){
+			return this.$store.getters.isAndroid
+		},
+		isIOS(){
+			return this.$store.getters.isIOS
+		},
 		guideStepModel(){
 			if(this.isAndroid){
 				return this.androidGuides

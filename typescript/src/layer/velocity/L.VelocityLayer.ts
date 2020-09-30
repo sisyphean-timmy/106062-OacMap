@@ -24,7 +24,7 @@ export class VelocityLayer extends L.Layer implements ILayer{
   imgUrl?: string;
   legendColor?: string;
   icon?: string;
-
+  status:"loading"|"loaded"|"error"
   lyrOpts:any = null
   dataIndexDef:Array<{
       name:string,
@@ -53,19 +53,6 @@ export class VelocityLayer extends L.Layer implements ILayer{
     this.opacity = opacity
     this.dataSet = dataSet
     this.lyrOpts = lyrOpts
-    // this.options = {
-    //   displayValues: true,
-    //   displayOptions: {
-    //     velocityType: 'Velocity',
-    //     position: 'bottomleft',
-    //     emptyString: 'No velocity data',
-		// 		angleConvention: 'bearingCCW',
-		// 		speedUnit: 'm/s'
-    //   },
-    //   maxVelocity: 10, // used to align color scale
-    //   colorScale: null,
-    //   data: null
-    // };
   }
 
   async fetchData(idx:number = 0):Promise<any>{
@@ -89,17 +76,24 @@ export class VelocityLayer extends L.Layer implements ILayer{
   onAdd(map: any) {
 
     (async()=>{
-      // get index file and times
-      this.dataIndexDef = await (await fetch(this.lyrOpts.url)).json()
-      this.times = this.dataIndexDef.map(i=>i.time08)
+      try{
+        this.status = "loading"
+        // get index file and times
+        this.dataIndexDef = await (await fetch(this.lyrOpts.url)).json()
+        this.times = this.dataIndexDef.map(i=>i.time08)
 
-      await this.setTimeData()
+        await this.setTimeData()
 
-      //! will envoke this.onDrawLayer() by delegate()
-      this._canvasLayer = new CanvasLayer().delegate(this);
-      this._canvasLayer.addTo(map);
-      
-      this.fireEvent("loaded")
+        //! will envoke this.onDrawLayer() by delegate()
+        this._canvasLayer = new CanvasLayer().delegate(this);
+        this._canvasLayer.addTo(map);
+        
+        this.fireEvent("loaded")
+        this.status = "loaded"
+      }catch(e){
+        this.status = "error"
+        this.fireEvent("error",e)
+      }
     })()
     
     return this

@@ -49,10 +49,10 @@
 				)
 					el-image(
 						fit="cover" 
-						:alt="'選擇'+lyr.name"
+						:alt="'選擇'+lyr.title"
 						:src="require('@/assets/basemap/'+lyr.imgUrl)"
 					)
-					strong {{ lyr.name }}
+					strong {{ lyr.title }}
 
 			el-button(
 				style="width:100%;"
@@ -76,24 +76,18 @@ export default {
 	data:()=>({
 		layerListVisibility: false
 	}),
-	props :{
-	},
 	computed: {
-		...mapGetters({
-			state:'layer/layer/state',
-			isMobile:'common/common/isMobile'
-		}),
 		size(){
-			return this.isMobile?'mini':'small'
+			return this.$store.getters.isMobile ? 'mini' : 'small'
 		},
 		allLayerList(){
-			return this.state('baseLayer')
+			return this.$store.state.layer.baseLayer
 		},
 		currentLayer(){
 			return this.allLayerList.find(l=>l.visible)
 		},
 		currentName(){
-			let name = this.currentLayer.name
+			let name = this.currentLayer.title
 			// 黑底底圖直接操作 DOM 改背景顏色
 			document.querySelector("#viewDiv").style.backgroundColor = /黑底/g.test(name) ? "#2a2a2a" : 'transparent'
 			return name
@@ -110,7 +104,7 @@ export default {
 	},
 	methods: {
 		...mapMutations({
-			UPDATE_BASELAYER_OPTIONS:'layer/layer/UPDATE_BASELAYER_OPTIONS',
+			UPDATE_BASELAYER_OPTIONS:'layer/UPDATE_BASELAYER_OPTIONS',
 		}),
 		handleBaseLayerVisibility(id){
 			//- update map instance

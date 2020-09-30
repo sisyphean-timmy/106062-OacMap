@@ -4,7 +4,7 @@
 	el-button(
 		circle
 		type="primary" 
-		@click="$openDialog('搜尋')"
+		@click="openSearch"
 	)
 		.tools__button
 			font-awesome-icon(icon="search" fixed-width size="lg")
@@ -19,13 +19,13 @@
 	//- 搜尋結果
 	el-button(
 		circle 
-		:disabled="!allR2"
+		:disabled="!resultCount"
 		@click="SET_CARD_VISIBLE({key:'result',bool:true})"
 	)
 		.tools__button
 			.tools__resultNum(
-				:class="{'tools__resultNum--active':allR2}" 
-			) {{allR2}}
+				:class="{'tools__resultNum--active':resultCount}" 
+			) {{resultCount}}
 			font-awesome-icon(icon="info" fixed-width size="lg")
 	//- 當前位置
 	el-button(
@@ -40,6 +40,7 @@
 <script>
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
+import searchAndFilterLayer from "@/components/searchAndFilterLayer"
 
 export default {
 	name:"tools",
@@ -47,27 +48,20 @@ export default {
 	data:()=>({}),
 	computed:{
 		...mapGetters({
-			isMobile:"common/common/isMobile",
-			allResultLength:"result/result/allResultLength",
-			allR2:"result/result/allR2",
-			commonState:"common/common/state",
-			layerState:"layer/layer/state"
+			resultCount:"result/resultCount"
 		}),
+		isMobile(){
+			return this.$store.getters.isMobile
+		},
 		currentTag(){
-			return this.commonState("currentTag")["label"]
+			return this.$store.state.currentTag.label
 		},
 		layerVisibility(){
-			return  this.commonState("layerCardVisible")
-		},
-		resultVisibility(){
-			return  this.commonState("resultCardVisible")
+			return this.$store.state.layerCardVisible
 		}
 	},
 	methods:{
-		...mapMutations({
-			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-			SET_CURRENT_TAG:"common/common/SET_CURRENT_TAG",
-		}),
+		...mapMutations(["SET_CARD_VISIBLE","SET_CURRENT_TAG"]),
 		async locateCurrent(){
 			try{
 				await this.$InitIns.toCurrentLocation()
@@ -75,6 +69,26 @@ export default {
 				this.$alert("目前無法定位到當前位置，請檢查GPS狀態",{type:"error"})
 			}
 		},
+		openSearch(){
+			
+            const dialog = this.$dialog({
+                style: {maxWidth:'500px'},
+                props:{
+                    ['close-on-click-modal']:false,
+                    title:"搜尋"
+                }
+            })
+            dialog.open({
+				...searchAndFilterLayer,
+				store: this.$store,
+			},{
+				on:{
+					close: ()=>{
+						dialog.close()
+					}
+				}
+			})
+		}
 	}
 }
 </script>

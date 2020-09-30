@@ -4,7 +4,7 @@ div
 	//- 圖層
 	transition(name="slide-fade-up")
 		layer(
-			v-if="layerVisibility"
+			v-if="layerCardVisible"
 			style="position: fixed;z-index: 999;transition: all ease 0.2s;height: 100%;left: 0;right: 0;margin: 0 auto;max-width: 100%;bottom: 0;top: 0;background: #fff;"
 		)
 			pageHeader(
@@ -49,7 +49,6 @@ import pullup from "@/components/pullup"
 import result from "@/components/result/result"
 import layer from "@/components/layer/layer"
 import pageHeader from '@/components/common/pageHeader'
-import isoheStation from "@/components/mark/isoheStation"
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import layerWeatherTool from "@/components/layer/layerWeatherTool"
@@ -75,20 +74,15 @@ export default {
 		toolTopRight
     },
 	computed:{
-		...mapGetters({
-			commonState:"common/common/state"
-		}),
-		layerVisibility(){
-			return this.commonState("layerCardVisible")
+		layerCardVisible(){
+			return this.$store.state.layerCardVisible
 		},
 		pageviews(){
-			return this.commonState("GACount").pageviews
+			return this.$store.state.GACount.pageviews
 		}
     },
 	methods:{
-		...mapMutations({
-			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-		}),
+		...mapMutations(["SET_CARD_VISIBLE"]),
 		/** UI 隨資訊卡片上下拉動 淡出、入 @overload +1 */
 		toggleUIFade(boolOrNumber){
 			if(!this.uiDoms) return
@@ -129,9 +123,9 @@ export default {
 	mounted(){
 		this.uiDoms = document.querySelectorAll(".tr,.tl")
         this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)
-        /** subscribe common/common/SET_CARD_VISIBLE  to toggleUp pullup card */
+        /** subscribe SET_CARD_VISIBLE  to toggleUp pullup card */
         this.$store.subscribe(async (mutation, state) => {
-            if(mutation.type === "common/common/SET_CARD_VISIBLE"){
+            if(mutation.type === "SET_CARD_VISIBLE"){
                 const {key,bool}= mutation.payload
                 if(key!=="result") return
                 const pullup = await new Promise(res=> this.$nextTick(()=>res(this.$refs.pullup)))

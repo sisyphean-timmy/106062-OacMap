@@ -64,7 +64,7 @@ export default {
     inserted(el, binding, vnode) {
 
         defalutWidth = el.clientWidth //- save default width when inserted()
-        console.log(defalutWidth)
+
         if (!binding.value) {
             return
         }

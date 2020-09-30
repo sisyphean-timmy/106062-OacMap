@@ -2,7 +2,7 @@
 	div
 		transition(name="slide-fade" mode="out-in")
 			//- 圖層操作
-			el-card.content-card(v-if="layerVisibility")
+			el-card.content-card(v-if="layerCardVisible")
 				layer(key="layer")
 					pageHeader(
 						slot="header"
@@ -12,7 +12,7 @@
 
 			//- 查詢結果
 			el-card.content-card(
-				v-if="resultVisibility"
+				v-if="resultCardVisible"
 				v-resize="true"
 			)
 				result
@@ -45,7 +45,6 @@ import toolTopRight from "@/components/toolTopRight"
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import pageHeader from '@/components/common/pageHeader'
 import {resize} from "@/directives/directives"
-import isoheStation from "@/components/mark/isoheStation"
 
 import layerWeatherTool from "@/components/layer/layerWeatherTool"
 
@@ -65,23 +64,18 @@ export default {
 		layerWeatherTool
 	},
 	computed:{
-		...mapGetters({
-			commonState:"common/common/state"
-		}),
-		layerVisibility(){
-			return  this.commonState("layerCardVisible")
+		resultCardVisible(){
+			return this.$store.state.resultCardVisible
 		},
-		resultVisibility(){
-			return  this.commonState("resultCardVisible")
+		layerCardVisible(){
+			return this.$store.state.layerCardVisible
 		},
 		pageviews(){
-			return this.commonState("GACount").pageviews
+			return this.$store.state.GACount.pageviews
 		}
 	},
 	methods:{
-		...mapMutations({
-			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-		})
+		...mapMutations(["SET_CARD_VISIBLE"])
 	},
 	mounted(){
 		this.$InitIns.mountScaleDom(this.$refs.scaleCoordInfo)

@@ -46,6 +46,7 @@ interface ILayer {
     imgUrl?:string
     legendColor?:string
     icon?:string
+    status:"loading"|"loaded"|"error"
 }
 
 declare namespace L {

@@ -1,37 +1,5 @@
 <template lang="pug">
 #app
-	//- DIALOG
-	el-dialog(
-		:title="dialogTitle"
-		v-if="dialogVisibility"
-		@close="dialogTitle = '';dialogVisibility = false"
-		visible
-		show-close
-		append-to-body	
-		center
-		:top="'10vh'"
-	)
-		template(v-if="dialogTitle === '加至主畫面說明'")
-			addToHome
-		template(v-else-if="dialogTitle === '搜尋'")
-			searchAndFilterLayer
-
-	//- DRAWER
-	el-drawer(
-		v-if="drawerVisibility"
-		:title='drawerTitle'
-		:size="drawerSize||isMobile?'100%':'400px'"
-		:visible="true"
-		:direction="drawerDir"
-		@close="drawerTitle='';drawerVisibility = false;drawerDir = 'rtl';drawerSize=''"
-		ref="drawer"
-	)
-		template(v-if="drawerTitle==='海情/海象資訊'")
-			layerWeatherDetail
-		template(v-else-if="drawerTitle")
-			info(:value="drawerTitle")
-		div(v-else) Empty
-
 	//- Windy Map
 	div(v-if="windyOption.visible" style="position:fixed;z-index:999;left:0;right:0;")
 		el-button(
@@ -50,17 +18,6 @@
 				:src="`https://embed.windy.com/?${windyOption.location}`"
 			)
 
-	//- UI and top msg
-	.topNotify(
-		ref="topNotify"
-		v-if="alertData.length"
-	)
-		div(style="display:flex;" @click="alertData.splice(0,alertData.length)")
-			strong
-				font-awesome-icon(icon="exclamation-triangle" fixed-width size="1x")
-				| 颱風警報 
-			div(v-marquee="{width:'70vw',play:true}") 
-				| {{Object.values(alertData[0]).join()}}
 	component(
 		v-if="mapConstructed" 
 		ref="mapUI" 
@@ -84,12 +41,8 @@ import {mapGetters,mapActions, mapMutations} from 'vuex'
 import mapUI from "@/components/mapUI"
 import mapUIxs from "@/components/mapUIxs"
 
-import searchAndFilterLayer from "@/components/dialog/searchAndFilterLayer"
-import addToHome from "@/components/dialog/addToHome"
-import info from "@/components/drawer/info"
-import layerWeatherDetail from "@/components/drawer/layerWeatherDetail"
-
-import isoheStation from "@/components/mark/isoheStation"
+import isoheStation from "@/components/result/isoheStation"
+import coastWeather from "@/components/result/coastWeather"
 
 import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
@@ -106,31 +59,16 @@ export default {
 		windyLoading: true,
 		mapConstructed:false,
 		//
-		dialogVisibility:false,
-		dialogTitle:"",
-		// 
-		drawerVisibility:false,
-		drawerTitle:"",
-		drawerDir:'rtl',
-		drawerSize:"",
-		//
 		alertData:[]
 	}),
 	components:{
 		mapUI,
 		mapUIxs,
-		addToHome,
-		info,
 		isoheStation,
-		searchAndFilterLayer,
-		layerWeatherDetail
+		coastWeather
 	},
 	computed:{
-		...mapGetters({
-			isMobile:"common/common/isMobile",
-			windyOption:"common/common/windyOption",
-			commonState: "common/common/state",
-		}),
+		...mapGetters(["isMobile","windyOption"]),
 		ifh(){ // iframe 高度 減 上方按鈕高度 
 			return window.innerHeight - 32
 		},
@@ -157,26 +95,13 @@ export default {
 				background: 'rgba(0, 0, 0, 0.8)'
 			})
 
-			await this.initBeforeMapMounted(this) // Action before mount
-	
-			Vue.prototype.$openLink = link=>window.open(link,"_blank")
-			Vue.prototype.$openDrawer = evt=>{
-				this.drawerVisibility=true
-				this.drawerTitle=(evt||'相關資訊')
-			}
-			Vue.prototype.$openDialog=evt=>{
-				this.dialogVisibility=true
-				this.dialogTitle=(evt||'搜尋')
-			}
 			Vue.prototype.$InitIns = new Init("viewDiv",{
 				center:["23.830576","121.20172"],
 				zoom: 7
 			})
 
-			// 載入圖層
 			await this.layerHandler()
 
-			// 依紀錄 的 localStorage 來定位到位置
 			if(localStorage.getItem("location")){
 				const locArr = localStorage.getItem("location").split(",")
 				const lat = locArr[0]
@@ -185,15 +110,7 @@ export default {
 				this.$InitIns.map.setView({lat,lng},zoom)
 			} 
 			
-			// 初始化相關事件
 			this.eventHandler()
-
-			if(this.isMobile){
-				this.dialogVisibility = true
-				this.dialogTitle = "加至主畫面說明"
-			}
-
-			await this.initAfterMapMounted(this) // Action after mount
 
 		}catch(e){
 			console.error(e)
@@ -204,64 +121,108 @@ export default {
 		}
 	},
 	methods:{
-		...mapActions({
-			initBeforeMapMounted:"common/common/initBeforeMapMounted",
-			initAfterMapMounted:"common/common/initAfterMapMounted",
-		}),
 		...mapMutations({
-			SNAPSHOT_RAW_LAYER:"layer/layer/SNAPSHOT_RAW_LAYER",
-			SET_RESULT:"result/result/SET_RESULT",
-			SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-			SET_WINDY_OPTION:"common/common/SET_WINDY_OPTION",
+			SNAPSHOT_RAW_LAYER:"layer/SNAPSHOT_RAW_LAYER",
+			SET_RESULT:"result/SET_RESULT",
+			SET_CARD_VISIBLE:"SET_CARD_VISIBLE",
+			SET_WINDY_OPTION:"SET_WINDY_OPTION",
 		}),
 		async eventHandler(){
-
 			const map = this.$InitIns.map
-
 			map.on({
 				"typhoonAlert":({data})=>{
-					//- render to ref.mapUI's top
-                    this.alertData.push(data)
-                    
-					this.$nextTick(()=>{
-						this.$refs.mapUI.$el.querySelectorAll(".tr,.tl").forEach(node => {
-							node.style.top = this.$refs.topNotify.clientHeight +12+ "px"
-						})
+					const h = this.$createElement
+					
+					console.log(" [ typhoonAlert ] ",data)
+
+					this.$message.closeAll()
+					this.$message({
+						message: h("div", {
+							style:"display: flex;align-items: center;white-space: nowrap;height:0;"
+						} , [
+							h("strong", {style:"margin-right:0.5rem;"} , "颱風警報"),
+							h("div",{
+								directives: [{
+									name:"marquee",
+									value: {width:'60vw',play:true}
+								}]
+							},data),
+							h("el-button", {
+								props:{type:"text"},
+								on:{
+									click:()=>{
+										this.$message.closeAll()
+									}
+								}
+							} , [h("i",{class:"el-icon-close",style:"color:red;"})])
+						]),
+						duration: 0,
+						type: "warning"
 					})
+
 				},
 				"moveend":evt=>{
-					/** 移動後記錄位置 */
 					const lat = map.getCenter().lat
 					const lng = map.getCenter().lng
 					const zoom = map.getZoom()
-					
 					const locStr = `${lat},${lng},${zoom}`
-
 					localStorage.setItem("location",`${locStr}`)
 					this.SET_WINDY_OPTION({location:`${locStr}`})
-
 					history.replaceState(null, document.title, `?loc=${locStr}`)
 				},
 				"geojsonClick":({result})=>{
 					console.log("[geojsonClick Result]", result)
+					
 					if(!result.length) return
-					this.SET_RESULT(result)
-					this.SET_CARD_VISIBLE({key:'layer',bool:false})
-					this.SET_CARD_VISIBLE({key:'result',bool:true})
+
+					let hasDrawer = false
+					for (const r of result) {
+						if(r.layerTitle === "海面天氣預報(近海海象)"){
+							const {data} = r
+							const drawerIns = this.$drawer({
+								props:{
+									title: data.locationName,
+									size: this.isMobile ? "100%" : "400px",
+									direction:"btt"
+								},
+								on:{
+									close:()=>{
+										console.log("drawer close")
+									}
+								}
+							})
+							drawerIns.open({...coastWeather,store:this.$store}, {
+								props:{data}
+							})
+							hasDrawer = true
+						}else{
+							this.SET_RESULT(r)
+						}
+					}
+					if(!hasDrawer){
+						this.SET_CARD_VISIBLE({key:'layer',bool:false})
+						this.SET_CARD_VISIBLE({key:'result',bool:true})
+					}
 				},
 				"markerClick": async ({dataType,layer,data,event})=>{
 					console.log("[markerClick]",{dataType,layer,data,event})
 					switch(dataType){
 						case "isoheStation":
-							/** layer.bindPopup( dom ) ---latency---> openPopup() */
-							this.drawerDir = "btt"
-							this.drawerVisibility = true
-							const component = await new Promise(res=>this.$nextTick(()=>res(this.$refs.drawer)))
-							new Vue({
-								render: h => h(isoheStation, {
-									props: {data},
-								})
-							}).$mount(component.$slots.default[0])
+							const drawerIns = this.$drawer({
+								props:{
+									title:"",
+									size: this.isMobile ? "100%" : "400px",
+									direction:"btt"
+								},
+								on:{
+									close:()=>{
+										console.log("drawer close")
+									}
+								}
+							})
+							drawerIns.open({...isoheStation,store:this.$store}, {
+								props:{data}
+							})
 							break
 						case "scenicSpot":
 						default:
@@ -273,45 +234,31 @@ export default {
 		},
 		async layerHandler(){
 
-			/** get layerDef (index) */
 			const layerDef = await(await fetch('./layerDef.json')).json()
+			const layerCateLog = await(await fetch('./layerCatelog.json')).json()
 
-			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map)
+			Vue.prototype.$LayerIns = new Layer(this.$InitIns.map,layerCateLog)
 			
-			await this.$LayerIns.addLayer(layerDef.layers)
+			/** baselayer must before normal -> "zoom" */
 			this.$LayerIns.addBaseLayer(layerDef.baseLayers)
+			await this.$LayerIns.addLayer(layerDef.layers)
 
 			console.log("%c $layerIns:","background:red;", this.$LayerIns)
 
 			this.SNAPSHOT_RAW_LAYER({
 				type:"baseLayer",
-				payload: this.$LayerIns.baseLayerColletion.map(l=>({
-					type:l.type,
-					id:l.id,
-					title:l.title,
-					name:l.title,
-					dataSet: l.dataSet,
-					opacity:l.opacity,
-					visible:l.visible,
-					imgUrl:l.imgUrl,
-					catelog:l.catelog,
-					tag:l.tag
+				payload: this.$LayerIns.baseLayerColletion.map(({
+					type,id,title,name,dataSet,opacity,visible,imgUrl,catelog,tag
+				})=>({
+					type,id,title,name,dataSet,opacity,visible,imgUrl,catelog,tag
 				})).reverse()
 			})
 			this.SNAPSHOT_RAW_LAYER({
 				type:"layer",
-				payload: this.$LayerIns.normalLayerCollection.map(l=>({
-					type:l.type,
-					title:l.title,
-					name:l.title,
-					id:l.id,
-					icon:l.icon,
-					dataSet: l.dataSet,
-					opacity:l.opacity,
-					visible:l.visible,
-					legendColor:l.legendColor||"145,145,145",
-					catelog:l.catelog,
-					tag:l.tag
+				payload: this.$LayerIns.normalLayerCollection.map(({
+					type,title,name,id,icon,dataSet,opacity,visible,legendColor="145,145,145",catelog,tag
+				})=>({
+					type,title,name,id,icon,dataSet,opacity,visible,legendColor,catelog,tag
 				})).reverse()
 			})
 			
@@ -323,7 +270,6 @@ export default {
 
 <style lang="scss">
 
-/** windyMap */
 #windy {
 	width: 100%;
 	z-index:999;
@@ -342,17 +288,4 @@ export default {
 	z-index: 0;
 }
 
-
-.topNotify{
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100vw;
-	padding:0.5rem 1rem;
-	position: relative;
-	font-size: 0.8rem;
-	z-index: 2;
-	background-color: rgba(lighten($danger,20),0.9);
-	color: darken($danger,10);
-}
 </style>

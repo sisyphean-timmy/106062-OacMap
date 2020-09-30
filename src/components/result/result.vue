@@ -122,24 +122,12 @@ export default {
         activeName:"全部",
         dataId:''
     }),
-    watch:{
-        "allResultLength":{
-            handler(count){
-                if(count===0){
-                    this.SET_CARD_VISIBLE({key:'result',bool:false})
-                    this.dataId = ''
-                }
-            }
-        }
-    },
     computed:{
         ...mapGetters({
-            commonState: "common/common/state",
-            isMobile: "common/common/isMobile",
-            history: "result/result/history",
-            newAdd: "result/result/newAdd",
-            tabsNames: "result/result/tabsNames", /** {id,title} */
-            allResultLength:"result/result/allResultLength"
+            isMobile: "isMobile",
+            history: "result/history",
+            newAdd: "result/newAdd",
+            tabsNames: "result/tabsNames", /** {id,title} */
         }),
         dataModel(){
             let data = []
@@ -171,10 +159,10 @@ export default {
             return Object.keys(data).some(k=>/公告/.test(k))
         },
         ...mapMutations({
-            DELETE_RESULT:"result/result/DELETE_RESULT",
-            INIT_NEWADD:"result/result/INIT_NEWADD",
-            SET_CARD_VISIBLE:"common/common/SET_CARD_VISIBLE",
-            UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
+            DELETE_RESULT:"result/DELETE_RESULT",
+            INIT_NEWADD:"result/INIT_NEWADD",
+            SET_CARD_VISIBLE:"SET_CARD_VISIBLE",
+            UPDATE_LAYER_OPTIONS:"layer/UPDATE_LAYER_OPTIONS"
         }),
         locate(evt){
             

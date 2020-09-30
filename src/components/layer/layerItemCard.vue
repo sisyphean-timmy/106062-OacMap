@@ -38,12 +38,6 @@
 					//- 名稱
 					strong(style="line-height:200%;")
 						
-						//- template(v-if="isRetrival && layer.mgroup || layer.sgroup")
-						//- 	el-tag(size="small") 
-						//- 		span(v-if="layer.mgroup") {{layer.mgroup}}
-						//- 		span(v-if="layer.sgroup") / {{layer.sgroup}}
-						//- 	br
-
 						div(style="display:flex;align-items:center;")
 							.color-legendColor(:style="`backgroundColor:${colorModel};`")
 							span {{layer.title}}
@@ -83,27 +77,19 @@
 								@input="$emit('opacitySlide',$event)"
 							)
 					transition(name="fade")
-						.layer-card__content__colorPicker(v-if="!isIE")
+						.layer-card__content__colorPicker
 							colorSliderPicker(v-model="colorModel")
 
 </template>
 
 <script>
 
-/** 調色、顏色功能 IE 不支援 : 移除 */
 import { mapGetters, mapMutations } from 'vuex'
 import { HandleDirective } from 'vue-slicksort'
-
-let colorConverter = (!document.documentMode) ? require("color-convert") : "";
 
 /** @see https://www.npmjs.com/package/vue-color */
 import {Slider as colorSliderPicker} from "vue-color"
 
-/**
- * @switch()
- * @opacitySlide()
- * @openExplain()
- */
 export default {
 	name:'layerItemCard',
 	directives: { handle: HandleDirective },
@@ -129,9 +115,6 @@ export default {
 		}
 	},
 	computed:{
-		...mapGetters({
-			rootState:"common/common/state"
-		}),
 		isIE(){
 			return Boolean(document.documentMode)
 		},
@@ -140,46 +123,20 @@ export default {
 		},
 		colorModel:{
 			get(){
-				
-				if(!this.layer.visible){
-					return `#efefef`
-				}
-
-				if(!colorConverter){
-					if(this.isIE){
-						return `rgb(${this.layer.legendColor})`
-					}
-					return `#000000`
-				} 
-
-				let rgb = this.layer.legendColor.split(",")
-				let hslArr = colorConverter.rgb.hsl(rgb)
-				let result = {
-					hsl:{
-						hue: hslArr[0]||0,
-						saturation: hslArr[1]||0,
-						luminosity: hslArr[2]||0,
-						alpha: 1
-					},
-					rgb:rgb,
-					hex: colorConverter.rgb.hex(rgb)
-				}
-				return `#${result.hex}`
+				return this.layer.visible ? `rgb(${this.layer.legendColor})` : `rgb(239,239,239)`
 			},
 			set(color){
-				
-				console.log("layer in state", this.layer)
-				console.log("color", color)
-
+				console.log("[colorModel setter]", color)
+				const {r,g,b} = color.rgba
 				// update map 
 				this.$LayerIns.setOpts(this.layer.id,{
-					color:color.hex
+					color:`rgb(${r},${g},${b})`
 				})
 				// update state
 				this.UPDATE_LAYER_OPTIONS({
 					id:this.layer.id,
 					payload:{
-						legendColor:`${color.rgba.r},${color.rgba.g},${color.rgba.b}`
+						legendColor:`${r},${g},${b}`
 					}
 				})
 
@@ -205,7 +162,7 @@ export default {
 	},
 	methods:{
 		...mapMutations({
-			UPDATE_LAYER_OPTIONS:"layer/layer/UPDATE_LAYER_OPTIONS"
+			UPDATE_LAYER_OPTIONS:"layer/UPDATE_LAYER_OPTIONS"
 		}),
 		handleOpacitySlider(evt){
 			if(this.$refs.outterButton.contains(evt.target)) return

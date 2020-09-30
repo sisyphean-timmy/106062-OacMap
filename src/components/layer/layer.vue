@@ -15,7 +15,7 @@
 				helperClass="dragging"
 				:transitionDuration="300"
 			)
-				.col
+				.col(v-if="pointerLayer.length")
 					small 地圖上帶有對應圖示的圓形，在縮放比例尺後可以得到更多關於點的資訊
 						.fixedTopList(style="position:relative;" )
 							.fixedTopList__collapse(:class="{'fixedTopList__collapse--hide':hideFixedTopList}")
@@ -76,15 +76,12 @@
 
 <script>
 
-
-
 import { SlickList, SlickItem } from "vue-slicksort"
 import {mapGetters,mapActions, mapMutations} from "vuex"
 import layerItemCard from "./layerItemCard"
 import layerBaseMap from "./layerBaseMap"
 
 import layerItemFixedCard from "./layerItemFixedCard"
-
 
 export default {
 	name:'layers',
@@ -110,12 +107,13 @@ export default {
 	}),
 	computed:{
 		...mapGetters({
-			state:'layer/layer/state',
-			rootState: 'common/common/state',
-			pointerLayer: 'layer/layer/pointerLayer',
-			sortableLayer: 'layer/layer/sortableLayer',
-			weatherLayer: 'layer/layer/weatherLayer'
+			pointerLayer: 'layer/pointerLayer',
+			sortableLayer: 'layer/sortableLayer',
+			weatherLayer: 'layer/weatherLayer'
 		}),
+		layer(){
+			return this.$store.state.layer.layer
+		},
 		isIE(){
 			return Boolean(document.documentMode)
 		},
@@ -155,21 +153,16 @@ export default {
 	},
 	methods:{
 		...mapMutations({
-			UPDATE_LAYER_OPTIONS:'layer/layer/UPDATE_LAYER_OPTIONS',
-			SNAPSHOT_RAW_LAYER:'layer/layer/SNAPSHOT_RAW_LAYER',
+			UPDATE_LAYER_OPTIONS:'layer/UPDATE_LAYER_OPTIONS',
+			SNAPSHOT_RAW_LAYER:'layer/SNAPSHOT_RAW_LAYER',
 		}),
 		_toggleLayerWiggle(bool){
 			this.$nextTick(()=>{
-				// console.log(this.$refs['toggleAble'])
 				this.$refs['toggleAble'].forEach(v=>{
 					const dom = v.$el.children[0]
 					dom.classList.toggle('wiggle',bool)
 					if(bool) dom.style.animationDuration = `${Math.random() * (2000 - 1000) + 1000}ms`
 				})
-				// this.$refs['toggleAble'].$el.childNodes.forEach(node => {
-				// 	node.children[0].classList.toggle('wiggle',bool)
-				// 	if(bool) node.children[0].style.animationDuration = `${Math.random() * (2000 - 1000) + 1000}ms`
-				// })
 			})
 		},
 		onSortEnd(evt){
@@ -194,25 +187,34 @@ export default {
 			this.lastDraggingLyrPtr = this.layerSortableModel[evt.index]
 		},
 		handleLayerVisibility(id,bool){
-			//- update map instance
-			this.$LayerIns.setVisible(id,bool)
-			//- update state snapshot
-			this.UPDATE_LAYER_OPTIONS({
-				id:id,
+			const lyrIns = this.$LayerIns.normalLayerCollection.find(l=>l.id === id)
+			if( lyrIns.status !== "loaded" ){
+				console.log("lyr not loaded now")
+				return
+			} 
+			
+			this.UPDATE_LAYER_OPTIONS({id,
 				payload:{
 					visible:bool
 				}
 			})
+			
+			this.$LayerIns.setVisible(id,bool)
+			
+			lyrIns.once("loaded",()=>{
+				if(bool){ // restore previous options in state
+					const {opacity,legendColor} = this.layer.find(l=>l.id === id)
+					this.$LayerIns.setOpts(id,{opacity,color:`rgb(${legendColor})`})
+					console.log("[handleLayerVisibility , when layer open restore style in state]",opacity,legendColor)
+				}
+			})
+
 		},
 		handleLayerOpacity(id,opacity){
-			//- update map instance
 			this.$LayerIns.setOpts(id,{opacity})
-			//- update state snapshot
 			this.UPDATE_LAYER_OPTIONS({
 				id:id,
-				payload:{
-					opacity:opacity
-				}
+				payload:{opacity}
 			})
 		},
 		getStatusClassName(layer){

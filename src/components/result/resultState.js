@@ -63,7 +63,7 @@ export default {
             let temp = [{
                 id: 'all',
                 title: "全部",
-                num: getter.allResultLength
+                num: getter.resultCount
             }]
 
             const ptr = state.history
@@ -81,14 +81,7 @@ export default {
 
             return temp
         },
-        allResultLength: state => {
-            let cnt = 0
-            const ptr = state.history
-            let keysHasData = Object.keys(ptr).filter(k => ptr[k].length)
-            keysHasData.forEach(k => cnt += ptr[k].length)
-            return cnt
-        },
-        allR2: state => {
+        resultCount: state => {
             let data = []
             Object.values(state.history).forEach(arr => {
                 arr.forEach(i => {

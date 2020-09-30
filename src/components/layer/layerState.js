@@ -99,28 +99,43 @@ export default {
         }
     },
     getters: {
-        state: state => key => state[key],
-        _currentTag: (state, getters, rootGetters) => {
-            return rootGetters["common/common"]["currentTag"]
-        },
         /** 可排序的圖層 */
-        sortableLayer: (state, getters) => {
+        sortableLayer: (state, getters , rootGetters) => {
             return state.layer.filter(l => {
-                const { value } = getters._currentTag
+                const { value } = rootGetters.currentTag
                 return /filelayer|geojson/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
             })
         },
         /** 預報 */
-        weatherLayer: (state, getters) => {
-            return state.layer.filter(l => {
-                const { value } = getters._currentTag
+        weatherLayer: (state, getters , rootGetters) => {
+            const wl = state.layer.filter(l => {
+                const { value } = rootGetters.currentTag
                 return /heatmap|velocity|gradient/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
+            })
+            // mixin icon
+            const ICON_ENUM = {
+                "風":"wind",
+                "海":"water",
+                "船":"ship",
+                "波浪":"wave-square",
+                "溫度":"thermometer-quarter",
+                "高度":"ruler-vertical",
+                "風險|潛勢":"exclamation-triangle",
+                "鹽度":"tachometer-alt"
+            }
+            // mixin icon
+            return wl.map(({title,...args})=>{
+                let icon = "cloud-sun-rain"
+                for (const k of Object.keys(ICON_ENUM)) {
+                    if(new RegExp(k,"g").test(title)) icon = ICON_ENUM[k]
+                }
+                return {title,...args, icon}
             })
         },
         /** 點狀 */
-        pointerLayer: (state, getters) => {
+        pointerLayer: (state, getters, rootGetters) => {
             return state.layer.filter(l => {
-                const { value } = getters._currentTag
+                const { value } = rootGetters.currentTag
                 return /cluster|mark/ig.test(l.type) && (value ? (l.tag || []).indexOf(value) > -1 : true)
             })
         }

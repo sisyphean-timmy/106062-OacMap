@@ -27,6 +27,7 @@
 						el-button(
 							type="text" 
 							title="圖層來源網址"
+							:visible-arrow='false'
 							:disabled="!layer.dataSet"
 							style="padding:0 0 0 0.5rem;"
 						)
