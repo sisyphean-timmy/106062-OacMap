@@ -8,20 +8,21 @@ self.addEventListener('install', function(evt) {
     try {
         importScripts("sw-manifest.js");
         console.log('[Service Worker]pre-fetch', PRECACHE);
-
-        evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-            var urls = ['/'];
-            PRECACHE.forEach(function(val, idx, arr) {
-                urls.push(val.url);
-            });
-            console.log("[urls]", urls)
-            cache.put('.assets', new Response(JSON.stringify(urls)));
-            assets = urls;
-            return cache.addAll(urls);
-        }));
     } catch (e) {
-        // nop why ?
+        // empty list
+	PRECACHE = [];
     }
+
+    evt.waitUntil(caches.open(ACACHE).then(function(cache) {
+        var urls = ['./'];
+        PRECACHE.forEach(function(val, idx, arr) {
+            urls.push(val.url);
+        });
+        console.log("[urls]", urls)
+        cache.put('.assets', new Response(JSON.stringify(urls)));
+        assets = urls;
+        return cache.addAll(urls);
+    }));
 });
 
 self.addEventListener('fetch', async function(evt) {
