@@ -54,8 +54,8 @@ module.exports = {
                         developerName: "詮華",
                         display: "fullscreen",
                         manifestRelativePaths: "./",
-                        start_url: "../../",
-                        scope: "../../"
+                        start_url: "./",
+                        scope: "./"
                     }
                 }])
         }

@@ -10,7 +10,7 @@ self.addEventListener('install', function(evt) {
         console.log('[Service Worker]pre-fetch', PRECACHE);
     } catch (e) {
         // empty list
-	PRECACHE = [];
+        PRECACHE = [];
     }
 
     evt.waitUntil(caches.open(ACACHE).then(function(cache) {
