@@ -13,16 +13,20 @@ self.addEventListener('install', function(evt) {
         PRECACHE = [];
     }
 
-    evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-        var urls = ['./'];
-        PRECACHE.forEach(function(val, idx, arr) {
-            urls.push(val.url);
-        });
-        console.log("[urls]", urls)
-        cache.put('.assets', new Response(JSON.stringify(urls)));
-        assets = urls;
-        return cache.addAll(urls);
-    }));
+    try {
+        evt.waitUntil(caches.open(ACACHE).then(function(cache) {
+            var urls = ['./'];
+            PRECACHE.forEach(function(val, idx, arr) {
+                urls.push(val.url);
+            });
+            console.log("[urls]", urls)
+            cache.put('./.assets', new Response(JSON.stringify(urls)));
+            assets = urls;
+            return cache.addAll(urls);
+        }));
+    } catch (e) {
+        console.log('[Service Worker]pre-fetch failed', e);
+    }
 });
 
 self.addEventListener('fetch', async function(evt) {
@@ -34,7 +38,7 @@ self.addEventListener('fetch', async function(evt) {
 async function assetsFromCache(req) {
     var cache = await caches.open(ACACHE);
     if (!assets) {
-        var listJson = await cache.match('.assets');
+        var listJson = await cache.match('./.assets');
         assets = listJson.json();
     }
 
