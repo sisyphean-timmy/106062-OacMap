@@ -408,6 +408,17 @@
             }
         },
         {
+            "title": "海域水質",
+            "url": "https://ocean.taiwan.gov.tw/OpenData/WaterQuality/20201012.json",
+            "visible": true,
+            "tag": [],
+            "dataSet": [{ "label": "", "value": "" }],
+            "type": "markWaterQuality",
+            "layerOption": {
+                "icon": "temperature-high"
+            }
+        },
+        {
             "title": "颱風路徑",
             "url": "https://ocean.taiwan.gov.tw/OpenData/CWB_Typhoon/json/W-C0034-001_002.json",
             "visible": true,

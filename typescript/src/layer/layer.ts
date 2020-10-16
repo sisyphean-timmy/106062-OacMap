@@ -18,7 +18,8 @@ import { TyphoonLayer } from "./typhoonLayer"
 import { 
     clusterMarkerLayer,
     IsoheStationLayer,
-    ScenicSpotLayer
+    ScenicSpotLayer,
+    WaterQualityLayer
 } from "./clusterMarkerLayer"
 
 export class Layer {
@@ -170,7 +171,8 @@ export class Layer {
                 "markIsoheStation":IsoheStationLayer,
                 "wavePeriodGradient":WavePeriodGradientLayer,
                 "waveHeightGradient":WaveHeightGradientLayer,
-                "typhoonLayer":TyphoonLayer
+                "typhoonLayer":TyphoonLayer,
+                "markWaterQuality": WaterQualityLayer,
             }
             const lyrIns = new mapFn[lyrOpts.type]({
                 ...lyrOpts,

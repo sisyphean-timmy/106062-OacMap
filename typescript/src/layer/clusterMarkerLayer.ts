@@ -244,6 +244,7 @@ export class ScenicSpotLayer extends BaseCluster {
             Py,Px
         } = feature.properties
         const img = Picture1||Picture2||Picture3||''
+        // TODO: fix XSS
         mk.bindPopup(`
             <h3>${Name}</h3>
             <small>
@@ -296,3 +297,78 @@ export class ScenicSpotLayer extends BaseCluster {
         return this
     }
 }
+
+export class WaterQualityLayer extends BaseCluster {
+
+    data:any
+
+    constructor(opts){
+        super(opts)
+    }
+
+    onAdd(map){
+        (async ()=>{
+            try{
+                this.status = "loading"
+                if(!this.data) this.data = await this.fetchData()
+
+                this.data.forEach((station, i, array) => {
+                    const Longitude = station.coordinates[0];
+                    const Latitude = station.coordinates[1];
+
+                    const mk = L.marker(
+                        L.latLng(Latitude,Longitude),{
+                            icon:L.divIcon({
+                                html: this.getIconVM()
+                            })
+                        }
+                    )
+                    // TODO: fix XSS
+                    mk.bindPopup(`
+                          <h3>測站: ${station.STATION_NAME}</h3>
+                          <p>
+                              經度 ${Longitude} 緯度 ${Latitude}
+                          </p>
+                          <div>最新監測日期: ${station.Sample_Date}</div>
+                          <div>氣溫: ${station.TEM_AIR}</div>
+                          <div>水溫: ${station.TEM_WATER}</div>
+                          <div>鹽度: ${station.SALINITY}</div>
+                          <div>PH: ${station.Str_pH}</div>
+                          <div>溶氧量(電極法): ${station.Str_DO}</div>
+                          <div>葉綠素a: ${station.Str_Chl_A}</div>
+                          <div>鎘: ${station.Str_Cd}</div>
+                          <div>鉻: ${station.Str_Cr}</div>
+                          <div>銅: ${station.Str_Cu}</div>
+                          <div>鋅: ${station.Str_Zn}</div>
+                          <div>鉛: ${station.Str_Pb}</div>
+                          <div>汞: ${station.Str_Hg}</div>
+                   `, {
+                          maxHeight: 300
+                    })
+                    mk.on("click",e=>{
+                        let result  = {
+                            title: station.STATION_NAME,
+                            data: station,
+                        }
+                        this._map.fireEvent("markerClick",{
+                            dataType: "waterQuality",
+                            layer: mk,
+                            data: result,
+                            event:e
+                        })
+                    })
+                    this.markerClusterGroup.addLayer(mk)
+                })
+                this.markerClusterGroup.addTo(map)
+
+                this.fireEvent("loaded")
+                this.status = "loaded"
+            }catch(e){
+                this.fireEvent("error",e)
+                this.status = "error"
+            }
+        })()
+        return this
+    }
+}
+
