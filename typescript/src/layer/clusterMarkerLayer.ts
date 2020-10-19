@@ -220,19 +220,8 @@ export class ScenicSpotLayer extends BaseCluster {
 
         const mk = L.marker(latlng, {
             icon:L.divIcon({
-                html:new Vue({
-                render: h => h(
-                    "div",
-                    {class:"leaflet-mark-icon"},
-                    [
-                        h(Vue.component('font-awesome-icon', FontAwesomeIcon),{
-                            props:{
-                                icon:this.icon
-                            }
-                        })
-                    ]
-                )
-            }).$mount().$el as HTMLElement})
+                html:this.getIconVM(),
+            }),
         })
 
         const {
@@ -244,17 +233,28 @@ export class ScenicSpotLayer extends BaseCluster {
             Py,Px
         } = feature.properties
         const img = Picture1||Picture2||Picture3||''
-        // TODO: fix XSS
-        mk.bindPopup(`
-            <h3>${Name}</h3>
-            <small>
-                經度 ${Px} 緯度 ${Py}
-            </small>
-            ${img?`<img style="max-width:200px;" src="${img}" alt="${Name}"/>`:``}
-            <p>${Toldescribe}</p>
-        `, {
-            maxHeight: 300
-        })
+
+        let dom = new Vue({
+            render: h => {
+                let eles = [];
+                eles.push(h("h3", `${Name}`));
+                eles.push(h("small", `經度 ${Px} 緯度 ${Py}`));
+                if(img) {
+                    eles.push(
+                        h("img", {
+                            style: {'max-width': '200px'},
+                            attrs: {'src': `${img}`, 'alt': `${Name}`},
+                        })
+                    );
+                }
+                eles.push(h("p", `${Toldescribe}`));
+                h("div", {class:"scenicspot-popup"}, eles);
+            }
+        }).$mount().$el as HTMLElement;
+
+        mk.bindPopup(dom, {
+              maxHeight: 300
+        });
         
         mk.on("click",e=>{
             this._map.fireEvent("markerClick",{
@@ -323,28 +323,37 @@ export class WaterQualityLayer extends BaseCluster {
                             })
                         }
                     )
-                    // TODO: fix XSS
-                    mk.bindPopup(`
-                          <h3>測站: ${station.STATION_NAME}</h3>
-                          <p>
-                              經度 ${Longitude} 緯度 ${Latitude}
-                          </p>
-                          <div>最新監測日期: ${station.Sample_Date}</div>
-                          <div>氣溫: ${station.TEM_AIR}</div>
-                          <div>水溫: ${station.TEM_WATER}</div>
-                          <div>鹽度: ${station.SALINITY}</div>
-                          <div>PH: ${station.Str_pH}</div>
-                          <div>溶氧量(電極法): ${station.Str_DO}</div>
-                          <div>葉綠素a: ${station.Str_Chl_A}</div>
-                          <div>鎘: ${station.Str_Cd}</div>
-                          <div>鉻: ${station.Str_Cr}</div>
-                          <div>銅: ${station.Str_Cu}</div>
-                          <div>鋅: ${station.Str_Zn}</div>
-                          <div>鉛: ${station.Str_Pb}</div>
-                          <div>汞: ${station.Str_Hg}</div>
-                   `, {
+
+                    let dom = new Vue({
+                        render: h => h(
+                            "div",
+                            {class:"waterquality-popup"},
+                            [
+                                h("h3", `測站: ${station.STATION_NAME}`),
+                                h("p", `經度 ${Longitude} 緯度 ${Latitude}`),
+                                h("div", `最新監測日期: ${station.Sample_Date}`),
+                                h("div", `氣溫: ${station.TEM_AIR}`),
+                                h("div", `水溫: ${station.TEM_WATER}`),
+                                h("div", `鹽度: ${station.SALINITY}`),
+                                h("div", `PH: ${station.Str_pH}`),
+                                h("div", `溶氧量(電極法): ${station.Str_DO}`),
+                                h("div", `葉綠素a: ${station.Str_Chl_A}`),
+
+                                h("div", `鎘: ${station.Str_Cd}`),
+                                h("div", `鉻: ${station.Str_Cr}`),
+                                h("div", `銅: ${station.Str_Cu}`),
+                                h("div", `鋅: ${station.Str_Zn}`),
+                                h("div", `鉛: ${station.Str_Pb}`),
+                                h("div", `汞: ${station.Str_Hg}`),
+
+                            ]
+                        )
+                    }).$mount().$el as HTMLElement;
+
+                    mk.bindPopup(dom, {
                           maxHeight: 300
-                    })
+                    });
+
                     mk.on("click",e=>{
                         let result  = {
                             title: station.STATION_NAME,
