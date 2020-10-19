@@ -48,6 +48,13 @@ import {Init} from "@/../typescript/dist/init"
 import {Layer} from "@/../typescript/dist/layer/layer"
 import { marquee } from '@/directives/directives';
 
+function getRequestParm(name) {
+	var re = location.search.match('[?&]'+encodeURIComponent(name)+'=([^&]*)');
+	if(re) {
+		return decodeURIComponent(re[1]);
+	}
+	return false;
+}
 
 export default {
 	name: 'app',
@@ -95,20 +102,29 @@ export default {
 				background: 'rgba(0, 0, 0, 0.8)'
 			})
 
-			Vue.prototype.$InitIns = new Init("viewDiv",{
+			var initPos = {
 				center:["23.830576","121.20172"],
 				zoom: 7
-			})
+			}
+			var loc = getRequestParm('loc');
+			if(loc) {
+				var p = loc.split(',');
+				initPos.center = [p[0], p[1]];
+				initPos.zoom = p[2];
+			} else {
+				if(localStorage.getItem("location")){
+					const p = localStorage.getItem("location").split(",")
+					//const lat = p[0]
+					//const lng = p[1]
+					//const zoom = p[2]
+					//this.$InitIns.map.setView({lat,lng},zoom)
+					initPos.center = [p[0], p[1]];
+					initPos.zoom = p[2];
+				}
+			}
+			Vue.prototype.$InitIns = new Init("viewDiv", initPos)
 
 			await this.layerHandler()
-
-			if(localStorage.getItem("location")){
-				const locArr = localStorage.getItem("location").split(",")
-				const lat = locArr[0]
-				const lng = locArr[1]
-				const zoom = locArr[2]
-				this.$InitIns.map.setView({lat,lng},zoom)
-			} 
 			
 			this.eventHandler()
 
