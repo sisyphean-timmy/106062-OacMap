@@ -415,7 +415,7 @@
             "dataSet": [{ "label": "", "value": "" }],
             "type": "markWaterQuality",
             "layerOption": {
-                "icon": "temperature-high"
+                "icon": "tint"
             }
         },
         {
