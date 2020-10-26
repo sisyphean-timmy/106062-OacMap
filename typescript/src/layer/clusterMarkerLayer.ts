@@ -258,12 +258,16 @@ export class ScenicSpotLayer extends BaseCluster {
                 eles.push(h("p", `${Toldescribe}`));
                 return h("div", {class:"scenicspot-popup"}, eles);
             }
-        }).$mount().$el as HTMLElement;
-
-        mk.bindPopup(dom, {
-              maxHeight: 300
         });
-        
+
+        mk.bindPopup('', {
+            maxHeight: 300,
+        });
+
+        mk.on("popupopen", e => {
+            e.popup.setContent(dom.$mount().$el as HTMLElement);
+        });
+
         mk.on("click",e=>{
             this._map.fireEvent("markerClick",{
                 dataType: "scenicSpot",
@@ -274,7 +278,7 @@ export class ScenicSpotLayer extends BaseCluster {
                     Picture1,
                     Picture2,
                     Picture3,
-                    Py,Px
+                    Py,Px,
                 },
                 event: e
             })
