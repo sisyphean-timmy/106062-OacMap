@@ -55,7 +55,7 @@ export default {
 		filterRegion:null,
 		filterTown:null,
 
-		LayerToFilt:null,
+		LayerToFilt:null, // layerID
 	}),
 	computed:{
 		...mapGetters({
@@ -75,10 +75,11 @@ export default {
 
 				if(!currentRegion) label = null;
 				this.currentRegion = label;
-				this.filterTown = currentRegion;
+				this.filterTown = Object.freeze(currentRegion);
 
 				this.SET_CURRENT_FILTER({region: label, town: null})
-				this.LayerToFilt.showOnly(value, null);
+				const layer = this.$LayerIns.normalLayerCollection.find(l => l.id === this.LayerToFilt)
+				layer.showOnly(value, null);
 			}
 		},
 		selectedTownModel:{
@@ -88,7 +89,8 @@ export default {
 			set({label,value}){
 				this.currentTown = label;
 				this.SET_CURRENT_FILTER({region: this.currentRegion, town: label})
-				this.LayerToFilt.showOnly(this.currentRegion, value);
+				const layer = this.$LayerIns.normalLayerCollection.find(l => l.id === this.LayerToFilt)
+				layer.showOnly(this.currentRegion, value);
 				this.$emit("close")
 			}
 		},
@@ -118,18 +120,12 @@ export default {
 		},
 	},
 	created(){
-		let regions = null;
-		//console.log(this.$LayerIns.normalLayerCollection, this, this.currentRegion, this.currentTown, this.filterRegion, this.filterTown)
-		this.$LayerIns.normalLayerCollection.forEach(l => {
-			//console.log(l.title, l, l.index)
-                        if (l.index) {
-				regions = l.index;
-				this.LayerToFilt = l;
-				return false;
-			}
-		});
+		const layer = this.$LayerIns.normalLayerCollection.find(l => !!l.index)
+		if (!layer.index) return;
+		const regions = Object.freeze(layer.index); // otherwise will be very slow
 		this.filterRegion = regions;
-		if (this.currentRegion) this.filterTown = regions[this.currentRegion];
+		if (this.currentRegion) this.filterTown = Object.freeze(regions[this.currentRegion]);
+		this.LayerToFilt = layer.id;
 	},
 	methods:{
 		...mapMutations({

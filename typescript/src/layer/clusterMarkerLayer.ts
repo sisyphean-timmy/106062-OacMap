@@ -218,8 +218,10 @@ export class ScenicSpotLayer extends BaseCluster {
 
     constructor(opts){
         super(opts)
-	this.marker = [];
-	this.index = {};
+        this.marker = [];
+        this.index = {};
+        this.currReg = null;
+        this.currTwn = null;
     }
 
     private _pointToLayer(feature, latlng){
@@ -284,25 +286,29 @@ export class ScenicSpotLayer extends BaseCluster {
             })
         })
 
-	this.marker.push(mk);
-	let reg = this.index[Region];
-	if (!reg) {
-		reg = {};
-		this.index[Region] = reg;
-	}
-	let twn = reg[Town];
-	if (!twn) {
-		twn = [];
-		reg[Town] = twn;
-	}
-	twn.push(mk);
+        this.marker.push(mk);
+        let reg = this.index[Region];
+        if (!reg) {
+            reg = {};
+            this.index[Region] = reg;
+        }
+        let twn = reg[Town];
+        if (!twn) {
+            twn = [];
+            reg[Town] = twn;
+        }
+        twn.push(mk);
 
         return mk
     }
 
+    getIndex(){
+        return Object.freeze(this.index);
+    }
+
     showOnly(region, town){
-	this.currReg = region;
-	this.currTwn = town;
+        this.currReg = region;
+        this.currTwn = town;
         if (!region) {
             this.marker.forEach(mk => {
                 this.markerClusterGroup.addLayer(mk)
@@ -310,12 +316,13 @@ export class ScenicSpotLayer extends BaseCluster {
             return;
         }
 
+        this.markerClusterGroup.clearLayers();
         let list = [];
         let reg = this.index[region];
         if (!reg) return;
         if (!town) {
             Object.keys(reg).forEach(regName => {
-		let twn = reg[regName];
+                let twn = reg[regName];
                 twn.forEach(mk => {
                     list.push(mk);
                 })
@@ -324,13 +331,16 @@ export class ScenicSpotLayer extends BaseCluster {
            let twn = reg[town];
            list = twn;
         }
-        this.marker.forEach(mk => {
-	    if(list.indexOf(mk) == -1) {
+        list.forEach(mk => {
+            this.markerClusterGroup.addLayer(mk)
+        })
+        /*this.marker.forEach(mk => {
+            if(list.indexOf(mk) == -1) {
                 this.markerClusterGroup.removeLayer(mk)
             } else {
                 this.markerClusterGroup.addLayer(mk)
             }
-        })
+        })*/
     }
 
     onAdd(map){
