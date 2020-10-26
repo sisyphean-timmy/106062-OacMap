@@ -9,6 +9,15 @@
 		.tools__button
 			font-awesome-icon(icon="search" fixed-width size="lg")
 
+	//- 複合搜尋(觀光景點篩選)
+	el-button(
+		circle
+		type="primary" 
+		@click="openFilter"
+	)
+		.tools__button
+			font-awesome-icon(icon="filter" fixed-width size="lg")
+
 	//- 圖層
 	el-button(
 		circle
@@ -41,6 +50,7 @@
 
 import {mapGetters,mapActions, mapMutations} from 'vuex'
 import searchAndFilterLayer from "@/components/searchAndFilterLayer"
+import compoundFilter from "@/components/compoundFilter"
 
 export default {
 	name:"tools",
@@ -70,15 +80,15 @@ export default {
 			}
 		},
 		openSearch(){
-			
-            const dialog = this.$dialog({
-                style: {maxWidth:'500px'},
-                props:{
-                    ['close-on-click-modal']:false,
-                    title:"搜尋"
-                }
-            })
-            dialog.open({
+
+			const dialog = this.$dialog({
+				style: {maxWidth:'500px'},
+				props:{
+					['close-on-click-modal']:false,
+					title:"搜尋",
+				}
+			})
+			dialog.open({
 				...searchAndFilterLayer,
 				store: this.$store,
 			},{
@@ -88,7 +98,27 @@ export default {
 					}
 				}
 			})
-		}
+		},
+		openFilter(){
+
+			const dialog = this.$dialog({
+				style: {maxWidth:'500px'},
+				props:{
+					['close-on-click-modal']:false,
+					title:"遊憩景點篩選",
+				}
+			})
+			dialog.open({
+				...compoundFilter,
+				store: this.$store,
+			},{
+				on:{
+					close: ()=>{
+						dialog.close()
+					}
+				}
+			})
+		},
 	}
 }
 </script>

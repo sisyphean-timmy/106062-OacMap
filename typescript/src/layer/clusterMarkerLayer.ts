@@ -211,11 +211,17 @@ export class IsoheStationLayer extends BaseCluster {
  */
 export class ScenicSpotLayer extends BaseCluster {
     data:any
+    marker: L.Marker[]
+    index: Object
+    currReg: string
+    currTwn: string
 
     constructor(opts){
         super(opts)
+	this.marker = [];
+	this.index = {};
     }
-    
+
     private _pointToLayer(feature, latlng){
 
         const mk = L.marker(latlng, {
@@ -230,7 +236,9 @@ export class ScenicSpotLayer extends BaseCluster {
             Picture1,
             Picture2,
             Picture3,
-            Py,Px
+            Py,Px,
+            Region,
+            Town,
         } = feature.properties
         const img = Picture1||Picture2||Picture3||''
 
@@ -271,7 +279,54 @@ export class ScenicSpotLayer extends BaseCluster {
                 event: e
             })
         })
+
+	this.marker.push(mk);
+	let reg = this.index[Region];
+	if (!reg) {
+		reg = {};
+		this.index[Region] = reg;
+	}
+	let twn = reg[Town];
+	if (!twn) {
+		twn = [];
+		reg[Town] = twn;
+	}
+	twn.push(mk);
+
         return mk
+    }
+
+    showOnly(region, town){
+	this.currReg = region;
+	this.currTwn = town;
+        if (!region) {
+            this.marker.forEach(mk => {
+                this.markerClusterGroup.addLayer(mk)
+            })
+            return;
+        }
+
+        let list = [];
+        let reg = this.index[region];
+        if (!reg) return;
+        if (!town) {
+            Object.keys(reg).forEach(regName => {
+		let twn = reg[regName];
+                twn.forEach(mk => {
+                    list.push(mk);
+                })
+            })
+        } else {
+           let twn = reg[town];
+           list = twn;
+        }
+        this.marker.forEach(mk => {
+	    if(list.indexOf(mk) == -1) {
+                this.markerClusterGroup.removeLayer(mk)
+            } else {
+                this.markerClusterGroup.addLayer(mk)
+            }
+        })
     }
 
     onAdd(map){
@@ -286,6 +341,9 @@ export class ScenicSpotLayer extends BaseCluster {
                 })
 
                 this.markerClusterGroup.addLayer(geojson).addTo(map)
+                if (this.currReg) {
+                    this.showOnly(this.currReg, this.currTwn);
+                }
 
                 this.fireEvent("loaded")
                 this.status = "loaded"
