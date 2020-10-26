@@ -248,7 +248,7 @@ export class ScenicSpotLayer extends BaseCluster {
                     );
                 }
                 eles.push(h("p", `${Toldescribe}`));
-                h("div", {class:"scenicspot-popup"}, eles);
+                return h("div", {class:"scenicspot-popup"}, eles);
             }
         }).$mount().$el as HTMLElement;
 
