@@ -1,32 +1,32 @@
-// list for app assets
-var assets = null;
+const ACACHE_NAME = `${registration.scope}!a-${BUILD_VERSION}`;
+const DCACHE_NAME = `${registration.scope}!d-${BUILD_VERSION}`;
 
 self.addEventListener('install', function(evt) {
-	console.log('[Service Worker] is being installed.', ACACHE);
+	console.log('[sw]installed', BUILD_VERSION);
 	//self.skipWaiting();
 
 	try {
 		importScripts("sw-manifest.js");
-		console.log('[Service Worker]pre-fetch', PRECACHE);
+		console.log('[sw]pre-fetch', PRECACHE);
 	} catch (e) {
 		// empty list
 		PRECACHE = [];
 	}
 
-	try {
-		evt.waitUntil(caches.open(ACACHE).then(function(cache) {
-			var urls = ['./'];
-			PRECACHE.forEach(function(val, idx, arr) {
-				urls.push(val.url);
-			});
-			console.log("[urls]", urls)
-			cache.put('./.assets', new Response(JSON.stringify(urls)));
-			assets = urls;
-			return cache.addAll(urls);
-		}));
-	} catch (e) {
-		console.log('[Service Worker]pre-fetch failed', e);
+	const handleCache = async () => {
+		const cache = await caches.open(ACACHE_NAME)
+		await cache.add('./')
+
+		for (const {url} of PRECACHE) {
+			try{
+				await cache.add(url)
+			}catch(e){
+				console.error('[sw]pre-fetch', `[${url}]`, e)
+				continue
+			}
+		}
 	}
+	evt.waitUntil(handleCache())
 });
 
 self.addEventListener('fetch', async function(evt) {
@@ -36,12 +36,7 @@ self.addEventListener('fetch', async function(evt) {
 });
 
 async function assetsFromCache(req) {
-	var cache = await caches.open(ACACHE);
-	if (!assets) {
-		var listJson = await cache.match('./.assets');
-		assets = listJson.json();
-	}
-
+	var cache = await caches.open(ACACHE_NAME);
 	if (req.url.match(/\/\?.*$/)) { // remove '/?xxxxx...'
 		req = './';
 	}
@@ -50,20 +45,23 @@ async function assetsFromCache(req) {
 }
 
 self.addEventListener('activate', function(ev) {
-	const aCache = ACACHE;
-	const dCache = DCACHE;
-	ev.waitUntil(
-		caches.keys().then(function(cacheNames) {
-			return Promise.all(
-				cacheNames.map(function(cacheName) {
-					if ((aCache != cacheName) && (dCache != cacheName)) {
-						console.log('Deleting out of date cache:', cacheName);
-						return caches.delete(cacheName);
-					}
-				})
-			);
-		})
-	);
+	const cleanup = async () => {
+		const scopePrefix = `${registration.scope}!`;
+		const aCache = ACACHE_NAME;
+//		const dCache = DCACHE_NAME;
+		const cacheNames = await caches.keys();
+		const cachesToDelete = cacheNames.filter( (cacheName) => {
+			let inScope = cacheName.startsWith(scopePrefix);
+//			return inScope && ((aCache !== cacheName) && (dCache !== cacheName));
+			return inScope && (aCache !== cacheName);
+		});
+		console.log('[sw]cachesToDelete:', cachesToDelete);
+		await Promise.all(cachesToDelete.map( (cacheName) => {
+			//console.log('[sw]Deleting out of date cache:', cacheName);
+			return caches.delete(cacheName);
+		}));
+	};
+	ev.waitUntil(cleanup());
 });
 
 self.addEventListener('message', async function(ev) {
