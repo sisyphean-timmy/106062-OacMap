@@ -80,6 +80,10 @@ export default {
 				this.SET_CURRENT_FILTER({region: label, town: null})
 				const layer = this.$LayerIns.normalLayerCollection.find(l => l.id === this.LayerToFilt)
 				layer.showOnly(value, null);
+
+				const bound = layer.markerClusterGroup.getBounds();
+				const {map} = this.$InitIns;
+				map.flyToBounds(bound);
 			}
 		},
 		selectedTownModel:{
@@ -91,7 +95,11 @@ export default {
 				this.SET_CURRENT_FILTER({region: this.currentRegion, town: label})
 				const layer = this.$LayerIns.normalLayerCollection.find(l => l.id === this.LayerToFilt)
 				layer.showOnly(this.currentRegion, value);
-				this.$emit("close")
+
+				const bound = layer.markerClusterGroup.getBounds();
+				const {map} = this.$InitIns;
+				map.flyToBounds(bound);
+				//this.$emit("close")
 			}
 		},
 		regions(){
