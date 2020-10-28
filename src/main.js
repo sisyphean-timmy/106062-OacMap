@@ -43,30 +43,42 @@ Vue.prototype.$drawer = ({ props = {}, on = {} }) => {
         }
     }
 }
-Vue.prototype.$dialog = ({ props = {}, on = {}, ...args }) => {
-    let vm = null
-    return {
-        open: (child, childOpts = {}) => {
-            vm = new Vue({
-                render: h => h(Dialog, {
-                    props: Object.assign(props, {
-                        destroyOnClose: true,
-                        visible: true,
-                        showClose: true,
-                        appendToBody: true,
-                        center: true
-                    }),
-                    on: {
-                        "close": () => vm.$destroy()
-                    },
-                    ...args
-                }, [h(child, childOpts)])
-            }).$mount()
-        },
-        close: () => {
-            vm.$destroy()
-        }
-    }
+Vue.prototype.$dialog = ({ props = {}, on = {}, style = null, ...args }) => {
+	let prop = Object.assign({
+		destroyOnClose: true,
+		visible: true,
+		showClose: true,
+		appendToBody: true,
+		center: true,
+	}, props);
+	let vm = null;
+	return {
+		open: (child, childOpts = {}) => {
+			vm = new Vue({
+				render: h => h(Dialog, {
+						ref: 'warp',
+						props: prop,
+						on: {
+							"close": () => {
+								vm.$destroy();
+							},
+						},
+						...args,
+				}, [h(child, childOpts)]),
+			}).$mount()
+//console.log('[Vue.$dialog]new()', vm, vm.$refs, vm.$refs.warp.$refs)
+
+			if(style) {
+				let domStyle = vm.$refs.warp.$refs.dialog.style;
+				Object.keys(style).forEach(k => {
+					domStyle[k] = style[k];
+				});
+			}
+		},
+		close: () => {
+			vm.$destroy()
+		}
+	}
 }
 
 // VUEX

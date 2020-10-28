@@ -84,7 +84,8 @@ export default {
 			const dialog = this.$dialog({
 				style: {maxWidth:'500px'},
 				props:{
-					['close-on-click-modal']:false,
+					['close-on-click-modal']:true,
+					['show-close']:false,
 					title:"搜尋",
 				}
 			})
@@ -104,7 +105,10 @@ export default {
 			const dialog = this.$dialog({
 				style: {maxWidth:'500px'},
 				props:{
-					['close-on-click-modal']:false,
+					//['close-on-click-modal']:false,
+					//['show-close']:false,
+					'closeOnClickModal': true,
+					'showClose':false,
 					title:"遊憩景點篩選",
 				}
 			})
@@ -114,6 +118,7 @@ export default {
 			},{
 				on:{
 					close: ()=>{
+						console.log('[tools.dialog]close()', dialog, this)
 						dialog.close()
 					}
 				}

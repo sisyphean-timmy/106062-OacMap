@@ -99,7 +99,6 @@ export default {
 				const bound = layer.markerClusterGroup.getBounds();
 				const {map} = this.$InitIns;
 				map.flyToBounds(bound);
-				//this.$emit("close")
 			}
 		},
 		regions(){
