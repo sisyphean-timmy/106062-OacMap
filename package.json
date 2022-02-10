@@ -58,7 +58,7 @@
         "favicons-webpack-plugin": "^1.0.2",
         "mocha": "^6.2.2",
         "msdeploy": "^1.2.1",
-        "node-sass": "^4.13.1",
+        "node-sass": "^7.0.0",
         "pug": "^2.0.4",
         "pug-html-loader": "^1.1.5",
         "pug-plain-loader": "^1.0.0",
